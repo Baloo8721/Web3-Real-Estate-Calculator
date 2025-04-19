@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https://images.unsplash.com; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
     <title data-lang="title">Ultimate Real Estate Calculator</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -41,99 +40,107 @@
             <div class="calc-body" id="calcBody" role="main" aria-live="polite">
                 <!-- Buyer Mode -->
                 <div class="calc-mode active" id="buyer-mode">
-                    <h3 data-lang="buyer_calc">Buyer Calculator</h3>
-                    <div class="input-group">
-                        <label for="buyer-price" data-lang="buyer_price">Home Price ($)</label>
-                        <input type="number" id="buyer-price" placeholder="Home Price ($)" data-lang="buyer_price" aria-label="Home Price" min="0" step="1000">
+                    <div class="calc-card">
+                        <h3 data-lang="buyer_calc">Buyer Calculator</h3>
+                        <div class="input-group">
+                            <input type="number" id="buyer-price" placeholder="Home Price ($)" data-lang="buyer_price" aria-label="Home Price" min="0" step="1000">
+                            <label for="buyer-price" data-lang="buyer_price">Home Price ($)</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="number" id="buyer-down" placeholder="Down Payment ($)" data-lang="buyer_down" aria-label="Down Payment" min="0" step="1000">
+                            <label for="buyer-down" data-lang="buyer_down">Down Payment ($)</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="number" id="buyer-term" placeholder="Loan Term (Years)" data-lang="buyer_term" aria-label="Loan Term" min="1" step="1">
+                            <label for="buyer-term" data-lang="buyer_term">Loan Term (Years)</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="number" id="buyer-rate" placeholder="Interest Rate (%)" data-lang="buyer_rate" step="0.1" aria-label="Interest Rate" min="0" max="100">
+                            <label for="buyer-rate" data-lang="buyer_rate">Interest Rate (%)</label>
+                        </div>
+                        <button type="button" class="calc-btn" id="buyer-calc" data-lang="calculate">Calculate</button>
+                        <p id="buyer-result" aria-live="polite"></p>
                     </div>
-                    <div class="input-group">
-                        <label for="buyer-down" data-lang="buyer_down">Down Payment ($)</label>
-                        <input type="number" id="buyer-down" placeholder="Down Payment ($)" data-lang="buyer_down" aria-label="Down Payment" min="0" step="1000">
-                    </div>
-                    <div class="input-group">
-                        <label for="buyer-term" data-lang="buyer_term">Loan Term (Years)</label>
-                        <input type="number" id="buyer-term" placeholder="Loan Term (Years)" data-lang="buyer_term" aria-label="Loan Term" min="1" step="1">
-                    </div>
-                    <div class="input-group">
-                        <label for="buyer-rate" data-lang="buyer_rate">Interest Rate (%)</label>
-                        <input type="number" id="buyer-rate" placeholder="Interest Rate (%)" data-lang="buyer_rate" step="0.1" aria-label="Interest Rate" min="0" max="100">
-                    </div>
-                    <button type="button" class="calc-btn" id="buyer-calc" data-lang="calculate">Calculate</button>
-                    <p id="buyer-result" aria-live="polite"></p>
                 </div>
                 <!-- Seller Mode -->
                 <div class="calc-mode" id="seller-mode">
-                    <h3 data-lang="seller_calc">Seller Calculator</h3>
-                    <div class="input-group">
-                        <label for="seller-price" data-lang="seller_price">Sale Price ($)</label>
-                        <input type="number" id="seller-price" placeholder="Sale Price ($)" data-lang="seller_price" aria-label="Sale Price" min="0" step="1000">
+                    <div class="calc-card">
+                        <h3 data-lang="seller_calc">Seller Calculator</h3>
+                        <div class="input-group">
+                            <input type="number" id="seller-price" placeholder="Sale Price ($)" data-lang="seller_price" aria-label="Sale Price" min="0" step="1000">
+                            <label for="seller-price" data-lang="seller_price">Sale Price ($)</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="number" id="seller-balance" placeholder="Mortgage Balance ($)" data-lang="seller_balance" aria-label="Mortgage Balance" min="0" step="1000">
+                            <label for="seller-balance" data-lang="seller_balance">Mortgage Balance ($)</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="number" id="seller-commission" placeholder="Commission (%)" data-lang="seller_commission" step="0.1" aria-label="Commission" min="0" max="100">
+                            <label for="seller-commission" data-lang="seller_commission">Commission (%)</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="number" id="seller-closing" placeholder="Closing Costs ($)" data-lang="seller_closing" aria-label="Closing Costs" min="0" step="1000">
+                            <label for="seller-closing" data-lang="seller_closing">Closing Costs ($)</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="number" id="seller-repairs" placeholder="Repairs ($)" data-lang="seller_repairs" aria-label="Repairs" min="0" step="1000">
+                            <label for="seller-repairs" data-lang="seller_repairs">Repairs ($)</label>
+                        </div>
+                        <button type="button" class="calc-btn" id="seller-calc" data-lang="calculate">Calculate</button>
+                        <p id="seller-result" aria-live="polite"></p>
                     </div>
-                    <div class="input-group">
-                        <label for="seller-balance" data-lang="seller_balance">Mortgage Balance ($)</label>
-                        <input type="number" id="seller-balance" placeholder="Mortgage Balance ($)" data-lang="seller_balance" aria-label="Mortgage Balance" min="0" step="1000">
-                    </div>
-                    <div class="input-group">
-                        <label for="seller-commission" data-lang="seller_commission">Commission (%)</label>
-                        <input type="number" id="seller-commission" placeholder="Commission (%)" data-lang="seller_commission" step="0.1" aria-label="Commission" min="0" max="100">
-                    </div>
-                    <div class="input-group">
-                        <label for="seller-closing" data-lang="seller_closing">Closing Costs ($)</label>
-                        <input type="number" id="seller-closing" placeholder="Closing Costs ($)" data-lang="seller_closing" aria-label="Closing Costs" min="0" step="1000">
-                    </div>
-                    <div class="input-group">
-                        <label for="seller-repairs" data-lang="seller_repairs">Repairs ($)</label>
-                        <input type="number" id="seller-repairs" placeholder="Repairs ($)" data-lang="seller_repairs" aria-label="Repairs" min="0" step="1000">
-                    </div>
-                    <button type="button" class="calc-btn" id="seller-calc" data-lang="calculate">Calculate</button>
-                    <p id="seller-result" aria-live="polite"></p>
                 </div>
                 <!-- Investor/Agent Mode -->
                 <div class="calc-mode" id="investor-mode">
-                    <h3 data-lang="investor_calc">Investor/Agent Calculator</h3>
-                    <div class="input-group">
-                        <label for="investor-price" data-lang="investor_price">Purchase Price ($)</label>
-                        <input type="number" id="investor-price" placeholder="Purchase Price ($)" data-lang="investor_price" aria-label="Purchase Price" min="0" step="1000">
+                    <div class="calc-card">
+                        <h3 data-lang="investor_calc">Investor/Agent Calculator</h3>
+                        <div class="input-group">
+                            <input type="number" id="investor-price" placeholder="Purchase Price ($)" data-lang="investor_price" aria-label="Purchase Price" min="0" step="1000">
+                            <label for="investor-price" data-lang="investor_price">Purchase Price ($)</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="number" id="investor-down" placeholder="Down Payment ($)" data-lang="investor_down" aria-label="Down Payment" min="0" step="1000">
+                            <label for="investor-down" data-lang="investor_down">Down Payment ($)</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="number" id="investor-term" placeholder="Loan Term (Years)" data-lang="investor_term" aria-label="Loan Term" min="1" step="1">
+                            <label for="investor-term" data-lang="investor_term">Loan Term (Years)</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="number" id="investor-rate" placeholder="Interest Rate (%)" data-lang="investor_rate" step="0.1" aria-label="Interest Rate" min="0" max="100">
+                            <label for="investor-rate" data-lang="investor_rate">Interest Rate (%)</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="number" id="investor-rental" placeholder="Monthly Rental Income ($)" data-lang="investor_rental" aria-label="Rental Income" min="0" step="100">
+                            <label for="investor-rental" data-lang="investor_rental">Monthly Rental Income ($)</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="number" id="investor-expenses" placeholder="Monthly Expenses ($)" data-lang="investor_expenses" aria-label="Expenses" min="0" step="100">
+                            <label for="investor-expenses" data-lang="investor_expenses">Monthly Expenses ($)</label>
+                        </div>
+                        <button type="button" class="calc-btn" id="investor-calc" data-lang="calculate">Calculate</button>
+                        <p id="investor-result" aria-live="polite"></p>
                     </div>
-                    <div class="input-group">
-                        <label for="investor-down" data-lang="investor_down">Down Payment ($)</label>
-                        <input type="number" id="investor-down" placeholder="Down Payment ($)" data-lang="investor_down" aria-label="Down Payment" min="0" step="1000">
-                    </div>
-                    <div class="input-group">
-                        <label for="investor-term" data-lang="investor_term">Loan Term (Years)</label>
-                        <input type="number" id="investor-term" placeholder="Loan Term (Years)" data-lang="investor_term" aria-label="Loan Term" min="1" step="1">
-                    </div>
-                    <div class="input-group">
-                        <label for="investor-rate" data-lang="investor_rate">Interest Rate (%)</label>
-                        <input type="number" id="investor-rate" placeholder="Interest Rate (%)" data-lang="investor_rate" step="0.1" aria-label="Interest Rate" min="0" max="100">
-                    </div>
-                    <div class="input-group">
-                        <label for="investor-rental" data-lang="investor_rental">Monthly Rental Income ($)</label>
-                        <input type="number" id="investor-rental" placeholder="Monthly Rental Income ($)" data-lang="investor_rental" aria-label="Rental Income" min="0" step="100">
-                    </div>
-                    <div class="input-group">
-                        <label for="investor-expenses" data-lang="investor_expenses">Monthly Expenses ($)</label>
-                        <input type="number" id="investor-expenses" placeholder="Monthly Expenses ($)" data-lang="investor_expenses" aria-label="Expenses" min="0" step="100">
-                    </div>
-                    <button type="button" class="calc-btn" id="investor-calc" data-lang="calculate">Calculate</button>
-                    <p id="investor-result" aria-live="polite"></p>
                 </div>
                 <!-- Crypto Mode -->
                 <div class="calc-mode" id="crypto-mode">
-                    <h3 data-lang="crypto_calc">Crypto Calculator</h3>
-                    <div class="input-group">
-                        <label for="crypto-amount" data-lang="crypto_amount">Amount ($)</label>
-                        <input type="number" id="crypto-amount" placeholder="Amount ($)" data-lang="crypto_amount" aria-label="Amount" min="0" step="100">
+                    <div class="calc-card">
+                        <h3 data-lang="crypto_calc">Crypto Calculator</h3>
+                        <div class="input-group">
+                            <input type="number" id="crypto-amount" placeholder="Amount ($)" data-lang="crypto_amount" aria-label="Amount" min="0" step="100">
+                            <label for="crypto-amount" data-lang="crypto_amount">Amount ($)</label>
+                        </div>
+                        <div class="input-group">
+                            <select id="crypto-type" aria-label="Crypto Type">
+                                <option value="BTC" data-lang="crypto_btc">Bitcoin (BTC)</option>
+                                <option value="ETH" data-lang="crypto_eth">Ethereum (ETH)</option>
+                                <option value="USDC" data-lang="crypto_usdc">USDC</option>
+                            </select>
+                            <label for="crypto-type" data-lang="crypto_type">Crypto Type</label>
+                        </div>
+                        <button type="button" class="calc-btn" id="crypto-calc" data-lang="calculate">Calculate</button>
+                        <p id="crypto-result" aria-live="polite"></p>
                     </div>
-                    <div class="input-group">
-                        <label for="crypto-type" data-lang="crypto_type">Crypto Type</label>
-                        <select id="crypto-type" aria-label="Crypto Type">
-                            <option value="BTC" data-lang="crypto_btc">Bitcoin (BTC)</option>
-                            <option value="ETH" data-lang="crypto_eth">Ethereum (ETH)</option>
-                            <option value="USDC" data-lang="crypto_usdc">USDC</option>
-                        </select>
-                    </div>
-                    <button type="button" class="calc-btn" id="crypto-calc" data-lang="calculate">Calculate</button>
-                    <p id="crypto-result" aria-live="polite"></p>
                 </div>
             </div>
             <div class="calc-footer">
