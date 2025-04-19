@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+    <title data-lang="title">Ultimate Real Estate Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Google Analytics (replace G-XXXXXXXXXX with your ID) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
+</head>
+<body>
+    <div class="language-selector">
+        <span onclick="changeLanguage('en')">English</span> |
+        <span onclick="changeLanguage('es')">Español</span> |
+        <span onclick="changeLanguage('zh')">中文</span> |
+        <span onclick="changeLanguage('ar')">العربية</span> |
+        <span class="more-languages">
+            More ▼
+            <div class="language-dropdown">
+                <span onclick="changeLanguage('ru')">Русский</span>
+                <span onclick="changeLanguage('pt')">Português</span>
+                <span onclick="changeLanguage('fr')">Français</span>
+                <span onclick="changeLanguage('it')">Italiano</span>
+                <span onclick="changeLanguage('de')">Deutsch</span>
+                <span onclick="changeLanguage('ja')">日本語</span>
+                <span onclick="changeLanguage('sv')">Svenska</span>
+                <span onclick="changeLanguage('ko')">한국어</span>
+            </div>
+        </span>
+    </div>
+    <div class="container">
+        <h1 data-lang="title">Ultimate Real Estate Calculator</h1>
+        <p class="subtitle" data-lang="subtitle">Calculate Your Mortgage, Sale, Investment, or Crypto Conversion</p>
+        <div class="calc-box">
+            <div class="calc-tabs">
+                <input type="radio" name="tab" id="tab-buyer" checked>
+                <label for="tab-buyer" class="tab-label" data-lang="buyer">Buyer</label>
+                <input type="radio" name="tab" id="tab-seller">
+                <label for="tab-seller" class="tab-label" data-lang="seller">Seller</label>
+                <input type="radio" name="tab" id="tab-investor">
+                <label for="tab-investor" class="tab-label" data-lang="investor">Investor/Agent</label>
+                <input type="radio" name="tab" id="tab-crypto">
+                <label for="tab-crypto" class="tab-label" data-lang="crypto">Crypto</label>
+            </div>
+            <div class="calc-body" id="calcBody" role="main" aria-live="polite">
+                <!-- Buyer Mode -->
+                <div class="calc-mode" id="buyer-mode">
+                    <h3 data-lang="buyer_calc">Buyer Calculator</h3>
+                    <input type="number" id="buyer-price" placeholder="Home Price ($)" data-lang="buyer_price" aria-label="Home Price">
+                    <input type="number" id="buyer-down" placeholder="Down Payment ($)" data-lang="buyer_down" aria-label="Down Payment">
+                    <input type="number" id="buyer-term" placeholder="Loan Term (Years)" data-lang="buyer_term" aria-label="Loan Term">
+                    <input type="number" id="buyer-rate" placeholder="Interest Rate (%)" data-lang="buyer_rate" step="0.1" aria-label="Interest Rate">
+                    <button class="calc-btn" id="buyer-calc" data-lang="calculate">Calculate</button>
+                    <p id="buyer-result" aria-live="polite"></p>
+                </div>
+                <!-- Seller Mode -->
+                <div class="calc-mode" id="seller-mode" style="display: none;">
+                    <h3 data-lang="seller_calc">Seller Calculator</h3>
+                    <input type="number" id="seller-price" placeholder="Sale Price ($)" data-lang="seller_price" aria-label="Sale Price">
+                    <input type="number" id="seller-balance" placeholder="Mortgage Balance ($)" data-lang="seller_balance" aria-label="Mortgage Balance">
+                    <input type="number" id="seller-commission" placeholder="Commission (%)" data-lang="seller_commission" step="0.1" aria-label="Commission">
+                    <input type="number" id="seller-closing" placeholder="Closing Costs ($)" data-lang="seller_closing" aria-label="Closing Costs">
+                    <input type="number" id="seller-repairs" placeholder="Repairs ($)" data-lang="seller_repairs" aria-label="Repairs">
+                    <button class="calc-btn" id="seller-calc" data-lang="calculate">Calculate</button>
+                    <p id="seller-result" aria-live="polite"></p>
+                </div>
+                <!-- Investor/Agent Mode -->
+                <div class="calc-mode" id="investor-mode" style="display: none;">
+                    <h3 data-lang="investor_calc">Investor/Agent Calculator</h3>
+                    <input type="number" id="investor-price" placeholder="Purchase Price ($)" data-lang="investor_price" aria-label="Purchase Price">
+                    <input type="number" id="investor-down" placeholder="Down Payment ($)" data-lang="investor_down" aria-label="Down Payment">
+                    <input type="number" id="investor-term" placeholder="Loan Term (Years)" data-lang="investor_term" aria-label="Loan Term">
+                    <input type="number" id="investor-rate" placeholder="Interest Rate (%)" data-lang="investor_rate" step="0.1" aria-label="Interest Rate">
+                    <input type="number" id="investor-rental" placeholder="Monthly Rental Income ($)" data-lang="investor_rental" aria-label="Rental Income">
+                    <input type="number" id="investor-expenses" placeholder="Monthly Expenses ($)" data-lang="investor_expenses" aria-label="Expenses">
+                    <button class="calc-btn" id="investor-calc" data-lang="calculate">Calculate</button>
+                    <p id="investor-result" aria-live="polite"></p>
+                </div>
+                <!-- Crypto Mode -->
+                <div class="calc-mode" id="crypto-mode" style="display: none;">
+                    <h3 data-lang="crypto_calc">Crypto Calculator</h3>
+                    <input type="number" id="crypto-amount" placeholder="Amount ($)" data-lang="crypto_amount" aria-label="Amount">
+                    <select id="crypto-type" aria-label="Crypto Type">
+                        <option value="BTC" data-lang="crypto_btc">Bitcoin (BTC)</option>
+                        <option value="ETH" data-lang="crypto_eth">Ethereum (ETH)</option>
+                        <option value="USDC" data-lang="crypto_usdc">USDC</option>
+                    </select>
+                    <button class="calc-btn" id="crypto-calc" data-lang="calculate">Calculate</button>
+                    <p id="crypto-result" aria-live="polite"></p>
+                </div>
+            </div>
+            <div class="calc-footer">
+                <button class="save-btn" id="saveBtn" data-lang="save_results">Save Results</button>
+                <button class="share-btn" id="shareBtn" data-lang="share_results">Share Results</button>
+                <a href="https://baloo8721.github.io/WebRealtorFL-v2/" class="referral-link" data-lang="referral_link">Find an Agent</a>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <a href="https://tylerbelisle.kw.com/" target="_blank" class="powered-by" data-lang="footer">Powered by Web3RealtorFL - Bridging Real Estate & Blockchain</a>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
