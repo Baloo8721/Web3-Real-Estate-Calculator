@@ -1,11 +1,9 @@
-// Static crypto prices
 const cryptoPrices = {
     BTC: 65000,
     ETH: 2500,
     USDC: 1
 };
 
-// Multilingual translations
 const translations = {
     en: {
         title: "Ultimate Real Estate Calculator",
@@ -153,13 +151,11 @@ const translations = {
         footer: "مدعوم من Web3RealtorFL - ربط العقارات والبلوكشين",
         invalid_input: "الرجاء إدخال بيانات صحيحة."
     }
-    // Add other languages (ru, pt, fr, it, de, ja, sv, ko) as needed
 };
 
-// Initialize
 document.addEventListener('DOMContentLoaded', () => {
     try {
-        // Language selector
+        console.log('Initializing calculator...');
         const savedLang = localStorage.getItem('selectedLanguage') || 'en';
         changeLanguage(savedLang);
 
@@ -169,27 +165,57 @@ document.addEventListener('DOMContentLoaded', () => {
         moreLanguages.addEventListener('click', (e) => {
             e.preventDefault();
             languageDropdown.classList.toggle('active');
+            console.log('Toggled language dropdown');
         });
 
         document.addEventListener('click', (e) => {
             if (!moreLanguages.contains(e.target) && languageDropdown.classList.contains('active')) {
                 languageDropdown.classList.remove('active');
+                console.log('Closed language dropdown');
             }
         });
 
-        // Calculator buttons
+        const tabs = document.querySelectorAll('.tab-label');
+        const modes = document.querySelectorAll('.calc-mode');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                console.log(`Switching to tab: ${tab.getAttribute('data-mode')}`);
+                tabs.forEach(t => t.classList.remove('active'));
+                modes.forEach(m => m.classList.remove('active'));
+
+                tab.classList.add('active');
+                const modeId = tab.getAttribute('data-mode') + '-mode';
+                const modeElement = document.getElementById(modeId);
+                if (modeElement) {
+                    modeElement.classList.add('active');
+                    console.log(`Activated mode: ${modeId}`);
+                } else {
+                    console.error(`Mode element not found: ${modeId}`);
+                }
+            });
+
+            tab.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    tab.click();
+                }
+            });
+        });
+
         document.getElementById('buyer-calc').addEventListener('click', calculateBuyer);
         document.getElementById('seller-calc').addEventListener('click', calculateSeller);
         document.getElementById('investor-calc').addEventListener('click', calculateInvestor);
         document.getElementById('crypto-calc').addEventListener('click', calculateCrypto);
         document.getElementById('saveBtn').addEventListener('click', saveResults);
         document.getElementById('shareBtn').addEventListener('click', shareResults);
+
+        console.log('Calculator initialized successfully');
     } catch (error) {
         console.error('Initialization error:', error);
     }
 });
 
-// Language change
 function changeLanguage(lang) {
     try {
         localStorage.setItem('selectedLanguage', lang);
@@ -211,12 +237,12 @@ function changeLanguage(lang) {
                 element.textContent = translation;
             }
         });
+        console.log(`Language changed to: ${lang}`);
     } catch (error) {
         console.error('Language change error:', error);
     }
 }
 
-// Buyer Calculator
 function calculateBuyer() {
     try {
         const price = parseFloat(document.getElementById('buyer-price').value) || 0;
@@ -225,7 +251,7 @@ function calculateBuyer() {
         const rate = parseFloat(document.getElementById('buyer-rate').value) || 0;
 
         if (price <= 0 || down < 0 || term <= 0 || rate <= 0) {
-            document.getElementById('buyer-result').textContent = translations[localStorage.getItem('selectedLanguage') || 'en'].invalid_input;
+            document.getElementById('buyer-result').innerHTML = `<span class="error">${translations[localStorage.getItem('selectedLanguage') || 'en'].invalid_input}</span>`;
             return;
         }
 
@@ -235,16 +261,17 @@ function calculateBuyer() {
         const monthlyPayment = (loan * monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
         const totalInterest = (monthlyPayment * months) - loan;
 
-        document.getElementById('buyer-result').textContent = 
-            `Monthly Payment: $${monthlyPayment.toFixed(2)}\nTotal Interest: $${totalInterest.toFixed(2)}`;
+        document.getElementById('buyer-result').innerHTML = `
+            <strong>Monthly Payment:</strong> $${monthlyPayment.toFixed(2)}<br>
+            <strong>Total Interest:</strong> $${totalInterest.toFixed(2)}
+        `;
         saveInputs('buyer', { price, down, term, rate, monthlyPayment, totalInterest });
     } catch (error) {
         console.error('Buyer calculation error:', error);
-        document.getElementById('buyer-result').textContent = 'Calculation error. Please try again.';
+        document.getElementById('buyer-result').innerHTML = '<span class="error">Calculation error. Please try again.</span>';
     }
 }
 
-// Seller Calculator
 function calculateSeller() {
     try {
         const price = parseFloat(document.getElementById('seller-price').value) || 0;
@@ -254,7 +281,7 @@ function calculateSeller() {
         const repairs = parseFloat(document.getElementById('seller-repairs').value) || 0;
 
         if (price <= 0 || balance < 0 || commission < 0 || closing < 0 || repairs < 0) {
-            document.getElementById('seller-result').textContent = translations[localStorage.getItem('selectedLanguage') || 'en'].invalid_input;
+            document.getElementById('seller-result').innerHTML = `<span class="error">${translations[localStorage.getItem('selectedLanguage') || 'en'].invalid_input}</span>`;
             return;
         }
 
@@ -262,16 +289,17 @@ function calculateSeller() {
         const totalCosts = commissionCost + closing + repairs;
         const netProceeds = price - balance - totalCosts;
 
-        document.getElementById('seller-result').textContent = 
-            `Net Proceeds: $${netProceeds.toFixed(2)}\nTotal Costs: $${totalCosts.toFixed(2)}`;
+        document.getElementById('seller-result').innerHTML = `
+            <strong>Net Proceeds:</strong> $${netProceeds.toFixed(2)}<br>
+            <strong>Total Costs:</strong> $${totalCosts.toFixed(2)}
+        `;
         saveInputs('seller', { price, balance, commission, closing, repairs, netProceeds, totalCosts });
     } catch (error) {
         console.error('Seller calculation error:', error);
-        document.getElementById('seller-result').textContent = 'Calculation error. Please try again.';
+        document.getElementById('seller-result').innerHTML = '<span class="error">Calculation error. Please try again.</span>';
     }
 }
 
-// Investor/Agent Calculator
 function calculateInvestor() {
     try {
         const price = parseFloat(document.getElementById('investor-price').value) || 0;
@@ -282,7 +310,7 @@ function calculateInvestor() {
         const expenses = parseFloat(document.getElementById('investor-expenses').value) || 0;
 
         if (price <= 0 || down < 0 || term <= 0 || rate <= 0 || rental < 0 || expenses < 0) {
-            document.getElementById('investor-result').textContent = translations[localStorage.getItem('selectedLanguage') || 'en'].invalid_input;
+            document.getElementById('investor-result').innerHTML = `<span class="error">${translations[localStorage.getItem('selectedLanguage') || 'en'].invalid_input}</span>`;
             return;
         }
 
@@ -295,43 +323,45 @@ function calculateInvestor() {
         const capRate = (noi / price) * 100;
         const cashOnCash = (cashFlow * 12 / down) * 100;
 
-        document.getElementById('investor-result').textContent = 
-            `Monthly Cash Flow: $${cashFlow.toFixed(2)}\nCap Rate: ${capRate.toFixed(2)}%\nCash-on-Cash Return: ${cashOnCash.toFixed(2)}%`;
+        document.getElementById('investor-result').innerHTML = `
+            <strong>Monthly Cash Flow:</strong> $${cashFlow.toFixed(2)}<br>
+            <strong>Cap Rate:</strong> ${capRate.toFixed(2)}%<br>
+            <strong>Cash-on-Cash Return:</strong> ${cashOnCash.toFixed(2)}%
+        `;
         saveInputs('investor', { price, down, term, rate, rental, expenses, cashFlow, capRate, cashOnCash });
     } catch (error) {
         console.error('Investor calculation error:', error);
-        document.getElementById('investor-result').textContent = 'Calculation error. Please try again.';
+        document.getElementById('investor-result').innerHTML = '<span class="error">Calculation error. Please try again.</span>';
     }
 }
 
-// Crypto Calculator
 function calculateCrypto() {
     try {
         const amount = parseFloat(document.getElementById('crypto-amount').value) || 0;
         const crypto = document.getElementById('crypto-type').value;
 
         if (amount <= 0) {
-            document.getElementById('crypto-result').textContent = translations[localStorage.getItem('selectedLanguage') || 'en'].invalid_input;
+            document.getElementById('crypto-result').innerHTML = `<span class="error">${translations[localStorage.getItem('selectedLanguage') || 'en'].invalid_input}</span>`;
             return;
         }
 
         const cryptoAmount = amount / cryptoPrices[crypto];
-        document.getElementById('crypto-result').textContent = 
-            `${crypto}: ${cryptoAmount.toFixed(6)} ($${amount.toFixed(2)})`;
+        document.getElementById('crypto-result').innerHTML = `
+            <strong>${crypto}:</strong> ${cryptoAmount.toFixed(6)}<br>
+            <strong>USD Value:</strong> $${amount.toFixed(2)}
+        `;
         saveInputs('crypto', { amount, crypto, cryptoAmount });
     } catch (error) {
         console.error('Crypto calculation error:', error);
-        document.getElementById('crypto-result').textContent = 'Calculation error. Please try again.';
+        document.getElementById('crypto-result').innerHTML = '<span class="error">Calculation error. Please try again.</span>';
     }
 }
 
-// Save inputs
 let lastInputs = {};
 function saveInputs(mode, inputs) {
     lastInputs = { mode, ...inputs };
 }
 
-// Save results as Markdown
 function saveResults() {
     try {
         if (!lastInputs.mode) return;
@@ -354,7 +384,6 @@ function saveResults() {
     }
 }
 
-// Share results via URL
 function shareResults() {
     try {
         if (!lastInputs.mode) return;
@@ -372,7 +401,6 @@ function shareResults() {
     }
 }
 
-// Error logging for debugging
 console.log('Calculator script loaded.');
 if (!document.querySelector('.calc-box')) {
     console.error('Calc-box not found in DOM. Check index.html structure.');
