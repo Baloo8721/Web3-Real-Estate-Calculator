@@ -50,6 +50,45 @@ const translations = {
         years_20: "20 Years",
         years_15: "15 Years",
         years_10: "10 Years",
+        monthly_costs: "Monthly Costs",
+        principal_interest: "Principal & Interest",
+        property_taxes: "Property Taxes",
+        homeowners_insurance: "Homeowners Insurance",
+        hoa_fees: "HOA Fees",
+        mortgage_insurance_premium: "Mortgage Insurance Premium",
+        private_mortgage_insurance: "Private Mortgage Insurance",
+        total_monthly_payment: "Total Monthly Payment",
+        with_extra_payment: "With Extra Payment",
+        loan_details: "Loan Details",
+        loan_amount: "Loan Amount",
+        loan_to_value_ratio: "Loan-to-Value Ratio",
+        total_interest: "Total Interest",
+        loan_term_extra_payments: "Loan Term with Extra Payments",
+        years_saved_extra_payments: "Years Saved with Extra Payments",
+        upfront_costs: "Upfront Costs",
+        down_payment: "Down Payment",
+        closing_costs: "Closing Costs",
+        total_upfront_costs: "Total Upfront Costs",
+        months: "months",
+        years: "years",
+        calculation_error: "Calculation error. Please try again.",
+        sale_summary: "Sale Summary",
+        sale_price: "Sale Price",
+        mortgage_balance: "Mortgage Balance",
+        total_costs: "Total Costs",
+        net_proceeds: "Net Proceeds",
+        cost_breakdown: "Cost Breakdown",
+        commission_amount: "Commission",
+        repair_costs: "Repair Costs",
+        investment_summary: "Investment Summary",
+        monthly_cash_flow: "Monthly Cash Flow",
+        annual_cash_flow: "Annual Cash Flow",
+        cap_rate: "Cap Rate",
+        cash_on_cash_return: "Cash on Cash Return",
+        investment_details: "Investment Details",
+        purchase_price: "Purchase Price",
+        monthly_rental_income: "Monthly Rental Income",
+        monthly_expenses: "Monthly Expenses",
         seller_price: "Sale Price ($)",
         seller_balance: "Mortgage Balance ($)",
         seller_commission: "Commission (%)",
@@ -115,6 +154,28 @@ const translations = {
         years_20: "20 Años",
         years_15: "15 Años",
         years_10: "10 Años",
+        months: "meses",
+        years: "años",
+        monthly_costs: "Costos Mensuales",
+        principal_interest: "Capital e Interés",
+        property_taxes: "Impuestos de Propiedad",
+        homeowners_insurance: "Seguro de Vivienda",
+        hoa_fees: "Cuotas de HOA",
+        mortgage_insurance_premium: "Prima de Seguro Hipotecario",
+        private_mortgage_insurance: "Seguro Hipotecario Privado",
+        total_monthly_payment: "Pago Mensual Total",
+        with_extra_payment: "Con Pago Adicional",
+        loan_details: "Detalles del Préstamo",
+        loan_amount: "Monto del Préstamo",
+        loan_to_value_ratio: "Relación Préstamo-Valor",
+        total_interest: "Interés Total",
+        loan_term_extra_payments: "Plazo del Préstamo con Pagos Adicionales",
+        years_saved_extra_payments: "Años Ahorrados con Pagos Adicionales",
+        upfront_costs: "Costos Iniciales",
+        down_payment: "Pago Inicial",
+        closing_costs: "Costos de Cierre",
+        total_upfront_costs: "Costos Iniciales Totales",
+        calculation_error: "Error de cálculo. Por favor, inténtalo de nuevo.",
         seller_price: "Precio de Venta ($)",
         seller_balance: "Saldo de la Hipoteca ($)",
         seller_commission: "Comisión (%)",
@@ -182,6 +243,28 @@ const translations = {
         years_20: "20年",
         years_15: "15年",
         years_10: "10年",
+        months: "个月",
+        years: "年",
+        monthly_costs: "月度费用",
+        principal_interest: "本金与利息",
+        property_taxes: "房产税",
+        homeowners_insurance: "房屋保险",
+        hoa_fees: "物业费",
+        mortgage_insurance_premium: "按揭保险费",
+        private_mortgage_insurance: "私人按揭保险",
+        total_monthly_payment: "月供总额",
+        with_extra_payment: "含额外付款",
+        loan_details: "贷款详情",
+        loan_amount: "贷款金额",
+        loan_to_value_ratio: "贷款价值比",
+        total_interest: "总利息",
+        loan_term_extra_payments: "含额外付款的贷款期限",
+        years_saved_extra_payments: "额外付款节省的年数",
+        upfront_costs: "预付费用",
+        down_payment: "首付款",
+        closing_costs: "过户费",
+        total_upfront_costs: "预付费用总额",
+        calculation_error: "计算错误。请重试。",
         seller_price: "销售价格 ($)",
         seller_balance: "抵押贷款余额 ($)",
         seller_commission: "佣金 (%)",
@@ -247,6 +330,28 @@ const translations = {
         years_20: "20 سنة",
         years_15: "15 سنة",
         years_10: "10 سنوات",
+        months: "شهور",
+        years: "سنوات",
+        monthly_costs: "التكاليف الشهرية",
+        principal_interest: "المبلغ الأساسي والفائدة",
+        property_taxes: "ضرائب العقار",
+        homeowners_insurance: "تأمين المنزل",
+        hoa_fees: "رسوم اتحاد الملاك",
+        mortgage_insurance_premium: "قسط تأمين الرهن العقاري",
+        private_mortgage_insurance: "تأمين الرهن العقاري الخاص",
+        total_monthly_payment: "إجمالي الدفع الشهري",
+        with_extra_payment: "مع دفعة إضافية",
+        loan_details: "تفاصيل القرض",
+        loan_amount: "مبلغ القرض",
+        loan_to_value_ratio: "نسبة القرض إلى القيمة",
+        total_interest: "إجمالي الفائدة",
+        loan_term_extra_payments: "مدة القرض مع الدفعات الإضافية",
+        years_saved_extra_payments: "السنوات الموفرة مع الدفعات الإضافية",
+        upfront_costs: "التكاليف المقدمة",
+        down_payment: "الدفعة المقدمة",
+        closing_costs: "تكاليف الإغلاق",
+        total_upfront_costs: "إجمالي التكاليف المقدمة",
+        calculation_error: "خطأ في الحساب. الرجاء المحاولة مرة أخرى.",
         seller_price: "سعر البيع ($)",
         seller_balance: "رصيد الرهن العقاري ($)",
         seller_commission: "العمولة (%)",
@@ -315,8 +420,30 @@ const translations = {
         years_30: "30 Лет",
         years_20: "20 Лет",
         years_15: "15 Лет",
-        years_10: "10 Лет",
-        seller_price: "Цена Продажи ($)",
+        years_10: "10 лет",
+        months: "месяцев",
+        years: "лет",
+        monthly_costs: "Ежемесячные расходы",
+        principal_interest: "Основная сумма и проценты",
+        property_taxes: "Налог на недвижимость",
+        homeowners_insurance: "Страхование дома",
+        hoa_fees: "Сборы ТСЖ",
+        mortgage_insurance_premium: "Премия страхования ипотеки",
+        private_mortgage_insurance: "Частное ипотечное страхование",
+        total_monthly_payment: "Общий ежемесячный платеж",
+        with_extra_payment: "С дополнительным платежом",
+        loan_details: "Детали кредита",
+        loan_amount: "Сумма кредита",
+        loan_to_value_ratio: "Отношение кредита к стоимости",
+        total_interest: "Общие проценты",
+        loan_term_extra_payments: "Срок кредита с дополнительными платежами",
+        years_saved_extra_payments: "Сэкономленные годы с дополнительными платежами",
+        upfront_costs: "Первоначальные затраты",
+        down_payment: "Первоначальный взнос",
+        closing_costs: "Расходы на закрытие сделки",
+        total_upfront_costs: "Общие первоначальные затраты",
+        calculation_error: "Ошибка вычислений. Пожалуйста, попробуйте снова.",
+        seller_price: "Цена продажи ($)",
         seller_balance: "Остаток Ипотеки ($)",
         seller_commission: "Комиссия (%)",
         seller_closing: "Расходы на Закрытие ($)",
@@ -383,6 +510,28 @@ const translations = {
         years_20: "20 Anos",
         years_15: "15 Anos",
         years_10: "10 Anos",
+        months: "meses",
+        years: "anos",
+        monthly_costs: "Custos Mensais",
+        principal_interest: "Principal e Juros",
+        property_taxes: "Impostos sobre a Propriedade",
+        homeowners_insurance: "Seguro Residencial",
+        hoa_fees: "Taxas de Condomínio",
+        mortgage_insurance_premium: "Prêmio de Seguro Hipotecário",
+        private_mortgage_insurance: "Seguro Hipotecário Privado",
+        total_monthly_payment: "Pagamento Mensal Total",
+        with_extra_payment: "Com Pagamento Extra",
+        loan_details: "Detalhes do Empréstimo",
+        loan_amount: "Valor do Empréstimo",
+        loan_to_value_ratio: "Relação Empréstimo-Valor",
+        total_interest: "Juros Totais",
+        loan_term_extra_payments: "Prazo do Empréstimo com Pagamentos Extras",
+        years_saved_extra_payments: "Anos Economizados com Pagamentos Extras",
+        upfront_costs: "Custos Iniciais",
+        down_payment: "Entrada",
+        closing_costs: "Custos de Fechamento",
+        total_upfront_costs: "Custos Iniciais Totais",
+        calculation_error: "Erro de cálculo. Por favor, tente novamente.",
         seller_price: "Preço de Venda ($)",
         seller_balance: "Saldo da Hipoteca ($)",
         seller_commission: "Comissão (%)",
@@ -450,6 +599,28 @@ const translations = {
         years_20: "20 Ans",
         years_15: "15 Ans",
         years_10: "10 Ans",
+        months: "mois",
+        years: "ans",
+        monthly_costs: "Coûts Mensuels",
+        principal_interest: "Capital et Intérêts",
+        property_taxes: "Impôts Fonciers",
+        homeowners_insurance: "Assurance Habitation",
+        hoa_fees: "Frais de Copropriété",
+        mortgage_insurance_premium: "Prime d'Assurance Hypothécaire",
+        private_mortgage_insurance: "Assurance Hypothécaire Privée",
+        total_monthly_payment: "Paiement Mensuel Total",
+        with_extra_payment: "Avec Paiement Supplémentaire",
+        loan_details: "Détails du Prêt",
+        loan_amount: "Montant du Prêt",
+        loan_to_value_ratio: "Ratio Prêt-Valeur",
+        total_interest: "Intérêts Totaux",
+        loan_term_extra_payments: "Durée du Prêt avec Paiements Supplémentaires",
+        years_saved_extra_payments: "Années Économisées avec Paiements Supplémentaires",
+        upfront_costs: "Coûts Initiaux",
+        down_payment: "Acompte",
+        closing_costs: "Frais de Clôture",
+        total_upfront_costs: "Coûts Initiaux Totaux",
+        calculation_error: "Erreur de calcul. Veuillez réessayer.",
         seller_price: "Prix de Vente ($)",
         seller_balance: "Solde Hypothécaire ($)",
         seller_commission: "Commission (%)",
@@ -517,6 +688,28 @@ const translations = {
         years_20: "20 Anni",
         years_15: "15 Anni",
         years_10: "10 Anni",
+        months: "mesi",
+        years: "anni",
+        monthly_costs: "Costi Mensili",
+        principal_interest: "Capitale e Interessi",
+        property_taxes: "Tasse sulla Proprietà",
+        homeowners_insurance: "Assicurazione Casa",
+        hoa_fees: "Spese Condominiali",
+        mortgage_insurance_premium: "Premio Assicurazione Ipotecaria",
+        private_mortgage_insurance: "Assicurazione Ipotecaria Privata",
+        total_monthly_payment: "Pagamento Mensile Totale",
+        with_extra_payment: "Con Pagamento Extra",
+        loan_details: "Dettagli del Prestito",
+        loan_amount: "Importo del Prestito",
+        loan_to_value_ratio: "Rapporto Prestito-Valore",
+        total_interest: "Interessi Totali",
+        loan_term_extra_payments: "Durata del Prestito con Pagamenti Extra",
+        years_saved_extra_payments: "Anni Risparmiati con Pagamenti Extra",
+        upfront_costs: "Costi Iniziali",
+        down_payment: "Acconto",
+        closing_costs: "Costi di Chiusura",
+        total_upfront_costs: "Costi Iniziali Totali",
+        calculation_error: "Errore di calcolo. Riprova.",
         seller_price: "Prezzo di Vendita ($)",
         seller_balance: "Saldo Mutuo ($)",
         seller_commission: "Commissione (%)",
@@ -584,6 +777,28 @@ const translations = {
         years_20: "20 Jahre",
         years_15: "15 Jahre",
         years_10: "10 Jahre",
+        months: "Monate",
+        years: "Jahre",
+        monthly_costs: "Monatliche Kosten",
+        principal_interest: "Kapital & Zinsen",
+        property_taxes: "Grundsteuer",
+        homeowners_insurance: "Hausbesitzerversicherung",
+        hoa_fees: "Gebühren der Eigentümergemeinschaft",
+        mortgage_insurance_premium: "Hypothekenversicherungsprämie",
+        private_mortgage_insurance: "Private Hypothekenversicherung",
+        total_monthly_payment: "Monatliche Gesamtzahlung",
+        with_extra_payment: "Mit Sondertilgung",
+        loan_details: "Kreditdetails",
+        loan_amount: "Kreditbetrag",
+        loan_to_value_ratio: "Beleihungsverhältnis",
+        total_interest: "Gesamtzinsen",
+        loan_term_extra_payments: "Kreditlaufzeit mit Sondertilgungen",
+        years_saved_extra_payments: "Eingesparte Jahre durch Sondertilgungen",
+        upfront_costs: "Anfängliche Kosten",
+        down_payment: "Anzahlung",
+        closing_costs: "Abschlusskosten",
+        total_upfront_costs: "Gesamte Vorabkosten",
+        calculation_error: "Berechnungsfehler. Bitte versuchen Sie es erneut.",
         seller_price: "Verkaufspreis ($)",
         seller_balance: "Hypothekensaldo ($)",
         seller_commission: "Provision (%)",
@@ -651,6 +866,28 @@ const translations = {
         years_20: "20年",
         years_15: "15年",
         years_10: "10年",
+        months: "ヶ月",
+        years: "年",
+        monthly_costs: "月額費用",
+        principal_interest: "元本と利息",
+        property_taxes: "固定資産税",
+        homeowners_insurance: "住宅所有者保険",
+        hoa_fees: "管理組合費",
+        mortgage_insurance_premium: "住宅ローン保険料",
+        private_mortgage_insurance: "個人住宅ローン保険",
+        total_monthly_payment: "月額支払い総額",
+        with_extra_payment: "繳済額追加",
+        loan_details: "ローン詳細",
+        loan_amount: "借入額",
+        loan_to_value_ratio: "ローン対価値比率",
+        total_interest: "総利息",
+        loan_term_extra_payments: "追加支払いを含むローン期間",
+        years_saved_extra_payments: "追加支払いによる節約年数",
+        upfront_costs: "初期費用",
+        down_payment: "頭金",
+        closing_costs: "貱い付け費用",
+        total_upfront_costs: "初期費用合計",
+        calculation_error: "計算エラー。もう一度お試しください。",
         seller_price: "売却価格 ($)",
         seller_balance: "住宅ローン残高 ($)",
         seller_commission: "手数料 (%)",
@@ -718,6 +955,28 @@ const translations = {
         years_20: "20 År",
         years_15: "15 År",
         years_10: "10 År",
+        months: "månader",
+        years: "år",
+        monthly_costs: "Månatliga Kostnader",
+        principal_interest: "Kapital & Ränta",
+        property_taxes: "Fastighetsskatt",
+        homeowners_insurance: "Hemförsäkring",
+        hoa_fees: "Samfällighetsavgifter",
+        mortgage_insurance_premium: "Bolåneförsäkringspremie",
+        private_mortgage_insurance: "Privat Bolåneförsäkring",
+        total_monthly_payment: "Total Månadsbetalning",
+        with_extra_payment: "Med Extra Amortering",
+        loan_details: "Lånedetaljer",
+        loan_amount: "Lånebelopp",
+        loan_to_value_ratio: "Belåningsgrad",
+        total_interest: "Total Ränta",
+        loan_term_extra_payments: "Lånetid med Extra Amorteringar",
+        years_saved_extra_payments: "Besparade År med Extra Amorteringar",
+        upfront_costs: "Initiala Kostnader",
+        down_payment: "Kontantinsats",
+        closing_costs: "Avslutningskostnader",
+        total_upfront_costs: "Totala Initiala Kostnader",
+        calculation_error: "Beräkningsfel. Försök igen.",
         seller_price: "Försäljningspris ($)",
         seller_balance: "Bolåneskuld ($)",
         seller_commission: "Provision (%)",
@@ -785,6 +1044,28 @@ const translations = {
         years_20: "20년",
         years_15: "15년",
         years_10: "10년",
+        months: "개월",
+        years: "년",
+        monthly_costs: "월간 비용",
+        principal_interest: "원금 및 이자",
+        property_taxes: "재산세",
+        homeowners_insurance: "주택 소유자 보험",
+        hoa_fees: "주택 소유자 협회 비용",
+        mortgage_insurance_premium: "주택대출 보험료",
+        private_mortgage_insurance: "사설 주택대출 보험",
+        total_monthly_payment: "월간 총 지불액",
+        with_extra_payment: "추가 지불 포함",
+        loan_details: "대출 상세 정보",
+        loan_amount: "대출 금액",
+        loan_to_value_ratio: "대출대비가치 비율",
+        total_interest: "총 이자",
+        loan_term_extra_payments: "추가 지불이 포함된 대출 기간",
+        years_saved_extra_payments: "추가 지불으로 절약된 년수",
+        upfront_costs: "초기 비용",
+        down_payment: "계약금",
+        closing_costs: "마무리 비용",
+        total_upfront_costs: "총 초기 비용",
+        calculation_error: "계산 오류가 발생했습니다. 다시 시도해 주세요.",
         seller_price: "판매 가격 ($)",
         seller_balance: "모기지 잔액 ($)",
         seller_commission: "수수료 (%)",
@@ -1211,6 +1492,34 @@ function changeLanguage(lang) {
             document.title = translations[lang].title;
         }
         
+        // Check if any calculation results are displayed and update them
+        const buyerResult = document.getElementById('buyer-result');
+        if (buyerResult && buyerResult.innerHTML.trim() !== '') {
+            // Re-run the calculation to update language on results
+            // Or re-render the last saved inputs
+            const savedInputs = getSavedInputs('buyer');
+            if (savedInputs) {
+                renderBuyerResults(savedInputs);
+            }
+        }
+        
+        // Similarly check for other calculator results and update them
+        const sellerResult = document.getElementById('seller-result');
+        if (sellerResult && sellerResult.innerHTML.trim() !== '') {
+            const savedInputs = getSavedInputs('seller');
+            if (savedInputs) {
+                renderSellerResults(savedInputs);
+            }
+        }
+        
+        const investorResult = document.getElementById('investor-result');
+        if (investorResult && investorResult.innerHTML.trim() !== '') {
+            const savedInputs = getSavedInputs('investor');
+            if (savedInputs) {
+                renderInvestorResults(savedInputs);
+            }
+        }
+        
         console.log(`Language successfully changed to: ${lang}`);
     } catch (error) {
         console.error('Language change error:', error);
@@ -1332,79 +1641,80 @@ function calculateBuyer() {
         });
         
         // Display comprehensive results
+        const lang = localStorage.getItem('selectedLanguage') || 'en';
         document.getElementById('buyer-result').innerHTML = `
             <div class="result-section">
-                <h4>Monthly Costs</h4>
+                <h4 data-lang="monthly_costs">${translations[lang].monthly_costs}</h4>
                 <div class="result-row">
-                    <span>Principal & Interest:</span>
+                    <span data-lang="principal_interest">${translations[lang].principal_interest}:</span>
                     <span>${formatter.format(principalInterest)}/mo</span>
                 </div>
                 <div class="result-row">
-                    <span>Property Taxes:</span>
+                    <span data-lang="property_taxes">${translations[lang].property_taxes}:</span>
                     <span>${formatter.format(monthlyPropertyTax)}/mo</span>
                 </div>
                 <div class="result-row">
-                    <span>Homeowners Insurance:</span>
+                    <span data-lang="homeowners_insurance">${translations[lang].homeowners_insurance}:</span>
                     <span>${formatter.format(monthlyInsurance)}/mo</span>
                 </div>
                 ${hoaFees > 0 ? `
                 <div class="result-row">
-                    <span>HOA Fees:</span>
+                    <span data-lang="hoa_fees">${translations[lang].hoa_fees}:</span>
                     <span>${formatter.format(hoaFees)}/mo</span>
                 </div>` : ''}
                 ${monthlyPMI > 0 ? `
                 <div class="result-row">
-                    <span>${loanType === 'fha' ? 'Mortgage Insurance Premium:' : 'Private Mortgage Insurance:'}</span>
+                    <span data-lang="${loanType === 'fha' ? 'mortgage_insurance_premium' : 'private_mortgage_insurance'}">${loanType === 'fha' ? translations[lang].mortgage_insurance_premium : translations[lang].private_mortgage_insurance}:</span>
                     <span>${formatter.format(monthlyPMI)}/mo</span>
                 </div>` : ''}
                 <div class="result-row total">
-                    <span>Total Monthly Payment:</span>
+                    <span data-lang="total_monthly_payment">${translations[lang].total_monthly_payment}:</span>
                     <span>${formatter.format(totalMonthlyPayment)}/mo</span>
                 </div>
                 ${extraPayment > 0 ? `
                 <div class="result-row extra">
-                    <span>With Extra Payment:</span>
+                    <span data-lang="with_extra_payment">${translations[lang].with_extra_payment}:</span>
                     <span>${formatter.format(effectiveMonthlyPayment)}/mo</span>
                 </div>` : ''}
             </div>
             
             <div class="result-section">
-                <h4>Loan Details</h4>
+                <h4 data-lang="loan_details">${translations[lang].loan_details}</h4>
                 <div class="result-row">
-                    <span>Loan Amount:</span>
+                    <span data-lang="loan_amount">${translations[lang].loan_amount}:</span>
                     <span>${formatter.format(loan)}</span>
                 </div>
                 <div class="result-row">
-                    <span>Loan-to-Value Ratio:</span>
+                    <span data-lang="loan_to_value_ratio">${translations[lang].loan_to_value_ratio}:</span>
                     <span>${ltv.toFixed(1)}%</span>
                 </div>
                 <div class="result-row">
-                    <span>Total Interest:</span>
+                    <span data-lang="total_interest">${translations[lang].total_interest}:</span>
                     <span>${formatter.format(totalInterest)}</span>
                 </div>
                 ${extraPayment > 0 ? `
                 <div class="result-row highlight">
-                    <span>Loan Term with Extra Payments:</span>
-                    <span>${Math.floor(effectiveTermMonths / 12)} years ${effectiveTermMonths % 12} months</span>
+                    <span data-lang="loan_term_extra_payments">${translations[lang].loan_term_extra_payments}:</span>
+                    <span>${Math.floor(effectiveTermMonths / 12)} ${translations[lang].years} ${effectiveTermMonths % 12} ${translations[lang].months || 'months'}</span>
                 </div>
                 <div class="result-row highlight">
-                    <span>Years Saved with Extra Payments:</span>
-                    <span>${((months - effectiveTermMonths) / 12).toFixed(1)} years</span>
+                    <span data-lang="years_saved_extra_payments">${translations[lang].years_saved_extra_payments}:</span>
+                    <span>${((months - effectiveTermMonths) / 12).toFixed(1)} ${translations[lang].years}</span>
                 </div>` : ''}
             </div>
             
             <div class="result-section">
-                <h4>Upfront Costs</h4>
+                <h4 data-lang="upfront_costs">${translations[lang].upfront_costs}</h4>
                 <div class="result-row">
-                    <span>Down Payment:</span>
+                    <span data-lang="down_payment">${translations[lang].down_payment}:</span>
                     <span>${formatter.format(down)} (${((down / price) * 100).toFixed(1)}%)</span>
                 </div>
                 <div class="result-row">
-                    <span>Closing Costs:</span>
+                    <span data-lang="closing_costs">${translations[lang].closing_costs}:</span>
                     <span>${formatter.format(closingCosts)}</span>
                 </div>
                 <div class="result-row total">
-                    <span>Total Upfront Costs:</span>
+                    <span data-lang="total_upfront_costs">${translations[lang].total_upfront_costs}:</span>
                     <span>${formatter.format(totalUpfrontCosts)}</span>
                 </div>
             </div>
@@ -1508,8 +1818,252 @@ function calculateCrypto() {
 }
 
 let lastInputs = {};
+let savedInputsByMode = {
+    buyer: null,
+    seller: null,
+    investor: null,
+    crypto: null
+};
+
 function saveInputs(mode, inputs) {
     lastInputs = { mode, ...inputs };
+    savedInputsByMode[mode] = inputs;
+}
+
+function getSavedInputs(mode) {
+    return savedInputsByMode[mode];
+}
+
+function renderBuyerResults(inputs) {
+    if (!inputs) return;
+    
+    try {
+        const lang = localStorage.getItem('selectedLanguage') || 'en';
+        const formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2
+        });
+        
+        // Only update the calculation result in the buyer section if it exists
+        const buyerResult = document.getElementById('buyer-result');
+        if (!buyerResult) return;
+        
+        // Extract values from inputs
+        const {
+            price, down, term, rate, propertyTax, insurance, hoaFees, pmiRate,
+            closingCosts, extraPayment, includeEscrow, loanType,
+            principalInterest, totalMonthlyPayment, totalInterest, ltv, totalUpfrontCosts,
+            loan, monthlyPropertyTax, monthlyInsurance, monthlyPMI, months, effectiveTermMonths, effectiveMonthlyPayment
+        } = inputs;
+        
+        // Display comprehensive results with appropriate language
+        document.getElementById('buyer-result').innerHTML = `
+            <div class="result-section">
+                <h4 data-lang="monthly_costs">${translations[lang].monthly_costs}</h4>
+                <div class="result-row">
+                    <span data-lang="principal_interest">${translations[lang].principal_interest}:</span>
+                    <span>${formatter.format(principalInterest)}/mo</span>
+                </div>
+                <div class="result-row">
+                    <span data-lang="property_taxes">${translations[lang].property_taxes}:</span>
+                    <span>${formatter.format(monthlyPropertyTax)}/mo</span>
+                </div>
+                <div class="result-row">
+                    <span data-lang="homeowners_insurance">${translations[lang].homeowners_insurance}:</span>
+                    <span>${formatter.format(monthlyInsurance)}/mo</span>
+                </div>
+                ${hoaFees > 0 ? `
+                <div class="result-row">
+                    <span data-lang="hoa_fees">${translations[lang].hoa_fees}:</span>
+                    <span>${formatter.format(hoaFees)}/mo</span>
+                </div>` : ''}
+                ${monthlyPMI > 0 ? `
+                <div class="result-row">
+                    <span data-lang="${loanType === 'fha' ? 'mortgage_insurance_premium' : 'private_mortgage_insurance'}">${loanType === 'fha' ? translations[lang].mortgage_insurance_premium : translations[lang].private_mortgage_insurance}:</span>
+                    <span>${formatter.format(monthlyPMI)}/mo</span>
+                </div>` : ''}
+                <div class="result-row total">
+                    <span data-lang="total_monthly_payment">${translations[lang].total_monthly_payment}:</span>
+                    <span>${formatter.format(totalMonthlyPayment)}/mo</span>
+                </div>
+                ${extraPayment > 0 ? `
+                <div class="result-row extra">
+                    <span data-lang="with_extra_payment">${translations[lang].with_extra_payment}:</span>
+                    <span>${formatter.format(effectiveMonthlyPayment)}/mo</span>
+                </div>` : ''}
+            </div>
+            
+            <div class="result-section">
+                <h4 data-lang="loan_details">${translations[lang].loan_details}</h4>
+                <div class="result-row">
+                    <span data-lang="loan_amount">${translations[lang].loan_amount}:</span>
+                    <span>${formatter.format(loan)}</span>
+                </div>
+                <div class="result-row">
+                    <span data-lang="loan_to_value_ratio">${translations[lang].loan_to_value_ratio}:</span>
+                    <span>${ltv.toFixed(1)}%</span>
+                </div>
+                <div class="result-row">
+                    <span data-lang="total_interest">${translations[lang].total_interest}:</span>
+                    <span>${formatter.format(totalInterest)}</span>
+                </div>
+                ${extraPayment > 0 ? `
+                <div class="result-row highlight">
+                    <span data-lang="loan_term_extra_payments">${translations[lang].loan_term_extra_payments}:</span>
+                    <span>${Math.floor(effectiveTermMonths / 12)} ${translations[lang].years} ${effectiveTermMonths % 12} ${translations[lang].months || 'months'}</span>
+                </div>
+                <div class="result-row highlight">
+                    <span data-lang="years_saved_extra_payments">${translations[lang].years_saved_extra_payments}:</span>
+                    <span>${((months - effectiveTermMonths) / 12).toFixed(1)} ${translations[lang].years}</span>
+                </div>` : ''}
+            </div>
+            
+            <div class="result-section">
+                <h4 data-lang="upfront_costs">${translations[lang].upfront_costs}</h4>
+                <div class="result-row">
+                    <span data-lang="down_payment">${translations[lang].down_payment}:</span>
+                    <span>${formatter.format(down)} (${((down / price) * 100).toFixed(1)}%)</span>
+                </div>
+                <div class="result-row">
+                    <span data-lang="closing_costs">${translations[lang].closing_costs}:</span>
+                    <span>${formatter.format(closingCosts)}</span>
+                </div>
+                <div class="result-row total">
+                    <span data-lang="total_upfront_costs">${translations[lang].total_upfront_costs}:</span>
+                    <span>${formatter.format(totalUpfrontCosts)}</span>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error rendering buyer results:', error);
+    }
+}
+
+function renderSellerResults(inputs) {
+    if (!inputs) return;
+    
+    try {
+        const lang = localStorage.getItem('selectedLanguage') || 'en';
+        const formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2
+        });
+        
+        // Extract values from inputs
+        const { price, balance, commission, closing, repairs, netProceeds, totalCosts } = inputs;
+        
+        // Only update the calculation result in the seller section if it exists
+        const sellerResult = document.getElementById('seller-result');
+        if (!sellerResult) return;
+        
+        // Display comprehensive results with appropriate language
+        sellerResult.innerHTML = `
+            <div class="result-section">
+                <h4>${translations[lang].sale_summary || 'Sale Summary'}</h4>
+                <div class="result-row">
+                    <span>${translations[lang].sale_price || 'Sale Price'}:</span>
+                    <span>${formatter.format(price)}</span>
+                </div>
+                <div class="result-row">
+                    <span>${translations[lang].mortgage_balance || 'Mortgage Balance'}:</span>
+                    <span>${formatter.format(balance)}</span>
+                </div>
+                <div class="result-row">
+                    <span>${translations[lang].total_costs || 'Total Costs'}:</span>
+                    <span>${formatter.format(totalCosts)}</span>
+                </div>
+                <div class="result-row total">
+                    <span>${translations[lang].net_proceeds || 'Net Proceeds'}:</span>
+                    <span>${formatter.format(netProceeds)}</span>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <h4>${translations[lang].cost_breakdown || 'Cost Breakdown'}</h4>
+                <div class="result-row">
+                    <span>${translations[lang].commission_amount || 'Commission'}:</span>
+                    <span>${formatter.format(price * (commission / 100))} (${commission}%)</span>
+                </div>
+                <div class="result-row">
+                    <span>${translations[lang].closing_costs || 'Closing Costs'}:</span>
+                    <span>${formatter.format(closing)}</span>
+                </div>
+                <div class="result-row">
+                    <span>${translations[lang].repair_costs || 'Repair Costs'}:</span>
+                    <span>${formatter.format(repairs)}</span>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error rendering seller results:', error);
+    }
+}
+
+function renderInvestorResults(inputs) {
+    if (!inputs) return;
+    
+    try {
+        const lang = localStorage.getItem('selectedLanguage') || 'en';
+        const formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2
+        });
+        
+        // Extract values from inputs
+        const { price, down, term, rate, rental, expenses, cashFlow, capRate, cashOnCash } = inputs;
+        
+        // Only update the calculation result in the investor section if it exists
+        const investorResult = document.getElementById('investor-result');
+        if (!investorResult) return;
+        
+        // Display comprehensive results with appropriate language
+        investorResult.innerHTML = `
+            <div class="result-section">
+                <h4>${translations[lang].investment_summary || 'Investment Summary'}</h4>
+                <div class="result-row">
+                    <span>${translations[lang].monthly_cash_flow || 'Monthly Cash Flow'}:</span>
+                    <span>${formatter.format(cashFlow)}/mo</span>
+                </div>
+                <div class="result-row">
+                    <span>${translations[lang].annual_cash_flow || 'Annual Cash Flow'}:</span>
+                    <span>${formatter.format(cashFlow * 12)}/yr</span>
+                </div>
+                <div class="result-row">
+                    <span>${translations[lang].cap_rate || 'Cap Rate'}:</span>
+                    <span>${capRate.toFixed(2)}%</span>
+                </div>
+                <div class="result-row total">
+                    <span>${translations[lang].cash_on_cash_return || 'Cash on Cash Return'}:</span>
+                    <span>${cashOnCash.toFixed(2)}%</span>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <h4>${translations[lang].investment_details || 'Investment Details'}</h4>
+                <div class="result-row">
+                    <span>${translations[lang].purchase_price || 'Purchase Price'}:</span>
+                    <span>${formatter.format(price)}</span>
+                </div>
+                <div class="result-row">
+                    <span>${translations[lang].down_payment || 'Down Payment'}:</span>
+                    <span>${formatter.format(down)} (${((down / price) * 100).toFixed(1)}%)</span>
+                </div>
+                <div class="result-row">
+                    <span>${translations[lang].monthly_rental_income || 'Monthly Rental Income'}:</span>
+                    <span>${formatter.format(rental)}/mo</span>
+                </div>
+                <div class="result-row">
+                    <span>${translations[lang].monthly_expenses || 'Monthly Expenses'}:</span>
+                    <span>${formatter.format(expenses)}/mo</span>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error rendering investor results:', error);
+    }
 }
 
 function saveResults() {
