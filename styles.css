@@ -190,13 +190,11 @@ p.subtitle {
     animation: fadeIn 0.4s ease-in-out;
 }
 
-<<<<<<< HEAD
 @keyframes pulse {
     0% { box-shadow: 0 4px 15px rgba(38, 198, 218, 0.4); }
     50% { box-shadow: 0 4px 20px rgba(38, 198, 218, 0.6); }
     100% { box-shadow: 0 4px 15px rgba(38, 198, 218, 0.4); }
 }
-=======
 .calc-card {
     background: rgba(255, 255, 255, 0.05);
     padding: 24px;
@@ -230,6 +228,11 @@ p.subtitle {
     transition: all 0.3s ease;
 }
 
+/* Hide placeholder text so it doesn't overlap with labels */
+.input-group input::placeholder {
+    color: transparent;
+}
+
 .input-group label {
     position: absolute;
     top: 50%;
@@ -242,6 +245,29 @@ p.subtitle {
     pointer-events: none;
 }
 
+/* Move input labels out of the way when field is focused or has content */
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label {
+    top: 0;
+    transform: translateY(-50%);
+    background: rgba(20, 35, 55, 0.85);
+    font-size: 0.75em;
+    padding: 0 8px;
+    color: #00ddeb;
+    z-index: 1;
+}
+
+/* Fix for select dropdowns to always show labels above */
+.input-group select + label {
+    top: 0;
+    transform: translateY(-50%);
+    background: rgba(20, 35, 55, 0.85);
+    font-size: 0.75em;
+    padding: 0 8px;
+    color: #00ddeb;
+    z-index: 1;
+}
+
 .input-group input:focus,
 .input-group select:focus {
     border-color: #00ddeb;
@@ -249,26 +275,113 @@ p.subtitle {
     box-shadow: 0 0 8px rgba(0, 221, 235, 0.3);
 }
 
-.input-group input:focus + label,
-.input-group input:not(:placeholder-shown) + label,
-.input-group select:focus + label {
-    top: -8px;
-    left: 12px;
-    font-size: 0.75em;
-    color: #00ddeb;
+/* Checkbox Group Styling */
+.checkbox-group {
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    color: #d5e1ef;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 14px 18px;
+    transition: all 0.3s ease;
+}
+
+/* Escrow Fields Container */
+.escrow-fields {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    margin: 0 0 20px 0;
+    padding: 16px;
+    border: 1px dashed rgba(0, 221, 235, 0.3);
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: all 0.4s ease-in-out;
+}
+
+.escrow-fields.active {
+    max-height: 500px;
+    opacity: 1;
+    margin-bottom: 20px;
+}
+
+.checkbox-group:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 12px;
+    cursor: pointer;
+    accent-color: #00ddeb;
+}
+
+.checkbox-group label {
+    color: #d5e1ef;
+    cursor: pointer;
+    font-weight: 400;
+    font-size: 0.95em;
+}
+
+/* Styling for field information text */
+.field-info {
+    display: block;
+    font-size: 0.8em;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 5px;
+    margin-left: 16px;
+    font-style: italic;
+}
+
+/* Combined input group styling */
+.combo-input-group {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+}
+
+.combo-input-group select {
+    flex: 0 0 auto;
+    width: 50%;
+    border-radius: 8px 0 0 8px;
+    border-right: none;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    padding-right: 30px;
+}
+
+.combo-input-group input.combo-input {
+    flex: 1;
+    border-radius: 0 8px 8px 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 14px;
+    padding-bottom: 14px;
+}
+
+.combo-input-group label {
+    top: 0;
+    left: 16px;
+    transform: translateY(-50%);
     background: rgba(20, 35, 55, 0.85);
-    padding: 0 6px;
+    font-size: 0.75em;
+    padding: 0 8px;
+    color: #00ddeb;
+    z-index: 1;
 }
 
-.input-group input::placeholder {
-    color: transparent;
-}
-
+/* Additional styling for select inputs */
 .input-group select {
-    background: rgba(255, 255, 255, 0.08) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="white"><polygon points="0,0 12,0 6,12"/></svg>') no-repeat 95% center;
-    background-size: 12px;
-    padding-right: 36px;
+    padding-right: 30px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23d5e1ef' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    -webkit-appearance: none;
+    -moz-appearance: none;
     appearance: none;
+    padding-top: 25px;
+    padding-bottom: 10px;
 }
 
 .calc-btn {
@@ -287,9 +400,62 @@ p.subtitle {
 }
 
 .calc-btn:hover {
-    background: linear-gradient(to right, #0288d1, #01579b);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 221, 235, 0.4);
+    background: linear-gradient(135deg, #0dbddd, #1890c5, #0dbddb);
+    box-shadow: 0 4px 16px rgba(0, 221, 235, 0.4);
+}
+
+/* Enhanced Results Styling */
+.result-section {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.result-section h4 {
+    color: #00ddeb;
+    margin: 0 0 12px 0;
+    font-size: 1.1em;
+    font-weight: 500;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding-bottom: 8px;
+}
+
+.result-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.95em;
+}
+
+.result-row span:first-child {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.result-row span:last-child {
+    font-weight: 500;
+    color: #fff;
+}
+
+.result-row.total {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    font-weight: 600;
+    font-size: 1.05em;
+}
+
+.result-row.total span:last-child {
+    color: #00ddeb;
+}
+
+.result-row.highlight span:last-child {
+    color: #4dff88;
+}
+
+.result-row.extra span:last-child {
+    color: #ffce3d;
 }
 
 .calc-mode p {

@@ -17,9 +17,39 @@ const translations = {
         investor_calc: "Investor/Agent Calculator",
         crypto_calc: "Crypto Calculator",
         buyer_price: "Home Price ($)",
+        buyer_price_range: "Home Price Range",
         buyer_down: "Down Payment ($)",
+        buyer_down_percent: "Down Payment %",
         buyer_term: "Loan Term (Years)",
+        buyer_term_preset: "Loan Term",
         buyer_rate: "Interest Rate (%)",
+        buyer_rate_preset: "Interest Rate",
+        buyer_loan_type: "Loan Type",
+        buyer_property_tax: "Property Taxes ($/year)",
+        buyer_insurance: "Homeowners Insurance ($/year)",
+        buyer_hoa: "HOA Fees ($/month)",
+        buyer_pmi_rate: "PMI Rate (%)",
+        buyer_closing_costs: "Closing Costs ($)",
+        buyer_extra_payment: "Extra Monthly Payment ($)",
+        buyer_escrow: "Include Taxes & Insurance in Payment (Escrow)",
+        custom_price: "Custom Price",
+        custom_amount: "Custom Amount",
+        custom_term: "Custom",
+        custom_rate: "Custom",
+        custom_term_label: "Custom Term (Years)",
+        custom_rate_label: "Custom Rate (%)",
+        conventional: "Conventional",
+        fha: "FHA",
+        va: "VA",
+        usda: "USDA",
+        arm: "ARM",
+        default_closing_costs: "Default: 3% of home price (typical for most areas)",
+        default_property_tax: "Default: 0.82% of home value (national average)",
+        default_insurance: "Default: Based on $4,419/yr for $300K home value",
+        years_30: "30 Years",
+        years_20: "20 Years",
+        years_15: "15 Years",
+        years_10: "10 Years",
         seller_price: "Sale Price ($)",
         seller_balance: "Mortgage Balance ($)",
         seller_commission: "Commission (%)",
@@ -52,9 +82,39 @@ const translations = {
         buyer_calc: "Calculadora para Compradores",
         seller_calc: "Calculadora para Vendedores",
         buyer_price: "Precio de la Vivienda ($)",
+        buyer_price_range: "Rango de Precio",
         buyer_down: "Pago Inicial ($)",
+        buyer_down_percent: "Porcentaje de Pago Inicial",
         buyer_term: "Plazo del Préstamo (Años)",
+        buyer_term_preset: "Plazo del Préstamo",
         buyer_rate: "Tasa de Interés (%)",
+        buyer_rate_preset: "Tasa de Interés",
+        buyer_loan_type: "Tipo de Préstamo",
+        buyer_property_tax: "Impuestos de Propiedad ($/año)",
+        buyer_insurance: "Seguro de Vivienda ($/año)",
+        buyer_hoa: "Cuotas de HOA ($/mes)",
+        buyer_pmi_rate: "Tasa de PMI (%)",
+        buyer_closing_costs: "Costos de Cierre ($)",
+        buyer_extra_payment: "Pago Mensual Adicional ($)",
+        buyer_escrow: "Incluir Impuestos y Seguro en Pago (Depósito en Garantía)",
+        custom_price: "Precio Personalizado",
+        custom_amount: "Cantidad Personalizada",
+        custom_term: "Personalizado",
+        custom_rate: "Personalizada",
+        custom_term_label: "Plazo Personalizado (Años)",
+        custom_rate_label: "Tasa Personalizada (%)",
+        conventional: "Convencional",
+        fha: "FHA",
+        va: "VA",
+        usda: "USDA",
+        arm: "ARM",
+        default_closing_costs: "Predeterminado: 3% del precio de la vivienda (típico para la mayoría de las áreas)",
+        default_property_tax: "Predeterminado: 0.82% del valor de la vivienda (promedio nacional)",
+        default_insurance: "Predeterminado: Basado en $4,419/año para una vivienda de $300K",
+        years_30: "30 Años",
+        years_20: "20 Años",
+        years_15: "15 Años",
+        years_10: "10 Años",
         seller_price: "Precio de Venta ($)",
         seller_balance: "Saldo de la Hipoteca ($)",
         seller_commission: "Comisión (%)",
@@ -89,9 +149,39 @@ const translations = {
         investor_calc: "投资者/代理计算器",
         crypto_calc: "加密货币计算器",
         buyer_price: "房屋价格 ($)",
+        buyer_price_range: "房价范围",
         buyer_down: "首付款 ($)",
+        buyer_down_percent: "首付款百分比",
         buyer_term: "贷款期限 (年)",
+        buyer_term_preset: "贷款期限",
         buyer_rate: "利率 (%)",
+        buyer_rate_preset: "利率",
+        buyer_loan_type: "贷款类型",
+        buyer_property_tax: "房产税 ($/年)",
+        buyer_insurance: "房屋保险 ($/年)",
+        buyer_hoa: "物业费 ($/月)",
+        buyer_pmi_rate: "房贷保险费率 (%)",
+        buyer_closing_costs: "过户费 ($)",
+        buyer_extra_payment: "额外月供 ($)",
+        buyer_escrow: "包含税费和保险在月供中 (托管)",
+        custom_price: "自定义价格",
+        custom_amount: "自定义金额",
+        custom_term: "自定义",
+        custom_rate: "自定义",
+        custom_term_label: "自定义期限(年)",
+        custom_rate_label: "自定义利率(%)",
+        conventional: "常规贷款",
+        fha: "FHA贷款",
+        va: "VA贷款",
+        usda: "USDA贷款",
+        arm: "浮动利率贷款",
+        default_closing_costs: "默认：房价的3%（大多数地区的典型比例）",
+        default_property_tax: "默认：房产价值的0.82%（全国平均水平）",
+        default_insurance: "默认：基于30万美元房产每年4419美元的保险费用",
+        years_30: "30年",
+        years_20: "20年",
+        years_15: "15年",
+        years_10: "10年",
         seller_price: "销售价格 ($)",
         seller_balance: "抵押贷款余额 ($)",
         seller_commission: "佣金 (%)",
@@ -124,9 +214,39 @@ const translations = {
         buyer_calc: "حاسبة المشترين",
         seller_calc: "حاسبة البائعين",
         buyer_price: "سعر المنزل ($)",
+        buyer_price_range: "نطاق سعر المنزل",
         buyer_down: "الدفعة المقدمة ($)",
+        buyer_down_percent: "نسبة الدفعة المقدمة",
         buyer_term: "مدة القرض (سنوات)",
+        buyer_term_preset: "مدة القرض",
         buyer_rate: "سعر الفائدة (%)",
+        buyer_rate_preset: "سعر الفائدة",
+        buyer_loan_type: "نوع القرض",
+        buyer_property_tax: "ضرائب العقار ($/سنة)",
+        buyer_insurance: "تأمين المنزل ($/سنة)",
+        buyer_hoa: "رسوم اتحاد الملاك ($/شهر)",
+        buyer_pmi_rate: "معدل تأمين الرهن العقاري (%)",
+        buyer_closing_costs: "تكاليف الإغلاق ($)",
+        buyer_extra_payment: "دفعة شهرية إضافية ($)",
+        buyer_escrow: "تضمين الضرائب والتأمين في الدفع (ضمان)",
+        custom_price: "سعر مخصص",
+        custom_amount: "مبلغ مخصص",
+        custom_term: "مخصص",
+        custom_rate: "مخصص",
+        custom_term_label: "مدة مخصصة (سنوات)",
+        custom_rate_label: "سعر فائدة مخصص (%)",
+        conventional: "تقليدي",
+        fha: "FHA",
+        va: "VA",
+        usda: "USDA",
+        arm: "معدل فائدة متغير",
+        default_closing_costs: "الافتراضي: 3% من سعر المنزل (نموذجي لمعظم المناطق)",
+        default_property_tax: "الافتراضي: 0.82% من قيمة المنزل (المتوسط الوطني)",
+        default_insurance: "الافتراضي: بناءً على 4,419$ سنويًا لمنزل بقيمة 300 ألف دولار",
+        years_30: "30 سنة",
+        years_20: "20 سنة",
+        years_15: "15 سنة",
+        years_10: "10 سنوات",
         seller_price: "سعر البيع ($)",
         seller_balance: "رصيد الرهن العقاري ($)",
         seller_commission: "العمولة (%)",
@@ -163,9 +283,39 @@ const translations = {
         investor_calc: "Калькулятор для Инвестора/Агента",
         crypto_calc: "Крипто Калькулятор",
         buyer_price: "Цена Дома ($)",
+        buyer_price_range: "Диапазон Цен",
         buyer_down: "Первоначальный Взнос ($)",
+        buyer_down_percent: "Процент Первоначального Взноса",
         buyer_term: "Срок Кредита (Годы)",
+        buyer_term_preset: "Срок Кредита",
         buyer_rate: "Процентная Ставка (%)",
+        buyer_rate_preset: "Процентная Ставка",
+        buyer_loan_type: "Тип Кредита",
+        buyer_property_tax: "Налог на Недвижимость ($/год)",
+        buyer_insurance: "Страхование Дома ($/год)",
+        buyer_hoa: "Оплата ТСЖ ($/месяц)",
+        buyer_pmi_rate: "Ставка Ипотечного Страхования (%)",
+        buyer_closing_costs: "Расходы на Закрытие Сделки ($)",
+        buyer_extra_payment: "Дополнительный Ежемесячный Платеж ($)",
+        buyer_escrow: "Включить Налоги и Страхование в Платеж (Эскроу)",
+        custom_price: "Пользовательская Цена",
+        custom_amount: "Пользовательская Сумма",
+        custom_term: "Пользовательский",
+        custom_rate: "Пользовательская",
+        custom_term_label: "Пользовательский Срок (Годы)",
+        custom_rate_label: "Пользовательская Ставка (%)",
+        conventional: "Стандартный",
+        fha: "FHA",
+        va: "VA",
+        usda: "USDA",
+        arm: "ARM",
+        default_closing_costs: "По умолчанию: 3% от стоимости дома (типично для большинства районов)",
+        default_property_tax: "По умолчанию: 0.82% от стоимости дома (среднее по стране)",
+        default_insurance: "По умолчанию: На основе $4,419/год для дома стоимостью $300K",
+        years_30: "30 Лет",
+        years_20: "20 Лет",
+        years_15: "15 Лет",
+        years_10: "10 Лет",
         seller_price: "Цена Продажи ($)",
         seller_balance: "Остаток Ипотеки ($)",
         seller_commission: "Комиссия (%)",
@@ -200,9 +350,39 @@ const translations = {
         investor_calc: "Calculadora do Investidor/Agente",
         crypto_calc: "Calculadora de Cripto",
         buyer_price: "Preço do Imóvel ($)",
+        buyer_price_range: "Faixa de Preço",
         buyer_down: "Entrada ($)",
+        buyer_down_percent: "Percentual de Entrada",
         buyer_term: "Prazo do Empréstimo (Anos)",
+        buyer_term_preset: "Prazo do Empréstimo",
         buyer_rate: "Taxa de Juros (%)",
+        buyer_rate_preset: "Taxa de Juros",
+        buyer_loan_type: "Tipo de Financiamento",
+        buyer_property_tax: "Imposto Predial ($/ano)",
+        buyer_insurance: "Seguro Residencial ($/ano)",
+        buyer_hoa: "Taxa de Condomínio ($/mês)",
+        buyer_pmi_rate: "Taxa de Seguro Hipotecário (%)",
+        buyer_closing_costs: "Custos de Fechamento ($)",
+        buyer_extra_payment: "Pagamento Mensal Extra ($)",
+        buyer_escrow: "Incluir Impostos e Seguro no Pagamento (Caução)",
+        custom_price: "Preço Personalizado",
+        custom_amount: "Valor Personalizado",
+        custom_term: "Personalizado",
+        custom_rate: "Personalizada",
+        custom_term_label: "Prazo Personalizado (Anos)",
+        custom_rate_label: "Taxa Personalizada (%)",
+        conventional: "Convencional",
+        fha: "FHA",
+        va: "VA",
+        usda: "USDA",
+        arm: "ARM",
+        default_closing_costs: "Padrão: 3% do preço do imóvel (típico para a maioria das regiões)",
+        default_property_tax: "Padrão: 0,82% do valor do imóvel (média nacional)",
+        default_insurance: "Padrão: Baseado em $4.419/ano para imóvel de $300K",
+        years_30: "30 Anos",
+        years_20: "20 Anos",
+        years_15: "15 Anos",
+        years_10: "10 Anos",
         seller_price: "Preço de Venda ($)",
         seller_balance: "Saldo da Hipoteca ($)",
         seller_commission: "Comissão (%)",
@@ -237,9 +417,39 @@ const translations = {
         investor_calc: "Calculateur Investisseur/Agent",
         crypto_calc: "Calculateur Crypto",
         buyer_price: "Prix du Logement ($)",
+        buyer_price_range: "Fourchette de Prix",
         buyer_down: "Acompte ($)",
+        buyer_down_percent: "Pourcentage d'Acompte",
         buyer_term: "Durée du Prêt (Années)",
+        buyer_term_preset: "Durée du Prêt",
         buyer_rate: "Taux d'Intérêt (%)",
+        buyer_rate_preset: "Taux d'Intérêt",
+        buyer_loan_type: "Type de Prêt",
+        buyer_property_tax: "Taxe Foncière ($/an)",
+        buyer_insurance: "Assurance Habitation ($/an)",
+        buyer_hoa: "Frais de Copropriété ($/mois)",
+        buyer_pmi_rate: "Taux d'Assurance Prêt Immobilier (%)",
+        buyer_closing_costs: "Frais de Clôture ($)",
+        buyer_extra_payment: "Paiement Mensuel Supplémentaire ($)",
+        buyer_escrow: "Inclure Taxes et Assurance dans le Paiement (Séquestre)",
+        custom_price: "Prix Personnalisé",
+        custom_amount: "Montant Personnalisé",
+        custom_term: "Personnalisée",
+        custom_rate: "Personnalisé",
+        custom_term_label: "Durée Personnalisée (Années)",
+        custom_rate_label: "Taux Personnalisé (%)",
+        conventional: "Conventionnel",
+        fha: "FHA",
+        va: "VA",
+        usda: "USDA",
+        arm: "ARM",
+        default_closing_costs: "Par défaut: 3% du prix du logement (typique pour la plupart des régions)",
+        default_property_tax: "Par défaut: 0,82% de la valeur du logement (moyenne nationale)",
+        default_insurance: "Par défaut: Basé sur 4 419$/an pour un logement de 300K$",
+        years_30: "30 Ans",
+        years_20: "20 Ans",
+        years_15: "15 Ans",
+        years_10: "10 Ans",
         seller_price: "Prix de Vente ($)",
         seller_balance: "Solde Hypothécaire ($)",
         seller_commission: "Commission (%)",
@@ -264,7 +474,7 @@ const translations = {
     },
     it: {
         title: "Calcolatore Immobiliare Definitivo",
-        subtitle: "Calcola il tuo mutuo, vendita, investimento o conversione crypto",
+        subtitle: "Calcola il tuo Mutuo, Vendita, Investimento o Conversione Crypto",
         buyer: "Acquirente",
         seller: "Venditore",
         investor: "Investitore/Agente",
@@ -274,9 +484,39 @@ const translations = {
         investor_calc: "Calcolatore Investitore/Agente",
         crypto_calc: "Calcolatore Cripto",
         buyer_price: "Prezzo Casa ($)",
+        buyer_price_range: "Gamma di Prezzi",
         buyer_down: "Acconto ($)",
+        buyer_down_percent: "Percentuale Acconto",
         buyer_term: "Durata Mutuo (Anni)",
+        buyer_term_preset: "Durata Mutuo",
         buyer_rate: "Tasso Interesse (%)",
+        buyer_rate_preset: "Tasso Interesse",
+        buyer_loan_type: "Tipo di Mutuo",
+        buyer_property_tax: "Tasse Immobiliari ($/anno)",
+        buyer_insurance: "Assicurazione Casa ($/anno)",
+        buyer_hoa: "Spese Condominiali ($/mese)",
+        buyer_pmi_rate: "Tasso Assicurazione Mutuo (%)",
+        buyer_closing_costs: "Costi di Chiusura ($)",
+        buyer_extra_payment: "Pagamento Mensile Extra ($)",
+        buyer_escrow: "Includi Tasse e Assicurazione nel Pagamento (Deposito)",
+        custom_price: "Prezzo Personalizzato",
+        custom_amount: "Importo Personalizzato",
+        custom_term: "Personalizzato",
+        custom_rate: "Personalizzato",
+        custom_term_label: "Durata Personalizzata (Anni)",
+        custom_rate_label: "Tasso Personalizzato (%)",
+        conventional: "Convenzionale",
+        fha: "FHA",
+        va: "VA",
+        usda: "USDA",
+        arm: "Tasso Variabile",
+        default_closing_costs: "Predefinito: 3% del prezzo casa (tipico per la maggior parte delle aree)",
+        default_property_tax: "Predefinito: 0.82% del valore casa (media nazionale)",
+        default_insurance: "Predefinito: Basato su $4,419/anno per casa da $300K",
+        years_30: "30 Anni",
+        years_20: "20 Anni",
+        years_15: "15 Anni",
+        years_10: "10 Anni",
         seller_price: "Prezzo di Vendita ($)",
         seller_balance: "Saldo Mutuo ($)",
         seller_commission: "Commissione (%)",
@@ -311,9 +551,39 @@ const translations = {
         investor_calc: "Investor-/Maklerrechner",
         crypto_calc: "Krypto-Rechner",
         buyer_price: "Hauspreis ($)",
+        buyer_price_range: "Preisbereich",
         buyer_down: "Anzahlung ($)",
+        buyer_down_percent: "Anzahlungsprozent",
         buyer_term: "Laufzeit (Jahre)",
+        buyer_term_preset: "Laufzeit",
         buyer_rate: "Zinssatz (%)",
+        buyer_rate_preset: "Zinssatz",
+        buyer_loan_type: "Kreditart",
+        buyer_property_tax: "Grundsteuer ($/Jahr)",
+        buyer_insurance: "Hausversicherung ($/Jahr)",
+        buyer_hoa: "Eigentümerverband-Gebühren ($/Monat)",
+        buyer_pmi_rate: "Kreditversicherungsrate (%)",
+        buyer_closing_costs: "Abschlusskosten ($)",
+        buyer_extra_payment: "Zusätzliche Monatszahlung ($)",
+        buyer_escrow: "Steuern & Versicherung in Zahlung inkludieren (Treuhand)",
+        custom_price: "Benutzerdefinierter Preis",
+        custom_amount: "Benutzerdefinierter Betrag",
+        custom_term: "Benutzerdefiniert",
+        custom_rate: "Benutzerdefiniert",
+        custom_term_label: "Benutzerdefinierte Laufzeit (Jahre)",
+        custom_rate_label: "Benutzerdefinierter Zinssatz (%)",
+        conventional: "Konventionell",
+        fha: "FHA",
+        va: "VA",
+        usda: "USDA",
+        arm: "Variable Verzinsung",
+        default_closing_costs: "Standard: 3% des Hauspreises (typisch für die meisten Gebiete)",
+        default_property_tax: "Standard: 0,82% des Hauswerts (nationaler Durchschnitt)",
+        default_insurance: "Standard: Basierend auf $4.419/Jahr für ein $300K-Haus",
+        years_30: "30 Jahre",
+        years_20: "20 Jahre",
+        years_15: "15 Jahre",
+        years_10: "10 Jahre",
         seller_price: "Verkaufspreis ($)",
         seller_balance: "Hypothekensaldo ($)",
         seller_commission: "Provision (%)",
@@ -348,9 +618,39 @@ const translations = {
         investor_calc: "投資家/エージェント計算機",
         crypto_calc: "暗号通貨計算機",
         buyer_price: "住宅価格 ($)",
+        buyer_price_range: "住宅価格範囲",
         buyer_down: "頭金 ($)",
+        buyer_down_percent: "頭金率",
         buyer_term: "ローン期間 (年)",
+        buyer_term_preset: "ローン期間",
         buyer_rate: "利率 (%)",
+        buyer_rate_preset: "利率",
+        buyer_loan_type: "ローンタイプ",
+        buyer_property_tax: "固定資産税 ($/年)",
+        buyer_insurance: "ホーム保険 ($/年)",
+        buyer_hoa: "管理費 ($/月)",
+        buyer_pmi_rate: "住宅ローン保険率 (%)",
+        buyer_closing_costs: "クロージング費用 ($)",
+        buyer_extra_payment: "追加月額支払い ($)",
+        buyer_escrow: "税金と保険を支払いに含む (エスクロー)",
+        custom_price: "カスタム価格",
+        custom_amount: "カスタム金額",
+        custom_term: "カスタム",
+        custom_rate: "カスタム",
+        custom_term_label: "カスタム期間 (年)",
+        custom_rate_label: "カスタム利率 (%)",
+        conventional: "常蔵ローン",
+        fha: "FHAローン",
+        va: "VAローン",
+        usda: "USDAローン",
+        arm: "変動金利ローン",
+        default_closing_costs: "デフォルト：住宅価格の3％ (多くの地域で一般的)",
+        default_property_tax: "デフォルト：住宅価格の0.82％ (全国平均)",
+        default_insurance: "デフォルト：30万ドルの住宅で年間$4,419を基準",
+        years_30: "30年",
+        years_20: "20年",
+        years_15: "15年",
+        years_10: "10年",
         seller_price: "売却価格 ($)",
         seller_balance: "住宅ローン残高 ($)",
         seller_commission: "手数料 (%)",
@@ -378,16 +678,46 @@ const translations = {
         subtitle: "Beräkna ditt bolån, försäljning, investering eller kryptokonvertering",
         buyer: "Köpare",
         seller: "Säljare",
-        investor: "Investerare/Mäklare",
+        investor: "Investerare/Agent",
         crypto: "Krypto",
-        buyer_calc: "Köparkalkylator",
-        seller_calc: "Säljarkalkylator",
-        investor_calc: "Investerar-/Mäklar-kalkylator",
-        crypto_calc: "Kryptokalkylator",
+        buyer_calc: "Köparräknare",
+        seller_calc: "Säljarräknare",
+        investor_calc: "Investerare/Agent-räknare",
+        crypto_calc: "Kryptoräknare",
         buyer_price: "Bostadspris ($)",
-        buyer_down: "Kontantinsats ($)",
-        buyer_term: "Lånetid (År)",
+        buyer_price_range: "Prisintervall",
+        buyer_down: "Handpenning ($)",
+        buyer_down_percent: "Handpenningsprocent",
+        buyer_term: "Låneperiod (År)",
+        buyer_term_preset: "Låneperiod",
         buyer_rate: "Ränta (%)",
+        buyer_rate_preset: "Ränta",
+        buyer_loan_type: "Lånetyp",
+        buyer_property_tax: "Fastighetsskatt ($/år)",
+        buyer_insurance: "Hemförsäkring ($/år)",
+        buyer_hoa: "Samfällighetsavgift ($/månad)",
+        buyer_pmi_rate: "Bolåneförsäkringsavgift (%)",
+        buyer_closing_costs: "Avslutningskostnader ($)",
+        buyer_extra_payment: "Extra Månatlig Betalning ($)",
+        buyer_escrow: "Inkludera Skatter & Försäkring i Betalning (Deposition)",
+        custom_price: "Anpassat Pris",
+        custom_amount: "Anpassat Belopp",
+        custom_term: "Anpassad",
+        custom_rate: "Anpassad",
+        custom_term_label: "Anpassad Period (År)",
+        custom_rate_label: "Anpassad Ränta (%)",
+        conventional: "Konventionell",
+        fha: "FHA",
+        va: "VA",
+        usda: "USDA",
+        arm: "Rörlig Ränta",
+        default_closing_costs: "Standard: 3% av bostadens pris (typiskt för de flesta områden)",
+        default_property_tax: "Standard: 0,82% av bostadens värde (nationellt genomsnitt)",
+        default_insurance: "Standard: Baserat på $4,419/år för en bostad värd $300K",
+        years_30: "30 År",
+        years_20: "20 År",
+        years_15: "15 År",
+        years_10: "10 År",
         seller_price: "Försäljningspris ($)",
         seller_balance: "Bolåneskuld ($)",
         seller_commission: "Provision (%)",
@@ -422,9 +752,39 @@ const translations = {
         investor_calc: "투자자/중개인 계산기",
         crypto_calc: "암호화폐 계산기",
         buyer_price: "주택 가격 ($)",
+        buyer_price_range: "주택 가격 범위",
         buyer_down: "계약금 ($)",
+        buyer_down_percent: "계약금 비율",
         buyer_term: "대출 기간 (년)",
+        buyer_term_preset: "대출 기간",
         buyer_rate: "이자율 (%)",
+        buyer_rate_preset: "이자율",
+        buyer_loan_type: "대출 유형",
+        buyer_property_tax: "재산세 ($/년)",
+        buyer_insurance: "주택 보험 ($/년)",
+        buyer_hoa: "관리비 ($/월)",
+        buyer_pmi_rate: "주택대출보험료 율 (%)",
+        buyer_closing_costs: "마감 비용 ($)",
+        buyer_extra_payment: "추가 월금 지불 ($)",
+        buyer_escrow: "세금 및 보험료 포함 (에스크로)",
+        custom_price: "직접 입력 가격",
+        custom_amount: "직접 입력 금액",
+        custom_term: "직접 입력",
+        custom_rate: "직접 입력",
+        custom_term_label: "직접 입력 기간 (년)",
+        custom_rate_label: "직접 입력 이자율 (%)",
+        conventional: "일반 대출",
+        fha: "FHA 대출",
+        va: "VA 대출",
+        usda: "USDA 대출",
+        arm: "변동금리 대출",
+        default_closing_costs: "기본값: 주택 가격의 3% (대부분 지역의 표준)",
+        default_property_tax: "기본값: 주택 가치의 0.82% (국가 평균)",
+        default_insurance: "기본값: 30만 달러 주택의 경우 년간 $4,419 기준",
+        years_30: "30년",
+        years_20: "20년",
+        years_15: "15년",
+        years_10: "10년",
         seller_price: "판매 가격 ($)",
         seller_balance: "모기지 잔액 ($)",
         seller_commission: "수수료 (%)",
@@ -452,116 +812,610 @@ const translations = {
 document.addEventListener('DOMContentLoaded', () => {
     try {
         console.log('Initializing calculator...');
+        
+        // Initialize language settings
         const savedLang = localStorage.getItem('selectedLanguage') || 'en';
         changeLanguage(savedLang);
 
-        const moreLanguages = document.querySelector('.more-languages');
+        // Setup language dropdown
+        const moreLanguagesDropdown = document.querySelector('.more-languages');
         const languageDropdown = document.querySelector('.language-dropdown');
 
-        moreLanguages.addEventListener('click', (e) => {
-            e.preventDefault();
-            languageDropdown.classList.toggle('active');
-            console.log('Toggled language dropdown');
-        });
+        if (moreLanguagesDropdown && languageDropdown) {
+            moreLanguagesDropdown.addEventListener('click', (e) => {
+                e.preventDefault();
+                languageDropdown.classList.toggle('active');
+            });
 
-        document.addEventListener('click', (e) => {
-            if (!moreLanguages.contains(e.target) && languageDropdown.classList.contains('active')) {
-                languageDropdown.classList.remove('active');
-                console.log('Closed language dropdown');
-            }
-        });
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!moreLanguagesDropdown.contains(e.target) && languageDropdown.classList.contains('active')) {
+                    languageDropdown.classList.remove('active');
+                }
+            });
+        }
 
+        // Initialize tab functionality
         const tabs = document.querySelectorAll('.tab-label');
         const modes = document.querySelectorAll('.calc-mode');
 
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
-                console.log(`Switching to tab: ${tab.getAttribute('data-mode')}`);
-                tabs.forEach(t => t.classList.remove('active'));
-                modes.forEach(m => m.classList.remove('active'));
-
+                document.querySelectorAll('.tab-label').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.calc-mode').forEach(mode => mode.classList.remove('active'));
+                
                 tab.classList.add('active');
-                const modeId = tab.getAttribute('data-mode') + '-mode';
-                const modeElement = document.getElementById(modeId);
-                if (modeElement) {
-                    modeElement.classList.add('active');
-                    console.log(`Activated mode: ${modeId}`);
-                } else {
-                    console.error(`Mode element not found: ${modeId}`);
-                }
-            });
-
-            tab.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    tab.click();
-                }
+                const modeId = tab.getAttribute('data-mode');
+                document.getElementById(`${modeId}-mode`).classList.add('active');
             });
         });
 
+        // Initialize calculator buttons
         document.getElementById('buyer-calc').addEventListener('click', calculateBuyer);
         document.getElementById('seller-calc').addEventListener('click', calculateSeller);
         document.getElementById('investor-calc').addEventListener('click', calculateInvestor);
         document.getElementById('crypto-calc').addEventListener('click', calculateCrypto);
         document.getElementById('saveBtn').addEventListener('click', saveResults);
         document.getElementById('shareBtn').addEventListener('click', shareResults);
-
-        console.log('Calculator initialized successfully');
+        
+        // Initialize Buyer Calculator Enhanced Features
+        initializeBuyerCalculator();
     } catch (error) {
         console.error('Initialization error:', error);
     }
 });
 
+// Initialize all the enhanced buyer calculator features
+function initializeBuyerCalculator() {
+    // Price Range dropdown - now combined with input
+    const priceRangeSelect = document.getElementById('buyer-price-range');
+    const priceInput = document.getElementById('buyer-price');
+    
+    // Make sure input gets focus when clicking on combo input container
+    const priceComboGroup = priceInput.closest('.combo-input-group');
+    if (priceComboGroup) {
+        priceComboGroup.addEventListener('click', function(e) {
+            // Don't focus input if clicking on the select itself
+            if (e.target !== priceRangeSelect) {
+                priceInput.focus();
+            }
+        });
+    }
+    
+    priceRangeSelect.addEventListener('change', function() {
+        if (this.value === 'custom') {
+            // Clear input to allow manual entry, and focus it
+            priceInput.value = '';
+            priceInput.focus();
+        } else if (this.value === '2000001-plus') {
+            priceInput.value = 2000001;
+        } else {
+            // Use the midpoint of the selected range
+            const [min, max] = this.value.split('-').map(Number);
+            priceInput.value = Math.round((min + max) / 2);
+        }
+        // Update down payment if percentage is selected
+        updateDownPaymentFromPercent();
+        // Update other default values based on home price
+        updateDefaultValues();
+    });
+    
+    // When price is manually entered, switch dropdown to 'custom'
+    priceInput.addEventListener('input', function() {
+        priceRangeSelect.value = 'custom';
+        updateDefaultValues();
+    });
+    
+    // Also update defaults when price is manually changed
+    priceInput.addEventListener('change', updateDefaultValues);
+    
+    // Down Payment percentage dropdown - now combined with input
+    const downPercentSelect = document.getElementById('buyer-down-percent');
+    const downInput = document.getElementById('buyer-down');
+    
+    // Make sure input gets focus when clicking on combo input container
+    const downComboGroup = downInput.closest('.combo-input-group');
+    if (downComboGroup) {
+        downComboGroup.addEventListener('click', function(e) {
+            // Don't focus input if clicking on the select itself
+            if (e.target !== downPercentSelect) {
+                downInput.focus();
+            }
+        });
+    }
+    
+    downPercentSelect.addEventListener('change', function() {
+        if (this.value === 'custom') {
+            // Clear input to allow manual entry, and focus it
+            downInput.value = '';
+            downInput.focus();
+        } else {
+            updateDownPaymentFromPercent();
+        }
+        // Also update PMI rate based on down payment percentage
+        updatePMIRate();
+    });
+    
+    function updateDownPaymentFromPercent() {
+        const price = parseFloat(priceInput.value) || 0;
+        if (downPercentSelect.value !== 'custom' && price > 0) {
+            const percent = parseFloat(downPercentSelect.value);
+            downInput.value = Math.round(price * (percent / 100));
+        }
+    }
+    
+    // Update down payment amount when price changes
+    priceInput.addEventListener('input', updateDownPaymentFromPercent);
+    
+    // When down payment is manually entered, switch dropdown to 'custom'
+    downInput.addEventListener('input', function() {
+        downPercentSelect.value = 'custom';
+        updatePMIRate();
+    });
+    
+    // Update down payment when changed manually
+    downInput.addEventListener('change', updatePMIRate);
+    
+    // Loan term dropdown
+    const termPresetSelect = document.getElementById('buyer-term-preset');
+    const termCustomGroup = document.getElementById('buyer-term-custom-group');
+    const termInput = document.getElementById('buyer-term');
+    
+    termPresetSelect.addEventListener('change', function() {
+        if (this.value === 'custom') {
+            termCustomGroup.style.display = 'block';
+        } else {
+            termCustomGroup.style.display = 'none';
+            termInput.value = this.value;
+        }
+    });
+    
+    // Interest rate dropdown
+    const ratePresetSelect = document.getElementById('buyer-rate-preset');
+    const rateCustomGroup = document.getElementById('buyer-rate-custom-group');
+    const rateInput = document.getElementById('buyer-rate');
+    
+    ratePresetSelect.addEventListener('change', function() {
+        if (this.value === 'custom') {
+            rateCustomGroup.style.display = 'block';
+        } else {
+            rateCustomGroup.style.display = 'none';
+            rateInput.value = this.value;
+        }
+    });
+    
+    // Loan type changes
+    const loanTypeSelect = document.getElementById('buyer-loan-type');
+    
+    loanTypeSelect.addEventListener('change', function() {
+        // Get the PMI input element
+        const pmiRateInput = document.getElementById('buyer-pmi-rate');
+        
+        // Set default PMI rates based on loan type
+        switch(this.value) {
+            case 'fha':
+                // FHA has upfront MIP of 1.75% and annual MIP of 0.55-1.05%
+                pmiRateInput.value = '0.85';
+                break;
+            case 'va':
+                // VA loans don't have PMI
+                pmiRateInput.value = '0';
+                break;
+            case 'usda':
+                // USDA has upfront guarantee fee of 1% and annual fee of 0.35%
+                pmiRateInput.value = '0.35';
+                break;
+            case 'conventional':
+                // Conventional PMI is typically 0.5-1% for good credit
+                pmiRateInput.value = '0.5';
+                break;
+            case 'arm':
+                // ARMs use conventional PMI
+                pmiRateInput.value = '0.5';
+                break;
+        }
+    });
+    
+    // Escrow checkbox toggle functionality
+    const escrowCheckbox = document.getElementById('buyer-escrow');
+    const escrowFields = document.getElementById('escrow-fields');
+    
+    // Function to toggle escrow fields visibility
+    function toggleEscrowFields() {
+        if (escrowCheckbox.checked) {
+            escrowFields.classList.add('active');
+        } else {
+            escrowFields.classList.remove('active');
+        }
+    }
+    
+    // Add event listener to checkbox
+    escrowCheckbox.addEventListener('change', toggleEscrowFields);
+    
+    // Set initial state based on checkbox
+    toggleEscrowFields();
+    
+    // Get references to the elements for default calculations
+    const propertyTaxInput = document.getElementById('buyer-property-tax');
+    const insuranceInput = document.getElementById('buyer-insurance');
+    const pmiRateInput = document.getElementById('buyer-pmi-rate');
+    const closingCostsInput = document.getElementById('buyer-closing-costs');
+    
+    // Function to update property tax based on property value (0.82%)
+    function updatePropertyTax() {
+        const price = parseFloat(priceInput.value) || 0;
+        // Always calculate the default value for property tax when price changes
+        if (price > 0) {
+            // Calculate property tax at 0.82% of home value
+            const annualTax = Math.round(price * 0.0082);
+            // Only set the value if it's empty or user hasn't manually changed it
+            if (!propertyTaxInput.value || propertyTaxInput.dataset.auto === 'true') {
+                propertyTaxInput.value = annualTax;
+                propertyTaxInput.dataset.auto = 'true';
+            }
+        }
+    }
+    
+    // Function to update homeowners insurance (scaled from $4,419/year for $300k value)
+    function updateInsurance() {
+        const price = parseFloat(priceInput.value) || 0;
+        if (price > 0) {
+            // Base rate of $4,419 for $300,000 home, scale proportionally
+            const baseRate = 4419;
+            const baseValue = 300000;
+            const annualInsurance = Math.round(baseRate * (price / baseValue));
+            // Only set the value if it's empty or user hasn't manually changed it
+            if (!insuranceInput.value || insuranceInput.dataset.auto === 'true') {
+                insuranceInput.value = annualInsurance;
+                insuranceInput.dataset.auto = 'true';
+            }
+        }
+    }
+    
+    // Function to update PMI rate based on down payment percentage
+    function updatePMIRate() {
+        const price = parseFloat(priceInput.value) || 0;
+        const down = parseFloat(downInput.value) || 0;
+        const loanType = document.getElementById('buyer-loan-type').value;
+        const pmiRateInput = document.getElementById('buyer-pmi-rate');
+        
+        if (price > 0 && down > 0) {
+            const downPaymentPercent = (down / price) * 100;
+            
+            // Only auto-set if user hasn't manually changed it from default
+            if (pmiRateInput.dataset.auto === 'true' || !pmiRateInput.dataset.auto) {
+                // VA loans don't have PMI
+                if (loanType === 'va') {
+                    pmiRateInput.value = '0';
+                }
+                // No PMI needed if down payment is 20% or more for conventional loans
+                else if (downPaymentPercent >= 20 && (loanType === 'conventional' || loanType === 'arm')) {
+                    pmiRateInput.value = '0';
+                }
+                // Default PMI rate is 0.5% for conventional loans with less than 20% down
+                else if (loanType === 'conventional' || loanType === 'arm') {
+                    pmiRateInput.value = '0.5';
+                }
+                // FHA has MIP regardless of down payment
+                else if (loanType === 'fha') {
+                    pmiRateInput.value = '0.85';
+                }
+                // USDA has annual fee
+                else if (loanType === 'usda') {
+                    pmiRateInput.value = '0.35';
+                }
+                
+                pmiRateInput.dataset.auto = 'true';
+            }
+        }
+    }
+    
+    // Function to update closing costs (default 3% of home price)
+    function updateClosingCosts() {
+        const price = parseFloat(priceInput.value) || 0;
+        if (price > 0) {
+            const closingCosts = Math.round(price * 0.03);
+            // Only set the value if it's empty or user hasn't manually changed it
+            if (!closingCostsInput.value || closingCostsInput.dataset.auto === 'true') {
+                closingCostsInput.value = closingCosts;
+                closingCostsInput.dataset.auto = 'true';
+            }
+        }
+    }
+    
+    // Function to update all default values
+    function updateDefaultValues() {
+        updatePropertyTax();
+        updateInsurance();
+        updatePMIRate();
+        updateClosingCosts();
+    }
+    
+    // Initialize with default values if price is already set
+    if (parseFloat(priceInput.value) > 0) {
+        updateDefaultValues();
+    }
+    
+    // Listen for user edits on fields that have automatic calculations
+    propertyTaxInput.addEventListener('input', function() {
+        // If user manually edits the field, mark it as non-auto
+        this.dataset.auto = 'false';
+    });
+    
+    insuranceInput.addEventListener('input', function() {
+        // If user manually edits the field, mark it as non-auto
+        this.dataset.auto = 'false';
+    });
+    
+    closingCostsInput.addEventListener('input', function() {
+        // If user manually edits the field, mark it as non-auto
+        this.dataset.auto = 'false';
+    });
+    
+    document.getElementById('buyer-pmi-rate').addEventListener('input', function() {
+        // If user manually edits the field, mark it as non-auto
+        this.dataset.auto = 'false';
+    });
+}
+
 function changeLanguage(lang) {
     try {
+        // Default to English if the requested language doesn't exist
+        if (!translations[lang]) {
+            console.warn(`Language ${lang} not found, defaulting to English`);
+            lang = 'en';
+        }
+        
         localStorage.setItem('selectedLanguage', lang);
         const elements = document.querySelectorAll('[data-lang]');
+        
+        // First pass: translate all elements
         elements.forEach(element => {
             const key = element.getAttribute('data-lang');
-            const translation = translations[lang][key] || element.textContent;
+            
+            // Check if translation exists for this key
+            if (!translations[lang][key]) {
+                console.warn(`Missing translation for key '${key}' in language '${lang}', using English fallback`);
+            }
+            
+            const translation = translations[lang][key] || translations['en'][key] || element.textContent;
+            
             if (element.tagName === 'INPUT') {
                 element.placeholder = translation;
             } else if (element.tagName === 'SELECT') {
+                // Handle select element label
+                element.setAttribute('data-translated', 'true');
+                if (element.labels && element.labels.length > 0) {
+                    element.labels[0].textContent = translation;
+                }
+                
+                // Handle select options in a separate loop
                 const options = element.querySelectorAll('option');
                 options.forEach(option => {
                     const optionKey = option.getAttribute('data-lang');
-                    if (optionKey && translations[lang][optionKey]) {
-                        option.textContent = translations[lang][optionKey];
+                    if (optionKey) {
+                        if (!translations[lang][optionKey] && translations['en'][optionKey]) {
+                            option.textContent = translations['en'][optionKey];
+                        } else if (translations[lang][optionKey]) {
+                            option.textContent = translations[lang][optionKey];
+                        }
                     }
                 });
             } else {
                 element.textContent = translation;
             }
         });
-        console.log(`Language changed to: ${lang}`);
+        
+        // Update document title
+        if (translations[lang].title) {
+            document.title = translations[lang].title;
+        }
+        
+        console.log(`Language successfully changed to: ${lang}`);
     } catch (error) {
         console.error('Language change error:', error);
+        alert('Error changing language. Defaulting to English.');
+        // Attempt to recover by switching to English
+        if (lang !== 'en') {
+            changeLanguage('en');
+        }
     }
 }
 
 function calculateBuyer() {
     try {
+        // Get all input values
         const price = parseFloat(document.getElementById('buyer-price').value) || 0;
         const down = parseFloat(document.getElementById('buyer-down').value) || 0;
         const term = parseFloat(document.getElementById('buyer-term').value) || 0;
         const rate = parseFloat(document.getElementById('buyer-rate').value) || 0;
+        const propertyTax = parseFloat(document.getElementById('buyer-property-tax').value) || 0;
+        const insurance = parseFloat(document.getElementById('buyer-insurance').value) || 0;
+        const hoaFees = parseFloat(document.getElementById('buyer-hoa').value) || 0;
+        const pmiRate = parseFloat(document.getElementById('buyer-pmi-rate').value) || 0;
+        const closingCosts = parseFloat(document.getElementById('buyer-closing-costs').value) || 0;
+        const extraPayment = parseFloat(document.getElementById('buyer-extra-payment').value) || 0;
+        const includeEscrow = document.getElementById('buyer-escrow').checked;
+        const loanType = document.getElementById('buyer-loan-type').value;
 
+        // Validate inputs
         if (price <= 0 || down < 0 || term <= 0 || rate <= 0) {
             document.getElementById('buyer-result').innerHTML = `<span class="error">${translations[localStorage.getItem('selectedLanguage') || 'en'].invalid_input}</span>`;
             return;
         }
 
+        // Calculate basic mortgage details
         const loan = price - down;
         const monthlyRate = rate / 100 / 12;
         const months = term * 12;
-        const monthlyPayment = (loan * monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
-        const totalInterest = (monthlyPayment * months) - loan;
-
+        const principalInterest = (loan * monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+        
+        // Calculate additional costs
+        const monthlyPropertyTax = propertyTax / 12;
+        const monthlyInsurance = insurance / 12;
+        
+        // Calculate PMI (if down payment < 20%)
+        let monthlyPMI = 0;
+        const ltv = (loan / price) * 100; // Loan-to-Value ratio
+        
+        // Apply PMI based on loan type and LTV
+        if (loanType === 'conventional' || loanType === 'arm') {
+            // Conventional loans only have PMI if LTV > 80%
+            if (ltv > 80) {
+                monthlyPMI = (loan * (pmiRate / 100)) / 12;
+            }
+        } else if (loanType === 'fha') {
+            // FHA has MIP regardless of down payment (though it can be removed after hitting 78% LTV and 5+ years on 30yr loans)
+            monthlyPMI = (loan * (pmiRate / 100)) / 12;
+        } else if (loanType === 'usda' && pmiRate > 0) {
+            // USDA has annual fee
+            monthlyPMI = (loan * (pmiRate / 100)) / 12;
+        }
+        // VA loans don't have PMI (pmiRate should be 0)
+        
+        // Calculate monthly payment with or without escrow
+        let baseMonthlyPayment = principalInterest;
+        let totalMonthlyPayment = principalInterest;
+        
+        if (includeEscrow) {
+            // Add taxes and insurance to monthly payment
+            totalMonthlyPayment += monthlyPropertyTax + monthlyInsurance;
+        }
+        
+        // Add HOA and PMI to both scenarios - these are separate from escrow
+        totalMonthlyPayment += hoaFees + monthlyPMI;
+        
+        // Add extra payment (this affects amortization but not required monthly payment)
+        const effectiveMonthlyPayment = totalMonthlyPayment + extraPayment;
+        
+        // Recalculate total interest and loan term with extra payments if applicable
+        let totalInterest;
+        let effectiveTermMonths;
+        
+        if (extraPayment > 0) {
+            // Calculate how extra payments affect the loan term and interest
+            let balance = loan;
+            let interestPaid = 0;
+            let monthsPaid = 0;
+            
+            while (balance > 0 && monthsPaid < months) {
+                const interestForMonth = balance * monthlyRate;
+                interestPaid += interestForMonth;
+                
+                let principalForMonth = principalInterest - interestForMonth;
+                if (extraPayment > 0) {
+                    principalForMonth += extraPayment;
+                }
+                
+                balance -= principalForMonth;
+                if (balance < 0) balance = 0;
+                monthsPaid++;
+            }
+            
+            totalInterest = interestPaid;
+            effectiveTermMonths = monthsPaid;
+        } else {
+            // Standard calculation without extra payments
+            totalInterest = (principalInterest * months) - loan;
+            effectiveTermMonths = months;
+        }
+        
+        // Calculate upfront costs
+        const totalUpfrontCosts = down + closingCosts;
+        
+        // Format results
+        const formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+        
+        // Display comprehensive results
         document.getElementById('buyer-result').innerHTML = `
-            <strong>Monthly Payment:</strong> $${monthlyPayment.toFixed(2)}<br>
-            <strong>Total Interest:</strong> $${totalInterest.toFixed(2)}
+            <div class="result-section">
+                <h4>Monthly Costs</h4>
+                <div class="result-row">
+                    <span>Principal & Interest:</span>
+                    <span>${formatter.format(principalInterest)}/mo</span>
+                </div>
+                <div class="result-row">
+                    <span>Property Taxes:</span>
+                    <span>${formatter.format(monthlyPropertyTax)}/mo</span>
+                </div>
+                <div class="result-row">
+                    <span>Homeowners Insurance:</span>
+                    <span>${formatter.format(monthlyInsurance)}/mo</span>
+                </div>
+                ${hoaFees > 0 ? `
+                <div class="result-row">
+                    <span>HOA Fees:</span>
+                    <span>${formatter.format(hoaFees)}/mo</span>
+                </div>` : ''}
+                ${monthlyPMI > 0 ? `
+                <div class="result-row">
+                    <span>${loanType === 'fha' ? 'Mortgage Insurance Premium:' : 'Private Mortgage Insurance:'}</span>
+                    <span>${formatter.format(monthlyPMI)}/mo</span>
+                </div>` : ''}
+                <div class="result-row total">
+                    <span>Total Monthly Payment:</span>
+                    <span>${formatter.format(totalMonthlyPayment)}/mo</span>
+                </div>
+                ${extraPayment > 0 ? `
+                <div class="result-row extra">
+                    <span>With Extra Payment:</span>
+                    <span>${formatter.format(effectiveMonthlyPayment)}/mo</span>
+                </div>` : ''}
+            </div>
+            
+            <div class="result-section">
+                <h4>Loan Details</h4>
+                <div class="result-row">
+                    <span>Loan Amount:</span>
+                    <span>${formatter.format(loan)}</span>
+                </div>
+                <div class="result-row">
+                    <span>Loan-to-Value Ratio:</span>
+                    <span>${ltv.toFixed(1)}%</span>
+                </div>
+                <div class="result-row">
+                    <span>Total Interest:</span>
+                    <span>${formatter.format(totalInterest)}</span>
+                </div>
+                ${extraPayment > 0 ? `
+                <div class="result-row highlight">
+                    <span>Loan Term with Extra Payments:</span>
+                    <span>${Math.floor(effectiveTermMonths / 12)} years ${effectiveTermMonths % 12} months</span>
+                </div>
+                <div class="result-row highlight">
+                    <span>Years Saved with Extra Payments:</span>
+                    <span>${((months - effectiveTermMonths) / 12).toFixed(1)} years</span>
+                </div>` : ''}
+            </div>
+            
+            <div class="result-section">
+                <h4>Upfront Costs</h4>
+                <div class="result-row">
+                    <span>Down Payment:</span>
+                    <span>${formatter.format(down)} (${((down / price) * 100).toFixed(1)}%)</span>
+                </div>
+                <div class="result-row">
+                    <span>Closing Costs:</span>
+                    <span>${formatter.format(closingCosts)}</span>
+                </div>
+                <div class="result-row total">
+                    <span>Total Upfront Costs:</span>
+                    <span>${formatter.format(totalUpfrontCosts)}</span>
+                </div>
+            </div>
         `;
-        saveInputs('buyer', { price, down, term, rate, monthlyPayment, totalInterest });
+        
+        // Save the inputs and results
+        saveInputs('buyer', { 
+            price, down, term, rate, propertyTax, insurance, hoaFees, pmiRate,
+            closingCosts, extraPayment, includeEscrow, loanType,
+            principalInterest, totalMonthlyPayment, totalInterest, ltv, totalUpfrontCosts
+        });
     } catch (error) {
         console.error('Buyer calculation error:', error);
         document.getElementById('buyer-result').innerHTML = '<span class="error">Calculation error. Please try again.</span>';

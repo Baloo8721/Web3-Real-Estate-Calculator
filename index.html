@@ -42,22 +42,137 @@
                 <div class="calc-mode active" id="buyer-mode">
                     <div class="calc-card">
                         <h3 data-lang="buyer_calc">Buyer Calculator</h3>
-                        <div class="input-group">
-                            <input type="number" id="buyer-price" placeholder="Home Price ($)" data-lang="buyer_price" aria-label="Home Price" min="0" step="1000">
-                            <label for="buyer-price" data-lang="buyer_price">Home Price ($)</label>
+                        
+                        <!-- Combined Home Price with dropdown -->
+                        <div class="input-group combo-input-group">
+                            <select id="buyer-price-range" aria-label="Home Price Range">
+                                <option value="custom" selected data-lang="custom_price">Custom Price</option>
+                                <option value="50000-100000">$50,000 - $100,000</option>
+                                <option value="100001-200000">$100,001 - $200,000</option>
+                                <option value="200001-350000">$200,001 - $350,000</option>
+                                <option value="350001-500000">$350,001 - $500,000</option>
+                                <option value="500001-750000">$500,001 - $750,000</option>
+                                <option value="750001-1000000">$750,001 - $1,000,000</option>
+                                <option value="1000001-2000000">$1,000,001 - $2,000,000</option>
+                                <option value="2000001-plus">$2,000,001+</option>
+                            </select>
+                            <input type="number" id="buyer-price" placeholder="Enter price" min="0" step="1000" class="combo-input">
+                            <label for="buyer-price-range" data-lang="buyer_price">Home Price ($)</label>
                         </div>
-                        <div class="input-group">
-                            <input type="number" id="buyer-down" placeholder="Down Payment ($)" data-lang="buyer_down" aria-label="Down Payment" min="0" step="1000">
-                            <label for="buyer-down" data-lang="buyer_down">Down Payment ($)</label>
+                        
+                        <!-- Combined Down Payment with percentage option -->
+                        <div class="input-group combo-input-group">
+                            <select id="buyer-down-percent" aria-label="Down Payment Percentage">
+                                <option value="custom" selected data-lang="custom_amount">Custom Amount</option>
+                                <option value="3.5">3.5% (FHA Minimum)</option>
+                                <option value="5">5%</option>
+                                <option value="10">10%</option>
+                                <option value="15">15%</option>
+                                <option value="20">20% (No PMI)</option>
+                                <option value="25">25%</option>
+                                <option value="30">30%</option>
+                            </select>
+                            <input type="number" id="buyer-down" placeholder="Enter amount" min="0" step="1000" class="combo-input">
+                            <label for="buyer-down-percent" data-lang="buyer_down">Down Payment ($)</label>
                         </div>
+                        
+                        <!-- Loan Type -->
                         <div class="input-group">
-                            <input type="number" id="buyer-term" placeholder="Loan Term (Years)" data-lang="buyer_term" aria-label="Loan Term" min="1" step="1">
-                            <label for="buyer-term" data-lang="buyer_term">Loan Term (Years)</label>
+                            <select id="buyer-loan-type" aria-label="Loan Type">
+                                <option value="conventional" selected data-lang="conventional">Conventional</option>
+                                <option value="fha" data-lang="fha">FHA</option>
+                                <option value="va" data-lang="va">VA</option>
+                                <option value="usda" data-lang="usda">USDA</option>
+                                <option value="arm" data-lang="arm">Adjustable-Rate (ARM)</option>
+                            </select>
+                            <label for="buyer-loan-type" data-lang="buyer_loan_type">Loan Type</label>
                         </div>
+                        
+                        <!-- Loan Term with common options -->
                         <div class="input-group">
-                            <input type="number" id="buyer-rate" placeholder="Interest Rate (%)" data-lang="buyer_rate" step="0.1" aria-label="Interest Rate" min="0" max="100">
-                            <label for="buyer-rate" data-lang="buyer_rate">Interest Rate (%)</label>
+                            <select id="buyer-term-preset" aria-label="Loan Term Preset">
+                                <option value="30" data-lang="years_30">30 Years</option>
+                                <option value="20" data-lang="years_20">20 Years</option>
+                                <option value="15" data-lang="years_15">15 Years</option>
+                                <option value="10" data-lang="years_10">10 Years</option>
+                                <option value="custom" data-lang="custom_term">Custom</option>
+                            </select>
+                            <label for="buyer-term-preset" data-lang="buyer_term_preset">Loan Term</label>
                         </div>
+                        <div class="input-group" id="buyer-term-custom-group" style="display: none;">
+                            <input type="number" id="buyer-term" placeholder="Loan Term (Years)" data-lang="buyer_term" aria-label="Custom Loan Term" min="1" step="1" value="30">
+                            <label for="buyer-term" data-lang="custom_term_label">Custom Term (Years)</label>
+                        </div>
+                        
+                        <!-- Interest Rate with common options -->
+                        <div class="input-group">
+                            <select id="buyer-rate-preset" aria-label="Interest Rate Preset">
+                                <option value="3">3.0%</option>
+                                <option value="3.5">3.5%</option>
+                                <option value="4">4.0%</option>
+                                <option value="4.5">4.5%</option>
+                                <option value="5">5.0%</option>
+                                <option value="5.5">5.5%</option>
+                                <option value="6">6.0%</option>
+                                <option value="6.5">6.5%</option>
+                                <option value="7">7.0%</option>
+                                <option value="custom" data-lang="custom_rate">Custom</option>
+                            </select>
+                            <label for="buyer-rate-preset" data-lang="buyer_rate_preset">Interest Rate</label>
+                        </div>
+                        <div class="input-group" id="buyer-rate-custom-group" style="display: none;">
+                            <input type="number" id="buyer-rate" placeholder="Interest Rate (%)" data-lang="buyer_rate" step="0.1" aria-label="Custom Interest Rate" min="0" max="100" value="5.5">
+                            <label for="buyer-rate" data-lang="custom_rate_label">Custom Rate (%)</label>
+                        </div>
+                        
+                        <!-- HOA Fees -->
+                        <div class="input-group">
+                            <input type="number" id="buyer-hoa" placeholder="Monthly HOA Fees ($)" data-lang="buyer_hoa" aria-label="HOA Fees" min="0" step="10">
+                            <label for="buyer-hoa" data-lang="buyer_hoa">HOA Fees ($/month)</label>
+                        </div>
+                        
+                        <!-- PMI-->
+                        <div class="input-group">
+                            <input type="number" id="buyer-pmi-rate" placeholder="PMI Rate (%)" data-lang="buyer_pmi_rate" aria-label="PMI Rate" min="0" step="0.01" value="0.5">
+                            <label for="buyer-pmi-rate" data-lang="buyer_pmi_rate">PMI Rate (%)</label>
+                        </div>
+                        
+                        <!-- Closing Costs -->
+                        <div class="input-group">
+                            <input type="number" id="buyer-closing-costs" placeholder="Closing Costs ($)" data-lang="buyer_closing_costs" aria-label="Closing Costs" min="0" step="500">
+                            <label for="buyer-closing-costs" data-lang="buyer_closing_costs">Closing Costs ($)</label>
+                            <span class="field-info" data-lang="default_closing_costs">Default: 3% of home price (typical for most areas)</span>
+                        </div>
+                        
+                        <!-- Extra Monthly Payment -->
+                        <div class="input-group">
+                            <input type="number" id="buyer-extra-payment" placeholder="Extra Monthly Payment ($)" data-lang="buyer_extra_payment" aria-label="Extra Monthly Payment" min="0" step="10">
+                            <label for="buyer-extra-payment" data-lang="buyer_extra_payment">Extra Monthly Payment ($)</label>
+                        </div>
+                        
+                        <!-- Escrow Account Option -->
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="buyer-escrow">
+                            <label for="buyer-escrow" data-lang="buyer_escrow">Include Taxes & Insurance in Payment (Escrow)</label>
+                        </div>
+                        
+                        <!-- Escrow Fields Container - Initially Hidden -->
+                        <div id="escrow-fields" class="escrow-fields">
+                            <!-- Property Taxes -->
+                            <div class="input-group">
+                                <input type="number" id="buyer-property-tax" placeholder="Annual Property Taxes ($)" data-lang="buyer_property_tax" aria-label="Property Taxes" min="0" step="100">
+                                <label for="buyer-property-tax" data-lang="buyer_property_tax">Property Taxes ($/year)</label>
+                                <span class="field-info" data-lang="default_property_tax">Default: 0.82% of home value (national average)</span>
+                            </div>
+                            
+                            <!-- Homeowners Insurance -->
+                            <div class="input-group">
+                                <input type="number" id="buyer-insurance" placeholder="Annual Insurance ($)" data-lang="buyer_insurance" aria-label="Homeowners Insurance" min="0" step="100">
+                                <label for="buyer-insurance" data-lang="buyer_insurance">Homeowners Insurance ($/year)</label>
+                                <span class="field-info" data-lang="default_insurance">Default: Based on $4,419/yr for $300K home value</span>
+                            </div>
+                        </div>
+                        
                         <button type="button" class="calc-btn" id="buyer-calc" data-lang="calculate">Calculate</button>
                         <p id="buyer-result" aria-live="polite"></p>
                     </div>
