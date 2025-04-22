@@ -1940,9 +1940,50 @@ function calculateSeller() {
         const totalCosts = commissionCost + closing + repairs;
         const netProceeds = price - balance - totalCosts;
 
+        const lang = localStorage.getItem('selectedLanguage') || 'en';
+        const formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2
+        });
+        
         document.getElementById('seller-result').innerHTML = `
-            <strong>Net Proceeds:</strong> $${netProceeds.toFixed(2)}<br>
-            <strong>Total Costs:</strong> $${totalCosts.toFixed(2)}
+            <div class="result-section">
+                <h4 data-lang="sale_summary">${translations[lang].sale_summary || 'Sale Summary'}</h4>
+                <div class="result-row">
+                    <span data-lang="sale_price">${translations[lang].sale_price || 'Sale Price'}:</span>
+                    <span>${formatter.format(price)}</span>
+                </div>
+                <div class="result-row">
+                    <span data-lang="mortgage_balance">${translations[lang].mortgage_balance || 'Mortgage Balance'}:</span>
+                    <span>${formatter.format(balance)}</span>
+                </div>
+                <div class="result-row">
+                    <span data-lang="total_costs">${translations[lang].total_costs || 'Total Costs'}:</span>
+                    <span>${formatter.format(totalCosts)}</span>
+                </div>
+                <div class="result-row total">
+                    <span data-lang="net_proceeds">${translations[lang].net_proceeds || 'Net Proceeds'}:</span>
+                    <span>${formatter.format(netProceeds)}</span>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <h4 data-lang="cost_breakdown">${translations[lang].cost_breakdown || 'Cost Breakdown'}</h4>
+                <div class="result-row">
+                    <span data-lang="commission_amount">${translations[lang].commission_amount || 'Commission'}:</span>
+                    <span>${formatter.format(commissionCost)}</span>
+                </div>
+                <div class="result-row">
+                    <span data-lang="closing_costs">${translations[lang].closing_costs || 'Closing Costs'}:</span>
+                    <span>${formatter.format(closing)}</span>
+                </div>
+                <div class="result-row">
+                    <span data-lang="repair_costs">${translations[lang].repair_costs || 'Repair Costs'}:</span>
+                    <span>${formatter.format(repairs)}</span>
+                </div>
+            </div>
+            <button class="reset-btn" onclick="window.location.href = window.location.pathname;">Reset Calculator</button>
         `;
         saveInputs('seller', { price, balance, commission, closing, repairs, netProceeds, totalCosts });
     } catch (error) {
@@ -1974,10 +2015,58 @@ function calculateInvestor() {
         const capRate = (noi / price) * 100;
         const cashOnCash = (cashFlow * 12 / down) * 100;
 
+        const lang = localStorage.getItem('selectedLanguage') || 'en';
+        const formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2
+        });
+        
         document.getElementById('investor-result').innerHTML = `
-            <strong>Monthly Cash Flow:</strong> $${cashFlow.toFixed(2)}<br>
-            <strong>Cap Rate:</strong> ${capRate.toFixed(2)}%<br>
-            <strong>Cash-on-Cash Return:</strong> ${cashOnCash.toFixed(2)}%
+            <div class="result-section">
+                <h4 data-lang="investment_summary">${translations[lang].investment_summary || 'Investment Summary'}</h4>
+                <div class="result-row">
+                    <span data-lang="monthly_cash_flow">${translations[lang].monthly_cash_flow || 'Monthly Cash Flow'}:</span>
+                    <span>${formatter.format(cashFlow)}/mo</span>
+                </div>
+                <div class="result-row">
+                    <span data-lang="annual_cash_flow">${translations[lang].annual_cash_flow || 'Annual Cash Flow'}:</span>
+                    <span>${formatter.format(cashFlow * 12)}/yr</span>
+                </div>
+                <div class="result-row">
+                    <span data-lang="cap_rate">${translations[lang].cap_rate || 'Cap Rate'}:</span>
+                    <span>${capRate.toFixed(2)}%</span>
+                </div>
+                <div class="result-row">
+                    <span data-lang="cash_on_cash_return">${translations[lang].cash_on_cash_return || 'Cash on Cash Return'}:</span>
+                    <span>${cashOnCash.toFixed(2)}%</span>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <h4 data-lang="investment_details">${translations[lang].investment_details || 'Investment Details'}</h4>
+                <div class="result-row">
+                    <span data-lang="purchase_price">${translations[lang].purchase_price || 'Purchase Price'}:</span>
+                    <span>${formatter.format(price)}</span>
+                </div>
+                <div class="result-row">
+                    <span data-lang="down_payment">${translations[lang].down_payment || 'Down Payment'}:</span>
+                    <span>${formatter.format(down)} (${((down / price) * 100).toFixed(1)}%)</span>
+                </div>
+                <div class="result-row">
+                    <span data-lang="monthly_rental_income">${translations[lang].monthly_rental_income || 'Monthly Rental Income'}:</span>
+                    <span>${formatter.format(rental)}/mo</span>
+                </div>
+                <div class="result-row">
+                    <span data-lang="monthly_expenses">${translations[lang].monthly_expenses || 'Monthly Expenses'}:</span>
+                    <span>${formatter.format(expenses)}/mo</span>
+                </div>
+                <div class="result-row">
+                    <span data-lang="principal_interest">${translations[lang].principal_interest || 'Principal & Interest'}:</span>
+                    <span>${formatter.format(monthlyPayment)}/mo</span>
+                </div>
+            </div>
+            <button class="reset-btn" onclick="window.location.href = window.location.pathname;">Reset Calculator</button>
         `;
         saveInputs('investor', { price, down, term, rate, rental, expenses, cashFlow, capRate, cashOnCash });
     } catch (error) {
@@ -1997,9 +2086,42 @@ function calculateCrypto() {
         }
 
         const cryptoAmount = amount / cryptoPrices[crypto];
+        const lang = localStorage.getItem('selectedLanguage') || 'en';
+        const formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2
+        });
+        
         document.getElementById('crypto-result').innerHTML = `
-            <strong>${crypto}:</strong> ${cryptoAmount.toFixed(6)}<br>
-            <strong>USD Value:</strong> $${amount.toFixed(2)}
+            <div class="result-section">
+                <h4 data-lang="crypto_calc">${translations[lang].crypto_calc || 'Crypto Calculator'}</h4>
+                <div class="result-row">
+                    <span data-lang="crypto_amount">${crypto}:</span>
+                    <span>${cryptoAmount.toFixed(6)}</span>
+                </div>
+                <div class="result-row">
+                    <span data-lang="usd_value">USD Value:</span>
+                    <span>${formatter.format(amount)}</span>
+                </div>
+                <div class="result-row">
+                    <span data-lang="exchange_rate">Exchange Rate:</span>
+                    <span>1 ${crypto} = ${formatter.format(cryptoPrices[crypto])}</span>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <h4 data-lang="other_conversions">Other Conversions</h4>
+                <div class="result-row">
+                    <span>BTC Equivalent:</span>
+                    <span>${(amount / cryptoPrices.BTC).toFixed(8)} BTC</span>
+                </div>
+                <div class="result-row">
+                    <span>ETH Equivalent:</span>
+                    <span>${(amount / cryptoPrices.ETH).toFixed(6)} ETH</span>
+                </div>
+            </div>
+            <button class="reset-btn" onclick="window.location.href = window.location.pathname;">Reset Calculator</button>
         `;
         saveInputs('crypto', { amount, crypto, cryptoAmount });
     } catch (error) {

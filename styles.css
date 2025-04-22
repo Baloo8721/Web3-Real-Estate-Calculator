@@ -435,9 +435,16 @@ p.subtitle {
     background: rgba(255, 255, 255, 0.08);
     border-radius: 10px;
     padding: 16px;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+/* Make the result container transparent but keep the individual result sections with their backgrounds */
+#buyer-result, #seller-result, #investor-result, #crypto-result {
+    background: transparent;
+    padding: 0;
+}
+
 
 .result-section h4 {
     color: #00ddeb;
