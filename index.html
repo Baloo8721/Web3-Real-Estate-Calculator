@@ -125,11 +125,7 @@
                             <label for="buyer-rate" data-lang="custom_rate_label">Custom Rate (%)</label>
                         </div>
                         
-                        <!-- HOA Fees -->
-                        <div class="input-group">
-                            <input type="number" id="buyer-hoa" placeholder="Monthly HOA Fees ($)" data-lang="buyer_hoa" aria-label="HOA Fees" min="0" step="10">
-                            <label for="buyer-hoa" data-lang="buyer_hoa">HOA Fees ($/month)</label>
-                        </div>
+                        <!-- HOA Fees moved to escrow section -->
                         
                         <!-- PMI-->
                         <div class="input-group">
@@ -153,7 +149,7 @@
                         <!-- Escrow Account Option -->
                         <div class="checkbox-group">
                             <input type="checkbox" id="buyer-escrow">
-                            <label for="buyer-escrow" data-lang="buyer_escrow">Include Taxes & Insurance in Payment (Escrow)</label>
+                            <label for="buyer-escrow" data-lang="buyer_escrow">Include Taxes & Insurance in Payment (Escrow), HOA/CDD Fees</label>
                         </div>
                         
                         <!-- Escrow Fields Container - Initially Hidden -->
@@ -170,6 +166,18 @@
                                 <input type="number" id="buyer-insurance" placeholder="Annual Insurance ($)" data-lang="buyer_insurance" aria-label="Homeowners Insurance" min="0" step="100">
                                 <label for="buyer-insurance" data-lang="buyer_insurance">Homeowners Insurance ($/year)</label>
                                 <span class="field-info" data-lang="default_insurance">Default: Based on $4,419/yr for $300K home value</span>
+                            </div>
+                            
+                            <!-- HOA Fees -->
+                            <div class="input-group">
+                                <input type="number" id="buyer-hoa" placeholder="Monthly HOA Fees ($)" data-lang="buyer_hoa" aria-label="HOA Fees" min="0" step="10">
+                                <label for="buyer-hoa" data-lang="buyer_hoa">HOA Fees ($/month)</label>
+                            </div>
+                            
+                            <!-- CDD Fees -->
+                            <div class="input-group">
+                                <input type="number" id="buyer-cdd" placeholder="Monthly CDD Fees ($)" data-lang="buyer_cdd" aria-label="CDD Fees" min="0" step="10">
+                                <label for="buyer-cdd" data-lang="buyer_cdd">CDD Fees ($/month)</label>
                             </div>
                         </div>
                         

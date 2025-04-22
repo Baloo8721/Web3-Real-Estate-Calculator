@@ -31,7 +31,8 @@ const translations = {
         buyer_pmi_rate: "PMI Rate (%)",
         buyer_closing_costs: "Closing Costs ($)",
         buyer_extra_payment: "Extra Monthly Payment ($)",
-        buyer_escrow: "Include Taxes & Insurance in Payment (Escrow)",
+        buyer_escrow: "Include Taxes & Insurance in Payment (Escrow), HOA/CDD Fees",
+        buyer_cdd: "CDD Fees ($/month)",
         custom_price: "Custom Price",
         custom_amount: "Custom Amount",
         custom_term: "Custom",
@@ -136,7 +137,8 @@ const translations = {
         buyer_pmi_rate: "Tasa de PMI (%)",
         buyer_closing_costs: "Costos de Cierre ($)",
         buyer_extra_payment: "Pago Mensual Adicional ($)",
-        buyer_escrow: "Incluir Impuestos y Seguro en Pago (Depósito en Garantía)",
+        buyer_escrow: "Incluir Impuestos y Seguro en Pago (Depósito en Garantía), Cuotas HOA/CDD",
+        buyer_cdd: "Cuotas CDD ($/mes)",
         custom_price: "Precio Personalizado",
         custom_amount: "Cantidad Personalizada",
         custom_term: "Personalizado",
@@ -226,7 +228,8 @@ const translations = {
         buyer_pmi_rate: "房贷保险费率 (%)",
         buyer_closing_costs: "过户费 ($)",
         buyer_extra_payment: "额外月供 ($)",
-        buyer_escrow: "包含税费和保险在月供中 (托管)",
+        buyer_escrow: "将税费和保险计入付款（托管），HOA/CDD费用",
+        buyer_cdd: "CDD费用（$/月）",
         custom_price: "自定义价格",
         custom_amount: "自定义金额",
         custom_term: "自定义",
@@ -315,6 +318,7 @@ const translations = {
         buyer_closing_costs: "تكاليف الإغلاق ($)",
         buyer_extra_payment: "دفعة شهرية إضافية ($)",
         buyer_escrow: "تضمين الضرائب والتأمين في الدفع (ضمان)",
+        buyer_cdd: "رسوم CDD ($/شهر)",
         custom_price: "سعر مخصص",
         custom_amount: "مبلغ مخصص",
         custom_term: "مخصص",
@@ -406,7 +410,8 @@ const translations = {
         buyer_pmi_rate: "Ставка Ипотечного Страхования (%)",
         buyer_closing_costs: "Расходы на Закрытие Сделки ($)",
         buyer_extra_payment: "Дополнительный Ежемесячный Платеж ($)",
-        buyer_escrow: "Включить Налоги и Страхование в Платеж (Эскроу)",
+        buyer_escrow: "Включить Налоги и Страховку в Платеж (Эскроу)",
+        buyer_cdd: "Сборы CDD ($/месяц)",
         custom_price: "Пользовательская Цена",
         custom_amount: "Пользовательская Сумма",
         custom_term: "Пользовательский",
@@ -496,7 +501,8 @@ const translations = {
         buyer_pmi_rate: "Taxa de Seguro Hipotecário (%)",
         buyer_closing_costs: "Custos de Fechamento ($)",
         buyer_extra_payment: "Pagamento Mensal Extra ($)",
-        buyer_escrow: "Incluir Impostos e Seguro no Pagamento (Caução)",
+        buyer_escrow: "Incluir Impostos e Seguro no Pagamento (Caução), Taxas HOA/CDD",
+        buyer_cdd: "Taxas CDD ($/mês)",
         custom_price: "Preço Personalizado",
         custom_amount: "Valor Personalizado",
         custom_term: "Personalizado",
@@ -587,6 +593,7 @@ const translations = {
         buyer_closing_costs: "Frais de Clôture ($)",
         buyer_extra_payment: "Paiement Mensuel Supplémentaire ($)",
         buyer_escrow: "Inclure Taxes et Assurance dans le Paiement (Séquestre)",
+        buyer_cdd: "Frais CDD ($/mois)",
         custom_price: "Prix Personnalisé",
         custom_amount: "Montant Personnalisé",
         custom_term: "Personnalisée",
@@ -677,6 +684,7 @@ const translations = {
         buyer_closing_costs: "Costi di Chiusura ($)",
         buyer_extra_payment: "Pagamento Mensile Extra ($)",
         buyer_escrow: "Includi Tasse e Assicurazione nel Pagamento (Deposito)",
+        buyer_cdd: "Spese CDD ($/mese)",
         custom_price: "Prezzo Personalizzato",
         custom_amount: "Importo Personalizzato",
         custom_term: "Personalizzato",
@@ -766,7 +774,8 @@ const translations = {
         buyer_pmi_rate: "Kreditversicherungsrate (%)",
         buyer_closing_costs: "Abschlusskosten ($)",
         buyer_extra_payment: "Zusätzliche Monatszahlung ($)",
-        buyer_escrow: "Steuern & Versicherung in Zahlung inkludieren (Treuhand)",
+        buyer_escrow: "Steuern & Versicherung in Zahlung einbeziehen (Treuhand)",
+        buyer_cdd: "CDD-Gebühren ($/Monat)",
         custom_price: "Benutzerdefinierter Preis",
         custom_amount: "Benutzerdefinierter Betrag",
         custom_term: "Benutzerdefiniert",
@@ -856,7 +865,8 @@ const translations = {
         buyer_pmi_rate: "住宅ローン保険率 (%)",
         buyer_closing_costs: "クロージング費用 ($)",
         buyer_extra_payment: "追加月額支払い ($)",
-        buyer_escrow: "税金と保険を支払いに含む (エスクロー)",
+        buyer_escrow: "税金と保険を支払いに含める (エスクロー)",
+        buyer_cdd: "CDD料金（$/月）",
         custom_price: "カスタム価格",
         custom_amount: "カスタム金額",
         custom_term: "カスタム",
@@ -870,7 +880,7 @@ const translations = {
         arm: "変動金利ローン",
         default_closing_costs: "デフォルト：住宅価格の3％ (多くの地域で一般的)",
         default_property_tax: "デフォルト：住宅価格の0.82％ (全国平均)",
-        default_insurance: "デフォルト：30万ドルの住宅で年間$4,419を基準",
+        default_insurance: "デフォルト：30万ドル住宅で年間$4,419を基準",
         years_30: "30年",
         years_20: "20年",
         years_15: "15年",
@@ -947,6 +957,7 @@ const translations = {
         buyer_closing_costs: "Avslutningskostnader ($)",
         buyer_extra_payment: "Extra Månatlig Betalning ($)",
         buyer_escrow: "Inkludera Skatter & Försäkring i Betalning (Deposition)",
+        buyer_cdd: "CDD-avgifter ($/månad)",
         custom_price: "Anpassat Pris",
         custom_amount: "Anpassat Belopp",
         custom_term: "Anpassad",
@@ -994,7 +1005,7 @@ const translations = {
         seller_repairs: "Reparationer ($)",
         investor_price: "Inköpspris ($)",
         investor_down: "Kontantinsats ($)",
-        investor_term: "Lånetid (År)",
+        investor_term: "Låneperiod (År)",
         investor_rate: "Ränta (%)",
         investor_rental: "Månatlig Hyresintäkt ($)",
         investor_expenses: "Månatliga Utgifter ($)",
@@ -1036,7 +1047,8 @@ const translations = {
         buyer_pmi_rate: "주택대출보험료 율 (%)",
         buyer_closing_costs: "마감 비용 ($)",
         buyer_extra_payment: "추가 월금 지불 ($)",
-        buyer_escrow: "세금 및 보험료 포함 (에스크로)",
+        buyer_escrow: "세금 및 보험을 지불에 포함 (에스크로)",
+        buyer_cdd: "CDD 수수료 ($/월)",
         custom_price: "직접 입력 가격",
         custom_amount: "직접 입력 금액",
         custom_term: "직접 입력",
@@ -1743,6 +1755,7 @@ function calculateBuyer() {
         const propertyTax = parseFloat(document.getElementById('buyer-property-tax').value) || 0;
         const insurance = parseFloat(document.getElementById('buyer-insurance').value) || 0;
         const hoaFees = parseFloat(document.getElementById('buyer-hoa').value) || 0;
+        const cddFees = parseFloat(document.getElementById('buyer-cdd').value) || 0;
         const pmiRate = parseFloat(document.getElementById('buyer-pmi-rate').value) || 0;
         const closingCosts = parseFloat(document.getElementById('buyer-closing-costs').value) || 0;
         const extraPayment = parseFloat(document.getElementById('buyer-extra-payment').value) || 0;
@@ -1788,13 +1801,15 @@ function calculateBuyer() {
         let baseMonthlyPayment = principalInterest;
         let totalMonthlyPayment = principalInterest;
         
-        if (includeEscrow) {
-            // Add taxes and insurance to monthly payment
-            totalMonthlyPayment += monthlyPropertyTax + monthlyInsurance;
-        }
+        // Always add PMI to monthly payment (if applicable)
+        totalMonthlyPayment += monthlyPMI;
         
-        // Add HOA and PMI to both scenarios - these are separate from escrow
-        totalMonthlyPayment += hoaFees + monthlyPMI;
+        if (includeEscrow) {
+            // When escrow is checked, add taxes, insurance, HOA, and CDD fees
+            totalMonthlyPayment += monthlyPropertyTax + monthlyInsurance + hoaFees + cddFees;
+        } else {
+            // When escrow is not checked, HOA and CDD fees are still visible/editable but not included in the payment
+        }
         
         // Add extra payment (this affects amortization but not required monthly payment)
         const effectiveMonthlyPayment = totalMonthlyPayment + extraPayment;
@@ -1925,8 +1940,8 @@ function calculateBuyer() {
         
         // Save the inputs and results
         saveInputs('buyer', { 
-            price, down, term, rate, propertyTax, insurance, hoaFees, pmiRate,
-            closingCosts, extraPayment, includeEscrow, loanType,
+            price, down, term, rate, loanType, propertyTax, insurance, hoaFees, cddFees, pmiRate,
+            closingCosts, extraPayment, includeEscrow,
             principalInterest, totalMonthlyPayment, totalInterest, ltv, totalUpfrontCosts
         });
     } catch (error) {
