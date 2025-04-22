@@ -1879,6 +1879,11 @@ function calculateBuyer() {
                     <span data-lang="hoa_fees">${translations[lang].hoa_fees}:</span>
                     <span>${formatter.format(hoaFees)}/mo</span>
                 </div>` : ''}
+                ${cddFees > 0 ? `
+                <div class="result-row">
+                    <span data-lang="buyer_cdd">${translations[lang].buyer_cdd || 'CDD Fees ($/month)'}:</span>
+                    <span>${formatter.format(cddFees)}/mo</span>
+                </div>` : ''}
                 ${monthlyPMI > 0 ? `
                 <div class="result-row">
                     <span data-lang="${loanType === 'fha' ? 'mortgage_insurance_premium' : 'private_mortgage_insurance'}">${loanType === 'fha' ? translations[lang].mortgage_insurance_premium : translations[lang].private_mortgage_insurance}:</span>
@@ -2217,6 +2222,11 @@ function renderBuyerResults(inputs) {
                 <div class="result-row">
                     <span data-lang="hoa_fees">${translations[lang].hoa_fees}:</span>
                     <span>${formatter.format(hoaFees)}/mo</span>
+                </div>` : ''}
+                ${cddFees > 0 ? `
+                <div class="result-row">
+                    <span data-lang="buyer_cdd">${translations[lang].buyer_cdd || 'CDD Fees ($/month)'}:</span>
+                    <span>${formatter.format(cddFees)}/mo</span>
                 </div>` : ''}
                 ${monthlyPMI > 0 ? `
                 <div class="result-row">
