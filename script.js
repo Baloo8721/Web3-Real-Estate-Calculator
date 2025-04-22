@@ -109,7 +109,8 @@ const translations = {
         share_results: "Share Results",
         referral_link: "Find an Agent",
         footer: "Powered by Web3RealtorFL - Bridging Real Estate & Blockchain",
-        invalid_input: "Please enter valid inputs."
+        invalid_input: "Please enter valid inputs.",
+        reset_calculator: "Reset Calculator"
     },
     es: {
         title: "Calculadora Inmobiliaria Definitiva",
@@ -196,7 +197,8 @@ const translations = {
         share_results: "Compartir Resultados",
         referral_link: "Encuentra un Agente",
         footer: "Desarrollado por Web3RealtorFL - Conectando Inmuebles y Blockchain",
-        invalid_input: "Por favor, introduce datos válidos."
+        invalid_input: "Por favor, introduce datos válidos.",
+        reset_calculator: "Reiniciar Calculadora"
     },
     zh: {
         title: "终极房地产计算器",
@@ -285,7 +287,8 @@ const translations = {
         share_results: "分享结果",
         referral_link: "寻找代理",
         footer: "由 Web3RealtorFL 提供支持 - 连接房地产与区块链",
-        invalid_input: "请输入有效数据。"
+        invalid_input: "请输入有效数据。",
+        reset_calculator: "重置计算器"
     },
     ar: {
         title: "حاسبة العقارات المثلى",
@@ -374,7 +377,8 @@ const translations = {
         share_results: "مشاركة النتائج",
         referral_link: "ابحث عن وكيل",
         footer: "مدعوم من Web3RealtorFL - ربط العقارات والبلوكشين",
-        invalid_input: "الرجاء إدخال بيانات صحيحة."
+        invalid_input: "الرجاء إدخال بيانات صحيحة.",
+        reset_calculator: "إعادة ضبط الآلة الحاسبة"
     },
     ru: {
         title: "Полный Калькулятор Недвижимости",
@@ -463,7 +467,8 @@ const translations = {
         share_results: "Поделиться Результатами",
         referral_link: "Найти Агента",
         footer: "Работает на Web3RealtorFL - Соединяя Недвижимость и Блокчейн",
-        invalid_input: "Пожалуйста, введите действительные данные."
+        invalid_input: "Пожалуйста, введите действительные данные.",
+        reset_calculator: "Сбросить Калькулятор"
     },
     pt: {
         title: "Calculadora Imobiliária Definitiva",
@@ -552,7 +557,8 @@ const translations = {
         share_results: "Compartilhar Resultados",
         referral_link: "Encontrar um Agente",
         footer: "Desenvolvido por Web3RealtorFL - Unindo Imóveis e Blockchain",
-        invalid_input: "Por favor, insira dados válidos."
+        invalid_input: "Por favor, insira dados válidos.",
+        reset_calculator: "Reiniciar Calculadora"
     },
     fr: {
         title: "Calculateur Immobilier Ultime",
@@ -641,7 +647,8 @@ const translations = {
         share_results: "Partager les Résultats",
         referral_link: "Trouver un Agent",
         footer: "Propulsé par Web3RealtorFL - Reliant l'Immobilier et la Blockchain",
-        invalid_input: "Veuillez entrer des données valides."
+        invalid_input: "Veuillez entrer des données valides.",
+        reset_calculator: "Réinitialiser la Calculatrice"
     },
     it: {
         title: "Calcolatore Immobiliare Definitivo",
@@ -730,7 +737,8 @@ const translations = {
         share_results: "Condividi Risultati",
         referral_link: "Trova un Agente",
         footer: "Realizzato da Web3RealtorFL - Collegando Immobiliare e Blockchain",
-        invalid_input: "Inserisci dati validi."
+        invalid_input: "Inserisci dati validi.",
+        reset_calculator: "Reimposta Calcolatrice"
     },
     de: {
         title: "Ultimativer Immobilienrechner",
@@ -819,7 +827,8 @@ const translations = {
         share_results: "Ergebnisse Teilen",
         referral_link: "Einen Makler Finden",
         footer: "Unterstützt von Web3RealtorFL - Verbindung von Immobilien & Blockchain",
-        invalid_input: "Bitte geben Sie gültige Daten ein."
+        invalid_input: "Bitte geben Sie gültige Daten ein.",
+        reset_calculator: "Rechner zurücksetzen"
     },
     ja: {
         title: "究極の不動産計算機",
@@ -908,7 +917,8 @@ const translations = {
         share_results: "結果を共有",
         referral_link: "エージェントを探す",
         footer: "Web3RealtorFL 提供 - 不動産とブロックチェーンを繋ぐ",
-        invalid_input: "有効なデータを入力してください。"
+        invalid_input: "有効なデータを入力してください。",
+        reset_calculator: "計算機をリセット"
     },
     sv: {
         title: "Ultimata Fastighetskalkylatorn",
@@ -997,7 +1007,8 @@ const translations = {
         share_results: "Dela Resultat",
         referral_link: "Hitta en Mäklare",
         footer: "Drivs av Web3RealtorFL - Överbryggar Fastigheter & Blockchain",
-        invalid_input: "Ange giltiga data."
+        invalid_input: "Ange giltiga data.",
+        reset_calculator: "Återställ Kalkylator"
     },
     ko: {
         title: "궁극의 부동산 계산기",
@@ -1086,7 +1097,8 @@ const translations = {
         share_results: "결과 공유",
         referral_link: "중개인 찾기",
         footer: "Web3RealtorFL 제공 - 부동산과 블록체인 연결",
-        invalid_input: "유효한 데이터를 입력하십시오."
+        invalid_input: "유효한 데이터를 입력하십시오.",
+        reset_calculator: "계산기 재설정"
     }
 };
 
@@ -1908,7 +1920,7 @@ function calculateBuyer() {
                     <span>${formatter.format(totalUpfrontCosts)}</span>
                 </div>
             </div>
-            <button class="reset-btn" onclick="window.location.href = window.location.pathname;">Reset Calculator</button>
+            <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
         `;
         
         // Save the inputs and results
@@ -1983,7 +1995,7 @@ function calculateSeller() {
                     <span>${formatter.format(repairs)}</span>
                 </div>
             </div>
-            <button class="reset-btn" onclick="window.location.href = window.location.pathname;">Reset Calculator</button>
+            <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
         `;
         saveInputs('seller', { price, balance, commission, closing, repairs, netProceeds, totalCosts });
     } catch (error) {
@@ -2066,7 +2078,7 @@ function calculateInvestor() {
                     <span>${formatter.format(monthlyPayment)}/mo</span>
                 </div>
             </div>
-            <button class="reset-btn" onclick="window.location.href = window.location.pathname;">Reset Calculator</button>
+            <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
         `;
         saveInputs('investor', { price, down, term, rate, rental, expenses, cashFlow, capRate, cashOnCash });
     } catch (error) {
@@ -2121,7 +2133,7 @@ function calculateCrypto() {
                     <span>${(amount / cryptoPrices.ETH).toFixed(6)} ETH</span>
                 </div>
             </div>
-            <button class="reset-btn" onclick="window.location.href = window.location.pathname;">Reset Calculator</button>
+            <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
         `;
         saveInputs('crypto', { amount, crypto, cryptoAmount });
     } catch (error) {
@@ -2247,7 +2259,7 @@ function renderBuyerResults(inputs) {
                     <span>${formatter.format(totalUpfrontCosts)}</span>
                 </div>
             </div>
-            <button class="reset-btn" onclick="window.location.href = window.location.pathname;">Reset Calculator</button>
+            <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
         `;
     } catch (error) {
         console.error('Error rendering buyer results:', error);
@@ -2293,7 +2305,7 @@ function renderSellerResults(inputs) {
                     <span>${formatter.format(netProceeds)}</span>
                 </div>
             </div>
-            <button class="reset-btn" onclick="window.location.href = window.location.pathname;">Reset Calculator</button>
+            <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
             
             <div class="result-section">
                 <h4>${translations[lang].cost_breakdown || 'Cost Breakdown'}</h4>
@@ -2310,7 +2322,7 @@ function renderSellerResults(inputs) {
                     <span>${formatter.format(repairs)}</span>
                 </div>
             </div>
-            <button class="reset-btn" onclick="window.location.href = window.location.pathname;">Reset Calculator</button>
+            <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
         `;
     } catch (error) {
         console.error('Error rendering seller results:', error);
@@ -2356,7 +2368,7 @@ function renderInvestorResults(inputs) {
                     <span>${cashOnCash.toFixed(2)}%</span>
                 </div>
             </div>
-            <button class="reset-btn" onclick="window.location.href = window.location.pathname;">Reset Calculator</button>
+            <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
             
             <div class="result-section">
                 <h4>${translations[lang].investment_details || 'Investment Details'}</h4>
@@ -2377,7 +2389,7 @@ function renderInvestorResults(inputs) {
                     <span>${formatter.format(expenses)}/mo</span>
                 </div>
             </div>
-            <button class="reset-btn" onclick="window.location.href = window.location.pathname;">Reset Calculator</button>
+            <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
         `;
     } catch (error) {
         console.error('Error rendering investor results:', error);
