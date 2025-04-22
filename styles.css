@@ -31,7 +31,7 @@ body::before {
     bottom: 0;
     width: 100%;
     height: 100%;
-    background: url('images/image (9).jpg') no-repeat center center;
+    background: url('images/background.jpg') no-repeat center center;
     background-size: cover;
     /* Removed fixed attachment for better mobile performance */
     will-change: transform; /* Hardware acceleration hint */
