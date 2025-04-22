@@ -342,6 +342,20 @@ p.subtitle {
     margin-top: 5px;
     margin-left: 16px;
     font-style: italic;
+    text-decoration: none;
+}
+
+/* Only make the insurance field-info link turn white on hover */
+a.field-info {
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.5);
+}
+
+a.field-info:hover,
+a.field-info:focus {
+    color: #fff;
+    text-decoration: underline;
 }
 
 /* Combined input group styling */
