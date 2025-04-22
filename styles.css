@@ -404,6 +404,29 @@ p.subtitle {
     box-shadow: 0 4px 16px rgba(0, 221, 235, 0.4);
 }
 
+/* Reset Button Styling */
+.reset-btn {
+    width: 100%;
+    padding: 12px;
+    margin: 15px 0 5px 0;
+    background: linear-gradient(to right, #8e44ad, #673ab7);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95em;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(142, 68, 173, 0.3);
+    transition: all 0.3s ease;
+    opacity: 0.85;
+}
+
+.reset-btn:hover {
+    background: linear-gradient(135deg, #9b59b6, #7e57c2, #9b59b6);
+    box-shadow: 0 4px 16px rgba(142, 68, 173, 0.4);
+    opacity: 1;
+}
+
 /* Enhanced Results Styling */
 .result-section {
     background: rgba(255, 255, 255, 0.08);

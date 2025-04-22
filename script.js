@@ -1090,9 +1090,171 @@ const translations = {
     }
 };
 
+// Function to force scroll to top - only used on page refresh, not calculation
+function forceScrollToTop() {
+    // Use multiple methods for maximum compatibility
+    window.scrollTo(0, 0);
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+    
+    // Add fragment identifier to URL and force navigation
+    if (window.location.href.indexOf('#page-top') === -1) {
+        window.location.href = '#page-top';
+    }
+    
+    // If all else fails, try to reset the scroll position with a delay
+    setTimeout(function() {
+        window.scrollTo(0, 0);
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+    }, 100);
+}
+
+// Apply on page load
+window.onload = function() {
+    // Set to English language
+    changeLanguage('en');
+    
+    // Force scroll to top
+    forceScrollToTop();
+};
+
+// Use the more modern 'load' event as a backup
+window.addEventListener('load', forceScrollToTop);
+
+// Apply on DOMContentLoaded as well
+document.addEventListener('DOMContentLoaded', forceScrollToTop);
+
+// Handle form submission and refreshes
+window.addEventListener('beforeunload', function() {
+    // Store a flag to indicate we should scroll to top after reload
+    sessionStorage.setItem('scrollToTop', 'true');
+});
+
+// Check if we need to scroll after a page refresh
+if (sessionStorage.getItem('scrollToTop') === 'true') {
+    // Remove the flag
+    sessionStorage.removeItem('scrollToTop');
+    // Force scroll with a slight delay
+    setTimeout(forceScrollToTop, 0);
+}
+
+// Function to parse URL parameters and load calculator with saved values
+function loadFromUrlParams() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('mode')) {
+            const mode = params.get('mode');
+            console.log('Loading calculator from shared link. Mode:', mode);
+            
+            // First, switch to the correct calculator mode/tab
+            const tabLabels = document.querySelectorAll('.tab-label');
+            tabLabels.forEach(tab => {
+                if (tab.dataset.mode === mode) {
+                    // Simulate click on the tab
+                    tab.click();
+                }
+            });
+            
+            // Now populate the fields based on the mode
+            switch(mode) {
+                case 'buyer':
+                    if (params.has('price')) document.getElementById('buyer-price').value = params.get('price');
+                    if (params.has('down')) document.getElementById('buyer-down').value = params.get('down');
+                    if (params.has('term')) {
+                        const term = params.get('term');
+                        const termPreset = document.getElementById('buyer-term-preset');
+                        if (term === '30' || term === '20' || term === '15' || term === '10') {
+                            termPreset.value = term;
+                        } else {
+                            termPreset.value = 'custom';
+                            document.getElementById('buyer-term').value = term;
+                            document.getElementById('buyer-term-custom-group').style.display = 'block';
+                        }
+                    }
+                    if (params.has('rate')) {
+                        const rate = params.get('rate');
+                        const ratePreset = document.getElementById('buyer-rate-preset');
+                        const standardRates = ['3', '3.5', '4', '4.5', '5', '5.5', '6', '6.5', '7'];
+                        if (standardRates.includes(rate)) {
+                            ratePreset.value = rate;
+                        } else {
+                            ratePreset.value = 'custom';
+                            document.getElementById('buyer-rate').value = rate;
+                            document.getElementById('buyer-rate-custom-group').style.display = 'block';
+                        }
+                    }
+                    if (params.has('loanType')) document.getElementById('buyer-loan-type').value = params.get('loanType');
+                    if (params.has('propertyTax')) document.getElementById('buyer-property-tax').value = params.get('propertyTax');
+                    if (params.has('insurance')) document.getElementById('buyer-insurance').value = params.get('insurance');
+                    if (params.has('hoaFees')) document.getElementById('buyer-hoa').value = params.get('hoaFees');
+                    if (params.has('pmiRate')) document.getElementById('buyer-pmi-rate').value = params.get('pmiRate');
+                    if (params.has('closingCosts')) document.getElementById('buyer-closing-costs').value = params.get('closingCosts');
+                    if (params.has('extraPayment')) document.getElementById('buyer-extra-payment').value = params.get('extraPayment');
+                    if (params.has('includeEscrow')) {
+                        const includeEscrow = params.get('includeEscrow') === 'true';
+                        document.getElementById('buyer-escrow').checked = includeEscrow;
+                        if (includeEscrow) {
+                            document.getElementById('escrow-fields').classList.add('active');
+                        }
+                    }
+                    
+                    // Trigger calculation
+                    setTimeout(() => {
+                        document.getElementById('buyer-calc').click();
+                    }, 500);
+                    break;
+                    
+                case 'seller':
+                    if (params.has('price')) document.getElementById('seller-price').value = params.get('price');
+                    if (params.has('balance')) document.getElementById('seller-balance').value = params.get('balance');
+                    if (params.has('commission')) document.getElementById('seller-commission').value = params.get('commission');
+                    if (params.has('closing')) document.getElementById('seller-closing').value = params.get('closing');
+                    if (params.has('repairs')) document.getElementById('seller-repairs').value = params.get('repairs');
+                    
+                    // Trigger calculation
+                    setTimeout(() => {
+                        document.getElementById('seller-calc').click();
+                    }, 500);
+                    break;
+                    
+                case 'investor':
+                    if (params.has('price')) document.getElementById('investor-price').value = params.get('price');
+                    if (params.has('down')) document.getElementById('investor-down').value = params.get('down');
+                    if (params.has('term')) document.getElementById('investor-term').value = params.get('term');
+                    if (params.has('rate')) document.getElementById('investor-rate').value = params.get('rate');
+                    if (params.has('rental')) document.getElementById('investor-rental').value = params.get('rental');
+                    if (params.has('expenses')) document.getElementById('investor-expenses').value = params.get('expenses');
+                    
+                    // Trigger calculation
+                    setTimeout(() => {
+                        document.getElementById('investor-calc').click();
+                    }, 500);
+                    break;
+                    
+                case 'crypto':
+                    if (params.has('amount')) document.getElementById('crypto-amount').value = params.get('amount');
+                    if (params.has('from')) document.getElementById('crypto-from').value = params.get('from');
+                    if (params.has('to')) document.getElementById('crypto-to').value = params.get('to');
+                    
+                    // Trigger calculation
+                    setTimeout(() => {
+                        document.getElementById('crypto-calc').click();
+                    }, 500);
+                    break;
+            }
+        }
+    } catch (error) {
+        console.error('Error loading from URL parameters:', error);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     try {
         console.log('Initializing calculator...');
+        
+        // Check for URL parameters to load saved calculations
+        loadFromUrlParams();
         
         // Initialize language settings
         const savedLang = localStorage.getItem('selectedLanguage') || 'en';
@@ -1132,10 +1294,38 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Initialize calculator buttons
-        document.getElementById('buyer-calc').addEventListener('click', calculateBuyer);
-        document.getElementById('seller-calc').addEventListener('click', calculateSeller);
-        document.getElementById('investor-calc').addEventListener('click', calculateInvestor);
-        document.getElementById('crypto-calc').addEventListener('click', calculateCrypto);
+        document.getElementById('buyer-calc')?.addEventListener('click', () => {
+            calculateBuyer();
+            // Scroll just slightly to show the beginning of results section
+            const results = document.getElementById('buyer-result');
+            if (results) {
+                results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+        document.getElementById('seller-calc').addEventListener('click', () => {
+            calculateSeller();
+            // Scroll just slightly to show the beginning of results section
+            const results = document.getElementById('seller-result');
+            if (results) {
+                results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+        document.getElementById('investor-calc')?.addEventListener('click', () => {
+            calculateInvestor();
+            // Scroll just slightly to show the beginning of results section
+            const results = document.getElementById('investor-result');
+            if (results) {
+                results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+        document.getElementById('crypto-calc').addEventListener('click', () => {
+            calculateCrypto();
+            // Scroll just slightly to show the beginning of results section
+            const results = document.getElementById('crypto-result');
+            if (results) {
+                results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
         document.getElementById('saveBtn').addEventListener('click', saveResults);
         document.getElementById('shareBtn').addEventListener('click', shareResults);
         
@@ -1718,6 +1908,7 @@ function calculateBuyer() {
                     <span>${formatter.format(totalUpfrontCosts)}</span>
                 </div>
             </div>
+            <button class="reset-btn" onclick="window.location.href = window.location.pathname;">Reset Calculator</button>
         `;
         
         // Save the inputs and results
@@ -1934,6 +2125,7 @@ function renderBuyerResults(inputs) {
                     <span>${formatter.format(totalUpfrontCosts)}</span>
                 </div>
             </div>
+            <button class="reset-btn" onclick="window.location.href = window.location.pathname;">Reset Calculator</button>
         `;
     } catch (error) {
         console.error('Error rendering buyer results:', error);
@@ -1979,6 +2171,7 @@ function renderSellerResults(inputs) {
                     <span>${formatter.format(netProceeds)}</span>
                 </div>
             </div>
+            <button class="reset-btn" onclick="window.location.href = window.location.pathname;">Reset Calculator</button>
             
             <div class="result-section">
                 <h4>${translations[lang].cost_breakdown || 'Cost Breakdown'}</h4>
@@ -1995,6 +2188,7 @@ function renderSellerResults(inputs) {
                     <span>${formatter.format(repairs)}</span>
                 </div>
             </div>
+            <button class="reset-btn" onclick="window.location.href = window.location.pathname;">Reset Calculator</button>
         `;
     } catch (error) {
         console.error('Error rendering seller results:', error);
@@ -2040,6 +2234,7 @@ function renderInvestorResults(inputs) {
                     <span>${cashOnCash.toFixed(2)}%</span>
                 </div>
             </div>
+            <button class="reset-btn" onclick="window.location.href = window.location.pathname;">Reset Calculator</button>
             
             <div class="result-section">
                 <h4>${translations[lang].investment_details || 'Investment Details'}</h4>
@@ -2060,6 +2255,7 @@ function renderInvestorResults(inputs) {
                     <span>${formatter.format(expenses)}/mo</span>
                 </div>
             </div>
+            <button class="reset-btn" onclick="window.location.href = window.location.pathname;">Reset Calculator</button>
         `;
     } catch (error) {
         console.error('Error rendering investor results:', error);
@@ -2090,16 +2286,351 @@ function saveResults() {
 
 function shareResults() {
     try {
-        if (!lastInputs.mode) return;
-        const params = new URLSearchParams();
-        params.set('mode', lastInputs.mode);
-        for (const [key, value] of Object.entries(lastInputs)) {
-            if (key !== 'mode') {
-                params.set(key, value);
-            }
+        if (!lastInputs.mode) {
+            alert('Please calculate results first before sharing.');
+            return;
         }
-        const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
-        prompt('Copy this URL to share:', url);
+        
+        // Get the currently active calculator mode
+        const mode = lastInputs.mode;
+        const resultElement = document.getElementById(`${mode}-result`);
+        if (!resultElement) return;
+        
+        // Get language and formatter
+        const lang = localStorage.getItem('selectedLanguage') || 'en';
+        const formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2
+        });
+        
+        // Create a clean text version of the results
+        let resultText = '===== Real Estate Calculator Results =====\n\n';
+        
+        // Add calculator type
+        switch(mode) {
+            case 'buyer':
+                resultText += '🏠 BUYER CALCULATOR\n';
+                resultText += `Home Price: ${formatter.format(lastInputs.price)}\n`;
+                resultText += `Down Payment: ${formatter.format(lastInputs.down)}\n`;
+                resultText += `Loan Amount: ${formatter.format(lastInputs.price - lastInputs.down)}\n`;
+                resultText += `Interest Rate: ${lastInputs.rate}%\n`;
+                resultText += `Loan Term: ${lastInputs.term} years\n\n`;
+                resultText += `Monthly Payment: ${formatter.format(lastInputs.monthlyPayment)}/month\n`;
+                if (lastInputs.taxes) resultText += `Property Taxes: ${formatter.format(lastInputs.taxes)}/month\n`;
+                if (lastInputs.insurance) resultText += `Insurance: ${formatter.format(lastInputs.insurance)}/month\n`;
+                if (lastInputs.hoa) resultText += `HOA: ${formatter.format(lastInputs.hoa)}/month\n`;
+                if (lastInputs.pmi) resultText += `PMI: ${formatter.format(lastInputs.pmi)}/month\n`;
+                if (lastInputs.totalMonthlyPayment) resultText += `Total Monthly Cost: ${formatter.format(lastInputs.totalMonthlyPayment)}/month\n`;
+                break;
+                
+            case 'seller':
+                resultText += '💰 SELLER CALCULATOR\n';
+                resultText += `Sale Price: ${formatter.format(lastInputs.price)}\n`;
+                resultText += `Mortgage Balance: ${formatter.format(lastInputs.balance)}\n`;
+                resultText += `Commission: ${lastInputs.commission}%\n`;
+                resultText += `Net Proceeds: ${formatter.format(lastInputs.netProceeds)}\n`;
+                break;
+                
+            case 'investor':
+                resultText += '📈 INVESTOR CALCULATOR\n';
+                resultText += `Property Price: ${formatter.format(lastInputs.price)}\n`;
+                resultText += `Monthly Rental Income: ${formatter.format(lastInputs.rental)}/month\n`;
+                resultText += `Monthly Expenses: ${formatter.format(lastInputs.expenses)}/month\n`;
+                resultText += `Cash Flow: ${formatter.format(lastInputs.cashFlow)}/month\n`;
+                resultText += `Cap Rate: ${lastInputs.capRate}%\n`;
+                resultText += `Cash on Cash Return: ${lastInputs.cashOnCash}%\n`;
+                break;
+                
+            case 'crypto':
+                resultText += '🪙 CRYPTO CALCULATOR\n';
+                // Add crypto-specific details
+                break;
+        }
+        
+        resultText += '\n🌐 Generated by Web3 Real Estate Calculator\n';
+        resultText += '🔗 https://tylerbelisle.kw.com/';
+        
+        // Create sharing options
+        const shareOptions = document.createElement('div');
+        shareOptions.className = 'share-options';
+        shareOptions.innerHTML = `
+            <div class="share-title">Share Results</div>
+            <button id="copy-text" class="share-option">📋 Copy as Text</button>
+            <button id="copy-link" class="share-option">🔗 Copy Link</button>
+            <div class="share-divider">Or share directly</div>
+            <div class="share-apps">
+                <button id="share-email" class="share-app">📧 Email</button>
+                <button id="share-sms" class="share-app">💬 SMS</button>
+            </div>
+            <button id="cancel-share" class="share-cancel">Cancel</button>
+        `;
+        
+        // Add temporary styles
+        const tempStyle = document.createElement('style');
+        tempStyle.textContent = `
+            .share-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(10, 25, 47, 0.8);
+                backdrop-filter: blur(3px);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            }
+            .share-options {
+                background: rgba(20, 35, 55, 0.95);
+                border-radius: 12px;
+                padding: 24px;
+                width: 90%;
+                max-width: 350px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow: 0 8px 32px rgba(0, 221, 235, 0.2);
+                color: #fff;
+            }
+            .share-title {
+                font-size: 1.2em;
+                font-weight: 600;
+                text-align: center;
+                margin-bottom: 12px;
+                color: #00ddeb;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+                padding-bottom: 10px;
+            }
+            .share-option, .share-app {
+                padding: 14px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                background: rgba(255, 255, 255, 0.08);
+                cursor: pointer;
+                font-size: 0.95em;
+                transition: all 0.3s ease;
+                text-align: left;
+                color: #d5e1ef;
+                font-weight: 500;
+            }
+            .share-option:hover, .share-app:hover {
+                background: rgba(255, 255, 255, 0.12);
+                border-color: rgba(255, 255, 255, 0.2);
+                box-shadow: 0 4px 12px rgba(0, 221, 235, 0.15);
+            }
+            .share-divider {
+                margin: 14px 0;
+                text-align: center;
+                color: rgba(255, 255, 255, 0.5);
+                position: relative;
+                font-size: 0.9em;
+            }
+            .share-divider:before, .share-divider:after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                width: 40%;
+                height: 1px;
+                background: rgba(255, 255, 255, 0.15);
+            }
+            .share-divider:before {
+                left: 0;
+            }
+            .share-divider:after {
+                right: 0;
+            }
+            .share-apps {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .share-cancel {
+                padding: 14px;
+                border: none;
+                border-radius: 8px;
+                background: linear-gradient(to right, #ff4f4f, #d63031);
+                color: white;
+                cursor: pointer;
+                font-size: 1em;
+                margin-top: 14px;
+                font-weight: 500;
+                transition: all 0.3s ease;
+            }
+            .share-cancel:hover {
+                box-shadow: 0 4px 12px rgba(255, 79, 79, 0.3);
+            }
+            .toast-message {
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(20, 35, 55, 0.9);
+                color: #00ddeb;
+                padding: 12px 24px;
+                border-radius: 50px;
+                z-index: 1001;
+                opacity: 0;
+                transition: opacity 0.3s;
+                border: 1px solid rgba(0, 221, 235, 0.3);
+                box-shadow: 0 4px 16px rgba(0, 221, 235, 0.2);
+                font-weight: 500;
+            }
+        `;
+        document.head.appendChild(tempStyle);
+        
+        // Create overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'share-overlay';
+        overlay.appendChild(shareOptions);
+        document.body.appendChild(overlay);
+        
+        // Toast message function
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-message';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            // Show toast
+            setTimeout(() => {
+                toast.style.opacity = '1';
+            }, 10);
+            
+            // Hide and remove toast
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 2000);
+        }
+        
+        // Copy text to clipboard using a fallback approach
+        document.getElementById('copy-text').addEventListener('click', () => {
+            try {
+                // Create a temporary textarea element
+                const textArea = document.createElement('textarea');
+                textArea.value = resultText;
+                
+                // Make the textarea out of viewport
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
+                document.body.appendChild(textArea);
+                
+                // Select and copy
+                textArea.focus();
+                textArea.select();
+                const successful = document.execCommand('copy');
+                
+                // Clean up
+                document.body.removeChild(textArea);
+                
+                if (successful) {
+                    showToast('Results copied to clipboard as text!');
+                    console.log('Text copied successfully using fallback');
+                } else {
+                    throw new Error('Copy command failed');
+                }
+                
+                document.body.removeChild(overlay);
+                document.head.removeChild(tempStyle);
+            } catch (error) {
+                console.error('Error in copy text handler:', error);
+                alert('Error copying text. We\'ll use a simpler approach.');
+                
+                // Show the text in a prompt for manual copy as last resort
+                prompt('Copy the text below (Ctrl+C / Cmd+C):', resultText);
+                document.body.removeChild(overlay);
+                document.head.removeChild(tempStyle);
+            }
+        });
+        
+        // Copy link using a fallback approach
+        document.getElementById('copy-link').addEventListener('click', () => {
+            try {
+                // Create URL with parameters
+                const params = new URLSearchParams();
+                params.set('mode', lastInputs.mode);
+                for (const [key, value] of Object.entries(lastInputs)) {
+                    if (key !== 'mode') {
+                        params.set(key, value);
+                    }
+                }
+                const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+                
+                // Create a temporary input element
+                const input = document.createElement('input');
+                input.value = url;
+                
+                // Make the input out of viewport
+                input.style.position = 'fixed';
+                input.style.left = '-999999px';
+                input.style.top = '-999999px';
+                document.body.appendChild(input);
+                
+                // Select and copy
+                input.focus();
+                input.select();
+                const successful = document.execCommand('copy');
+                
+                // Clean up
+                document.body.removeChild(input);
+                
+                if (successful) {
+                    showToast('Link copied to clipboard!');
+                    console.log('Link copied successfully using fallback:', url);
+                } else {
+                    throw new Error('Copy command failed');
+                }
+                
+                document.body.removeChild(overlay);
+                document.head.removeChild(tempStyle);
+            } catch (error) {
+                console.error('Error in copy link handler:', error);
+                
+                // Show the URL in a prompt for manual copy as last resort
+                const params = new URLSearchParams();
+                params.set('mode', lastInputs.mode);
+                for (const [key, value] of Object.entries(lastInputs)) {
+                    if (key !== 'mode') {
+                        params.set(key, value);
+                    }
+                }
+                const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+                prompt('Copy this URL (Ctrl+C / Cmd+C):', url);
+                document.body.removeChild(overlay);
+                document.head.removeChild(tempStyle);
+            }
+        });
+        
+        // Share via Email
+        document.getElementById('share-email').addEventListener('click', () => {
+            const subject = 'Real Estate Calculator Results';
+            const body = encodeURIComponent(resultText);
+            window.open(`mailto:?subject=${subject}&body=${body}`);
+            document.body.removeChild(overlay);
+            document.head.removeChild(tempStyle);
+        });
+        
+        
+        // Share via SMS
+        document.getElementById('share-sms').addEventListener('click', () => {
+            const text = encodeURIComponent(resultText);
+            window.open(`sms:?&body=${text}`);
+            document.body.removeChild(overlay);
+            document.head.removeChild(tempStyle);
+        });
+        
+        // Cancel button
+        document.getElementById('cancel-share').addEventListener('click', () => {
+            document.body.removeChild(overlay);
+            document.head.removeChild(tempStyle);
+        });
+        
     } catch (error) {
         console.error('Share results error:', error);
     }
