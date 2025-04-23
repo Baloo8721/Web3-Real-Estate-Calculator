@@ -38,7 +38,7 @@ const translations = {
         monthly_debt: "Monthly Debt ($)",
         credit_score: "Credit Score",
         zip_code: "ZIP Code",
-        first_time_buyer: "First-Time Buyer",
+        first_time_buyer: "First-Time Buyer Help/Resources/Tips",
         crypto_down_payment: "Crypto Down Payment",
         crypto_currency: "Cryptocurrency",
         crypto_amount: "Amount",
@@ -2090,6 +2090,39 @@ function calculateBuyer() {
             <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
         `;
         
+        // Always display first-time buyer resources in a condensed format
+        document.getElementById('buyer-result').innerHTML += `
+            <div class="result-section first-time-buyer-resources">
+                <h4>First-Time Buyer Resources</h4>
+                <div class="condensed-resources">
+                    <div class="resource-column">
+                        <h5>Assistance Programs</h5>
+                        <ul>
+                            <li><a href="https://www.hud.gov/buying/loans" target="_blank">HUD Programs</a></li>
+                            <li><a href="https://www.floridahousing.org/programs/homebuyer-overview-page" target="_blank">FL Housing</a></li>
+                            <li><a href="https://www.fha.com/fha_loan_requirements" target="_blank">FHA Loans (3.5% down)</a></li>
+                        </ul>
+                    </div>
+                    <div class="resource-column">
+                        <h5>Quick Tips</h5>
+                        <ul>
+                            <li>Get pre-approved first</li>
+                            <li>Budget for closing costs (2-5%)</li>
+                            <li>Include inspection contingencies</li>
+                        </ul>
+                    </div>
+                    <div class="resource-column">
+                        <h5>More Resources</h5>
+                        <ul>
+                            <li><a href="https://www.consumerfinance.gov/owning-a-home/" target="_blank">CFPB Guides</a></li>
+                            <li><a href="https://www.irs.gov/credits-deductions/individuals/first-time-homebuyer" target="_blank">Tax Benefits</a></li>
+                            <li><a href="https://www.bankrate.com/mortgages/first-time-homebuyer-grants-and-programs/" target="_blank">More Programs</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        `;
+        
         // Save the inputs and results
         saveInputs('buyer', { 
             price, down, term, rate, loanType, propertyTax, insurance, hoaFees, cddFees, pmiRate,
@@ -2346,7 +2379,8 @@ function renderBuyerResults(inputs) {
             price, down, term, rate, propertyTax, insurance, hoaFees, pmiRate,
             closingCosts, extraPayment, includeEscrow, loanType,
             principalInterest, totalMonthlyPayment, totalInterest, ltv, totalUpfrontCosts,
-            loan, monthlyPropertyTax, monthlyInsurance, monthlyPMI, months, effectiveTermMonths, effectiveMonthlyPayment
+            loan, monthlyPropertyTax, monthlyInsurance, monthlyPMI, months, effectiveTermMonths, effectiveMonthlyPayment,
+            affordabilityEnabled, firstTimeBuyer
         } = inputs;
         
         // Display comprehensive results with appropriate language
