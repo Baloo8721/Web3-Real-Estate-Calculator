@@ -1,9 +1,3 @@
-const cryptoPrices = {
-    BTC: 65000,
-    ETH: 2500,
-    USDC: 1
-};
-
 const translations = {
     en: {
         title: "Ultimate Real Estate Calculator",
@@ -42,10 +36,11 @@ const translations = {
         crypto_down_payment: "Crypto Down Payment",
         crypto_currency: "Cryptocurrency",
         crypto_amount: "Amount",
-        custom_price: "Custom Price",
-        custom_amount: "Custom Amount",
+        custom_price: "Select Price",
+        custom_amount: "Select Amount",
         custom_term: "Custom",
         custom_rate: "Custom",
+        see_how_much_i_can_afford: "See How Much I Can Afford",
         custom_term_label: "Custom Term (Years)",
         custom_rate_label: "Custom Rate (%)",
         conventional: "Conventional",
@@ -1614,24 +1609,11 @@ function initializeBuyerCalculator() {
     // Set initial state based on checkbox
     toggleAffordabilityFields();
     
-    // Crypto Down Payment toggle functionality
-    const cryptoDownPaymentToggle = document.getElementById('crypto-down-payment');
-    const cryptoFields = document.getElementById('crypto-fields');
-    
-    // Function to toggle crypto fields visibility
-    function toggleCryptoFields() {
-        if (cryptoDownPaymentToggle.checked) {
-            cryptoFields.classList.add('active');
-        } else {
-            cryptoFields.classList.remove('active');
-        }
+    // Add event listener for the affordability calculator button
+    const affordabilityCalcBtn = document.getElementById('affordability-calc');
+    if (affordabilityCalcBtn) {
+        affordabilityCalcBtn.addEventListener('click', calculateQuickAffordability);
     }
-    
-    // Add event listener to checkbox
-    cryptoDownPaymentToggle.addEventListener('change', toggleCryptoFields);
-    
-    // Set initial state based on checkbox
-    toggleCryptoFields();
     
     // Credit Score change handler to update PMI rate
     const creditScoreSelect = document.getElementById('credit-score');
@@ -1897,7 +1879,7 @@ function calculateBuyer() {
         // Get all input values
         const price = parseFloat(document.getElementById('buyer-price').value) || 0;
         const down = parseFloat(document.getElementById('buyer-down').value) || 0;
-        const term = parseFloat(document.getElementById('buyer-term').value) || 0;
+        const term = parseFloat(document.getElementById('buyer-term').value) || 30;
         const rate = parseFloat(document.getElementById('buyer-rate').value) || 0;
         const propertyTax = parseFloat(document.getElementById('buyer-property-tax').value) || 0;
         const insurance = parseFloat(document.getElementById('buyer-insurance').value) || 0;
@@ -1908,6 +1890,24 @@ function calculateBuyer() {
         const extraPayment = parseFloat(document.getElementById('buyer-extra-payment').value) || 0;
         const includeEscrow = document.getElementById('buyer-escrow').checked;
         const loanType = document.getElementById('buyer-loan-type').value;
+
+        // Check if affordability calculator is enabled
+        const affordabilityEnabled = document.getElementById('affordability-toggle')?.checked || false;
+        
+        // Get affordability calculator inputs if enabled
+        let householdIncome = 0;
+        let monthlyDebt = 0;
+        let creditScore = '';
+        let affordabilityResults = null;
+        
+        if (affordabilityEnabled) {
+            householdIncome = parseFloat(document.getElementById('household-income').value) || 0;
+            monthlyDebt = parseFloat(document.getElementById('monthly-debt').value) || 0;
+            creditScore = document.getElementById('credit-score').value;
+            
+            // Calculate affordability based on 2025 data
+            affordabilityResults = calculateAffordability(householdIncome, monthlyDebt, creditScore, rate);
+        }
 
         // Validate inputs
         if (price <= 0 || down < 0 || term <= 0 || rate <= 0) {
@@ -2090,6 +2090,39 @@ function calculateBuyer() {
             <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
         `;
         
+        // Display affordability results if the calculator is enabled
+        if (affordabilityEnabled && affordabilityResults) {
+            document.getElementById('buyer-result').innerHTML += `
+                <div class="result-section affordability-results">
+                    <h4>${translations[lang].affordability_analysis || 'Affordability Analysis (2025)'}</h4>
+                    <div class="result-row">
+                        <span>${translations[lang].max_home_price || 'Maximum Home Price'}:</span>
+                        <span>${formatter.format(affordabilityResults.maxHomePrice)}</span>
+                    </div>
+                    <div class="result-row">
+                        <span>${translations[lang].recommended_monthly_payment || 'Recommended Monthly Payment'}:</span>
+                        <span>${formatter.format(affordabilityResults.recommendedMonthlyPayment)}/mo</span>
+                    </div>
+                    <div class="result-row">
+                        <span>${translations[lang].debt_to_income_ratio || 'Debt-to-Income Ratio'}:</span>
+                        <span>${affordabilityResults.dti.toFixed(1)}%</span>
+                    </div>
+                    <div class="result-row">
+                        <span>${translations[lang].recommended_down_payment || 'Recommended Down Payment'}:</span>
+                        <span>${formatter.format(affordabilityResults.recommendedDownPayment)} (${affordabilityResults.downPaymentPercent.toFixed(1)}%)</span>
+                    </div>
+                    <div class="result-row">
+                        <span>${translations[lang].estimated_closing_costs || 'Estimated Closing Costs'}:</span>
+                        <span>${formatter.format(affordabilityResults.estimatedClosingCosts)}</span>
+                    </div>
+                    <div class="result-row total">
+                        <span>${translations[lang].total_cash_needed || 'Total Cash Needed'}:</span>
+                        <span>${formatter.format(affordabilityResults.totalCashNeeded)}</span>
+                    </div>
+                </div>
+            `;
+        }
+        
         // Always display first-time buyer resources in a condensed format
         document.getElementById('buyer-result').innerHTML += `
             <div class="result-section first-time-buyer-resources">
@@ -2127,11 +2160,183 @@ function calculateBuyer() {
         saveInputs('buyer', { 
             price, down, term, rate, loanType, propertyTax, insurance, hoaFees, cddFees, pmiRate,
             closingCosts, extraPayment, includeEscrow,
-            principalInterest, totalMonthlyPayment, totalInterest, ltv, totalUpfrontCosts
+            principalInterest, totalMonthlyPayment, totalInterest, ltv, totalUpfrontCosts,
+            loan, monthlyPropertyTax, monthlyInsurance, monthlyPMI, months, effectiveTermMonths, effectiveMonthlyPayment,
+            affordabilityEnabled, householdIncome, monthlyDebt, creditScore, affordabilityResults
         });
     } catch (error) {
         console.error('Buyer calculation error:', error);
         document.getElementById('buyer-result').innerHTML = '<span class="error">Calculation error. Please try again.</span>';
+    }
+}
+
+function calculateAffordability(householdIncome, monthlyDebt, creditScore, interestRate) {
+    // 2025 Affordability Calculator based on updated financial standards
+    
+    // Convert annual income to monthly
+    const monthlyIncome = householdIncome / 12;
+    
+    // Calculate debt-to-income ratio (DTI)
+    const dti = (monthlyDebt / monthlyIncome) * 100;
+    
+    // Get maximum DTI based on credit score (2025 standards)
+    let maxDti = 0;
+    let downPaymentPercent = 0;
+    let interestRateAdjustment = 0;
+    
+    // Determine credit score tier and set parameters
+    switch(creditScore) {
+        case 'below620':
+            maxDti = 36; // More conservative DTI for lower credit scores
+            downPaymentPercent = 10; // Higher down payment requirement
+            interestRateAdjustment = 1.5; // Higher interest rate
+            break;
+        case '620-679':
+            maxDti = 41;
+            downPaymentPercent = 7.5;
+            interestRateAdjustment = 0.75;
+            break;
+        case '680-739':
+            maxDti = 43;
+            downPaymentPercent = 5;
+            interestRateAdjustment = 0.25;
+            break;
+        case '740plus':
+        default:
+            maxDti = 45; // 2025 standard for excellent credit
+            downPaymentPercent = 3.5; // Lower down payment requirement
+            interestRateAdjustment = 0; // No adjustment
+            break;
+    }
+    
+    // Calculate adjusted interest rate (2025 market conditions)
+    const adjustedRate = interestRate + interestRateAdjustment;
+    
+    // Calculate housing expense ratio (28% of monthly income is standard in 2025)
+    const housingRatio = 0.28;
+    
+    // Calculate maximum monthly payment for housing
+    // This accounts for both the housing ratio and the remaining DTI after other debts
+    const availableDti = Math.min(maxDti / 100, 0.45) - (monthlyDebt / monthlyIncome);
+    const maxMonthlyPayment = Math.min(monthlyIncome * housingRatio, monthlyIncome * availableDti);
+    
+    // Calculate maximum loan amount based on payment, rate, and term
+    const monthlyInterestRate = adjustedRate / 100 / 12;
+    const termInMonths = 30 * 12; // 30-year fixed is still standard in 2025
+    
+    // Present value formula to determine loan amount from payment
+    let maxLoanAmount = 0;
+    if (monthlyInterestRate > 0) {
+        maxLoanAmount = maxMonthlyPayment * ((1 - Math.pow(1 + monthlyInterestRate, -termInMonths)) / monthlyInterestRate);
+    } else {
+        maxLoanAmount = maxMonthlyPayment * termInMonths;
+    }
+    
+    // Calculate maximum home price based on loan amount and down payment percentage
+    const maxHomePrice = maxLoanAmount / (1 - (downPaymentPercent / 100));
+    
+    // Calculate recommended down payment
+    const recommendedDownPayment = maxHomePrice * (downPaymentPercent / 100);
+    
+    // Calculate estimated closing costs (2025 average is 2-5% of home price)
+    const closingCostPercent = 3.5; // 2025 average
+    const estimatedClosingCosts = maxHomePrice * (closingCostPercent / 100);
+    
+    // Calculate total cash needed
+    const totalCashNeeded = recommendedDownPayment + estimatedClosingCosts;
+    
+    // Calculate recommended monthly payment (PITI)
+    // Principal and Interest
+    const loanAmount = maxHomePrice - recommendedDownPayment;
+    const principalAndInterest = (loanAmount * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, termInMonths)) / (Math.pow(1 + monthlyInterestRate, termInMonths) - 1);
+    
+    // Taxes and Insurance (estimated at 1.5% of home value annually for taxes, 0.5% for insurance in 2025)
+    const monthlyTaxes = (maxHomePrice * 0.015) / 12;
+    const monthlyInsurance = (maxHomePrice * 0.005) / 12;
+    
+    const recommendedMonthlyPayment = principalAndInterest + monthlyTaxes + monthlyInsurance;
+    
+    return {
+        maxHomePrice: Math.round(maxHomePrice),
+        recommendedMonthlyPayment: Math.round(recommendedMonthlyPayment),
+        dti: dti,
+        recommendedDownPayment: Math.round(recommendedDownPayment),
+        downPaymentPercent: downPaymentPercent,
+        estimatedClosingCosts: Math.round(estimatedClosingCosts),
+        totalCashNeeded: Math.round(totalCashNeeded),
+        adjustedInterestRate: adjustedRate
+    };
+}
+
+// Function to calculate and display quick affordability results
+function calculateQuickAffordability() {
+    try {
+        // Get affordability calculator inputs
+        const householdIncome = parseFloat(document.getElementById('household-income').value) || 0;
+        const monthlyDebt = parseFloat(document.getElementById('monthly-debt').value) || 0;
+        const creditScore = document.getElementById('credit-score').value;
+        
+        // Get interest rate from the main calculator
+        const interestRate = parseFloat(document.getElementById('buyer-rate').value) || 4.5; // Default to 4.5% if not set
+        
+        // Validate inputs
+        if (householdIncome <= 0) {
+            document.getElementById('affordability-quick-results').innerHTML = `<span class="error">Please enter your household income.</span>`;
+            document.getElementById('affordability-quick-results').classList.add('active');
+            return;
+        }
+        
+        // Calculate affordability based on 2025 data
+        const affordabilityResults = calculateAffordability(householdIncome, monthlyDebt, creditScore, interestRate);
+        
+        // Format results
+        const formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        });
+        
+        // Display results in the quick results container
+        const lang = localStorage.getItem('selectedLanguage') || 'en';
+        document.getElementById('affordability-quick-results').innerHTML = `
+            <h4>${translations[lang].affordability_analysis || 'Affordability Analysis (2025)'}</h4>
+            <div class="result-row">
+                <span>${translations[lang].max_home_price || 'Maximum Home Price'}:</span>
+                <span>${formatter.format(affordabilityResults.maxHomePrice)}</span>
+            </div>
+            <div class="result-row">
+                <span>${translations[lang].recommended_monthly_payment || 'Recommended Monthly Payment'}:</span>
+                <span>${formatter.format(affordabilityResults.recommendedMonthlyPayment)}/mo</span>
+            </div>
+            <div class="result-row">
+                <span>${translations[lang].debt_to_income_ratio || 'Debt-to-Income Ratio'}:</span>
+                <span>${affordabilityResults.dti.toFixed(1)}%</span>
+            </div>
+            <div class="result-row">
+                <span>${translations[lang].recommended_down_payment || 'Recommended Down Payment'}:</span>
+                <span>${formatter.format(affordabilityResults.recommendedDownPayment)} (${affordabilityResults.downPaymentPercent.toFixed(1)}%)</span>
+            </div>
+            <div class="result-row">
+                <span>${translations[lang].estimated_closing_costs || 'Estimated Closing Costs'}:</span>
+                <span>${formatter.format(affordabilityResults.estimatedClosingCosts)}</span>
+            </div>
+            <div class="result-row total">
+                <span>${translations[lang].total_cash_needed || 'Total Cash Needed'}:</span>
+                <span>${formatter.format(affordabilityResults.totalCashNeeded)}</span>
+            </div>
+        `;
+        
+        // Show the results container
+        document.getElementById('affordability-quick-results').classList.add('active');
+        
+        // Scroll to the results
+        document.getElementById('affordability-quick-results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+    } catch (error) {
+        console.error('Quick affordability calculation error:', error);
+        document.getElementById('affordability-quick-results').innerHTML = `<span class="error">Calculation error. Please try again.</span>`;
+        document.getElementById('affordability-quick-results').classList.add('active');
     }
 }
 
@@ -2380,7 +2585,7 @@ function renderBuyerResults(inputs) {
             closingCosts, extraPayment, includeEscrow, loanType,
             principalInterest, totalMonthlyPayment, totalInterest, ltv, totalUpfrontCosts,
             loan, monthlyPropertyTax, monthlyInsurance, monthlyPMI, months, effectiveTermMonths, effectiveMonthlyPayment,
-            affordabilityEnabled, firstTimeBuyer
+            affordabilityEnabled, householdIncome, monthlyDebt, creditScore, affordabilityResults
         } = inputs;
         
         // Display comprehensive results with appropriate language

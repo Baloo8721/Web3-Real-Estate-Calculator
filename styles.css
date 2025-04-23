@@ -367,24 +367,7 @@ p.subtitle {
     overflow-y: auto;
 }
 
-.crypto-fields {
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 8px;
-    margin: 0 0 20px 0;
-    padding: 16px;
-    border: 1px dashed rgba(0, 221, 235, 0.3);
-    overflow: hidden;
-    max-height: 0;
-    opacity: 0;
-    transition: all 0.4s ease-in-out;
-}
 
-.crypto-fields.active {
-    max-height: 300px;
-    opacity: 1;
-    margin-bottom: 20px;
-    overflow-y: auto;
-}
 
 .checkbox-group:hover {
     background: rgba(255, 255, 255, 0.08);
@@ -428,6 +411,79 @@ p.subtitle {
         margin-left: 8px;
         margin-right: 8px;
     }
+}
+
+/* Button Container */
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+/* Affordability Button Styling */
+.affordability-btn {
+    display: inline-block;
+    width: auto;
+    padding: 12px 24px;
+    margin: 0;
+    background: linear-gradient(135deg, #6b46c1 0%, #9f7aea 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+
+.affordability-btn:hover {
+    background: linear-gradient(135deg, #805ad5 0%, #b794f4 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.affordability-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Affordability Quick Results Styling */
+#affordability-quick-results {
+    margin-top: 16px;
+    padding: 0;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: all 0.4s ease-in-out;
+}
+
+#affordability-quick-results.active {
+    max-height: 600px;
+    opacity: 1;
+    padding: 16px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    background: rgba(0, 221, 235, 0.05);
+    border-radius: 8px;
+    border: 1px dashed rgba(0, 221, 235, 0.3);
+}
+
+/* Affordability Results Styling */
+.affordability-results {
+    margin-top: 20px;
+    border-top: 1px solid rgba(0, 221, 235, 0.3);
+    padding-top: 20px;
+    background: rgba(0, 221, 235, 0.05);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.affordability-results h4 {
+    color: #00ddeb;
+    margin-bottom: 15px;
+    text-align: center;
 }
 
 /* First-Time Buyer Resources Styling */
