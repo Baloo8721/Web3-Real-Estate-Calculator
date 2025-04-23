@@ -242,6 +242,15 @@ p.subtitle {
     color: transparent;
 }
 
+/* Center placeholders for specific input fields */
+#buyer-closing-costs::placeholder,
+#buyer-property-tax::placeholder,
+#buyer-insurance::placeholder {
+    color: #fff;
+    opacity: 1;
+    text-align: center;
+}
+
 .input-group label {
     position: absolute;
     top: 50%;
@@ -282,6 +291,42 @@ p.subtitle {
     border-color: #00ddeb;
     background: rgba(255, 255, 255, 0.12);
     box-shadow: 0 0 8px rgba(0, 221, 235, 0.3);
+}
+
+/* Center floating labels for specific fields */
+#buyer-closing-costs + label,
+#buyer-property-tax + label,
+#buyer-insurance + label {
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    visibility: hidden;
+}
+
+#buyer-closing-costs:focus + label,
+#buyer-closing-costs:not(:placeholder-shown) + label,
+#buyer-property-tax:focus + label,
+#buyer-property-tax:not(:placeholder-shown) + label,
+#buyer-insurance:focus + label,
+#buyer-insurance:not(:placeholder-shown) + label {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Center placeholder text for specific input fields */
+#buyer-closing-costs,
+#buyer-property-tax,
+#buyer-insurance {
+    text-align: center;
+}
+
+/* Override placeholder styling for specific input fields */
+#buyer-closing-costs::placeholder,
+#buyer-property-tax::placeholder,
+#buyer-insurance::placeholder {
+    color: #fff;
+    opacity: 1;
+    text-align: center;
 }
 
 /* Checkbox Group Styling */
@@ -661,4 +706,3 @@ footer {
         font-size: 0.9em;
     }
 }
->>>>>>> e1905a8 (Modernize calculator UI with floating labels and card layout)
