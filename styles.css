@@ -360,6 +360,24 @@ p.subtitle {
     margin-bottom: 20px;
 }
 
+.crypto-fields {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    margin: 0 0 20px 0;
+    padding: 16px;
+    border: 1px dashed rgba(0, 221, 235, 0.3);
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: all 0.4s ease-in-out;
+}
+
+.crypto-fields.active {
+    max-height: 500px;
+    opacity: 1;
+    margin-bottom: 20px;
+}
+
 .checkbox-group:hover {
     background: rgba(255, 255, 255, 0.08);
 }
@@ -377,6 +395,13 @@ p.subtitle {
     cursor: pointer;
     font-weight: 400;
     font-size: 0.95em;
+}
+
+.nested-checkbox {
+    margin-left: 16px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
 }
 
 /* Styling for field information text */

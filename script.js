@@ -33,6 +33,15 @@ const translations = {
         buyer_extra_payment: "Extra Monthly Payment ($)",
         buyer_escrow: "Include Taxes & Insurance in Payment (Escrow), HOA/CDD Fees",
         buyer_cdd: "CDD Fees ($/month)",
+        affordability_toggle: "Affordability Calculator",
+        household_income: "Household Income ($/year)",
+        monthly_debt: "Monthly Debt ($)",
+        credit_score: "Credit Score",
+        zip_code: "ZIP Code",
+        first_time_buyer: "First-Time Buyer",
+        crypto_down_payment: "Crypto Down Payment",
+        crypto_currency: "Cryptocurrency",
+        crypto_amount: "Amount",
         custom_price: "Custom Price",
         custom_amount: "Custom Amount",
         custom_term: "Custom",
@@ -1183,44 +1192,100 @@ function loadFromUrlParams() {
             // Now populate the fields based on the mode
             switch(mode) {
                 case 'buyer':
-                    if (params.has('price')) document.getElementById('buyer-price').value = params.get('price');
-                    if (params.has('down')) document.getElementById('buyer-down').value = params.get('down');
-                    if (params.has('term')) {
-                        const term = params.get('term');
-                        const termPreset = document.getElementById('buyer-term-preset');
-                        if (term === '30' || term === '20' || term === '15' || term === '10') {
-                            termPreset.value = term;
+                    if (params.has('buyer-price')) {
+                        document.getElementById('buyer-price').value = params.get('buyer-price');
+                        document.getElementById('buyer-price-range').value = 'custom';
+                    }
+                    if (params.has('buyer-down')) {
+                        document.getElementById('buyer-down').value = params.get('buyer-down');
+                        document.getElementById('buyer-down-percent').value = 'custom';
+                    }
+                    if (params.has('buyer-term')) {
+                        const term = params.get('buyer-term');
+                        if (['30', '20', '15', '10'].includes(term)) {
+                            document.getElementById('buyer-term-preset').value = term;
+                            document.getElementById('buyer-term').value = term;
+                            document.getElementById('buyer-term-custom-group').style.display = 'none';
                         } else {
-                            termPreset.value = 'custom';
+                            document.getElementById('buyer-term-preset').value = 'custom';
                             document.getElementById('buyer-term').value = term;
                             document.getElementById('buyer-term-custom-group').style.display = 'block';
                         }
                     }
-                    if (params.has('rate')) {
-                        const rate = params.get('rate');
-                        const ratePreset = document.getElementById('buyer-rate-preset');
-                        const standardRates = ['3', '3.5', '4', '4.5', '5', '5.5', '6', '6.5', '7'];
-                        if (standardRates.includes(rate)) {
-                            ratePreset.value = rate;
+                    if (params.has('buyer-rate')) {
+                        const rate = params.get('buyer-rate');
+                        if (['3', '3.5', '4', '4.5', '5', '5.5', '6', '6.5', '7', '7.5', '8'].includes(rate)) {
+                            document.getElementById('buyer-rate-preset').value = rate;
+                            document.getElementById('buyer-rate').value = rate;
+                            document.getElementById('buyer-rate-custom-group').style.display = 'none';
                         } else {
-                            ratePreset.value = 'custom';
+                            document.getElementById('buyer-rate-preset').value = 'custom';
                             document.getElementById('buyer-rate').value = rate;
                             document.getElementById('buyer-rate-custom-group').style.display = 'block';
                         }
                     }
-                    if (params.has('loanType')) document.getElementById('buyer-loan-type').value = params.get('loanType');
-                    if (params.has('propertyTax')) document.getElementById('buyer-property-tax').value = params.get('propertyTax');
-                    if (params.has('insurance')) document.getElementById('buyer-insurance').value = params.get('insurance');
-                    if (params.has('hoaFees')) document.getElementById('buyer-hoa').value = params.get('hoaFees');
-                    if (params.has('pmiRate')) document.getElementById('buyer-pmi-rate').value = params.get('pmiRate');
-                    if (params.has('closingCosts')) document.getElementById('buyer-closing-costs').value = params.get('closingCosts');
-                    if (params.has('extraPayment')) document.getElementById('buyer-extra-payment').value = params.get('extraPayment');
-                    if (params.has('includeEscrow')) {
-                        const includeEscrow = params.get('includeEscrow') === 'true';
-                        document.getElementById('buyer-escrow').checked = includeEscrow;
-                        if (includeEscrow) {
-                            document.getElementById('escrow-fields').classList.add('active');
-                        }
+                    if (params.has('buyer-loan-type')) {
+                        document.getElementById('buyer-loan-type').value = params.get('buyer-loan-type');
+                    }
+                    if (params.has('buyer-property-tax')) {
+                        document.getElementById('buyer-property-tax').value = params.get('buyer-property-tax');
+                        document.getElementById('buyer-property-tax').dataset.auto = 'false';
+                    }
+                    if (params.has('buyer-insurance')) {
+                        document.getElementById('buyer-insurance').value = params.get('buyer-insurance');
+                        document.getElementById('buyer-insurance').dataset.auto = 'false';
+                    }
+                    if (params.has('buyer-hoa')) {
+                        document.getElementById('buyer-hoa').value = params.get('buyer-hoa');
+                    }
+                    if (params.has('buyer-cdd')) {
+                        document.getElementById('buyer-cdd').value = params.get('buyer-cdd');
+                    }
+                    if (params.has('buyer-pmi-rate')) {
+                        document.getElementById('buyer-pmi-rate').value = params.get('buyer-pmi-rate');
+                        document.getElementById('buyer-pmi-rate').dataset.auto = 'false';
+                    }
+                    if (params.has('buyer-closing-costs')) {
+                        document.getElementById('buyer-closing-costs').value = params.get('buyer-closing-costs');
+                        document.getElementById('buyer-closing-costs').dataset.auto = 'false';
+                    }
+                    if (params.has('buyer-extra-payment')) {
+                        document.getElementById('buyer-extra-payment').value = params.get('buyer-extra-payment');
+                    }
+                    if (params.has('buyer-escrow') && params.get('buyer-escrow') === 'true') {
+                        document.getElementById('buyer-escrow').checked = true;
+                        document.getElementById('escrow-fields').classList.add('active');
+                    }
+                    
+                    // Affordability Calculator params
+                    if (params.has('affordability-toggle') && params.get('affordability-toggle') === 'true') {
+                        document.getElementById('affordability-toggle').checked = true;
+                        document.getElementById('affordability-fields').classList.add('active');
+                    }
+                    if (params.has('household-income')) {
+                        document.getElementById('household-income').value = params.get('household-income');
+                    }
+                    if (params.has('monthly-debt')) {
+                        document.getElementById('monthly-debt').value = params.get('monthly-debt');
+                    }
+                    if (params.has('credit-score')) {
+                        document.getElementById('credit-score').value = params.get('credit-score');
+                    }
+                    if (params.has('zip-code')) {
+                        document.getElementById('zip-code').value = params.get('zip-code');
+                    }
+                    if (params.has('first-time-buyer') && params.get('first-time-buyer') === 'true') {
+                        document.getElementById('first-time-buyer').checked = true;
+                    }
+                    if (params.has('crypto-down-payment') && params.get('crypto-down-payment') === 'true') {
+                        document.getElementById('crypto-down-payment').checked = true;
+                        document.getElementById('crypto-fields').classList.add('active');
+                    }
+                    if (params.has('crypto-currency')) {
+                        document.getElementById('crypto-currency').value = params.get('crypto-currency');
+                    }
+                    if (params.has('crypto-amount')) {
+                        document.getElementById('crypto-amount').value = params.get('crypto-amount');
                     }
                     
                     // Trigger calculation
@@ -1529,6 +1594,88 @@ function initializeBuyerCalculator() {
     
     // Set initial state based on checkbox
     toggleEscrowFields();
+    
+    // Affordability Calculator toggle functionality
+    const affordabilityToggle = document.getElementById('affordability-toggle');
+    const affordabilityFields = document.getElementById('affordability-fields');
+    
+    // Function to toggle affordability fields visibility
+    function toggleAffordabilityFields() {
+        if (affordabilityToggle.checked) {
+            affordabilityFields.classList.add('active');
+        } else {
+            affordabilityFields.classList.remove('active');
+        }
+    }
+    
+    // Add event listener to checkbox
+    affordabilityToggle.addEventListener('change', toggleAffordabilityFields);
+    
+    // Set initial state based on checkbox
+    toggleAffordabilityFields();
+    
+    // Crypto Down Payment toggle functionality
+    const cryptoDownPaymentToggle = document.getElementById('crypto-down-payment');
+    const cryptoFields = document.getElementById('crypto-fields');
+    
+    // Function to toggle crypto fields visibility
+    function toggleCryptoFields() {
+        if (cryptoDownPaymentToggle.checked) {
+            cryptoFields.classList.add('active');
+        } else {
+            cryptoFields.classList.remove('active');
+        }
+    }
+    
+    // Add event listener to checkbox
+    cryptoDownPaymentToggle.addEventListener('change', toggleCryptoFields);
+    
+    // Set initial state based on checkbox
+    toggleCryptoFields();
+    
+    // Credit Score change handler to update PMI rate
+    const creditScoreSelect = document.getElementById('credit-score');
+    creditScoreSelect.addEventListener('change', function() {
+        updatePMIRateFromCreditScore();
+    });
+    
+    // Function to update PMI rate based on credit score
+    function updatePMIRateFromCreditScore() {
+        const creditScore = creditScoreSelect.value;
+        const pmiRateInput = document.getElementById('buyer-pmi-rate');
+        
+        // Only update if PMI rate is being auto-calculated
+        if (pmiRateInput.dataset.auto === 'true' || !pmiRateInput.dataset.auto) {
+            // Set PMI rate based on credit score
+            switch(creditScore) {
+                case 'below620':
+                    pmiRateInput.value = '1.5';
+                    break;
+                case '620-679':
+                    pmiRateInput.value = '1.0';
+                    break;
+                case '680-739':
+                    pmiRateInput.value = '0.75';
+                    break;
+                case '740plus':
+                    pmiRateInput.value = '0.5';
+                    break;
+            }
+            pmiRateInput.dataset.auto = 'true';
+        }
+    }
+    
+    // ZIP Code validation
+    const zipCodeInput = document.getElementById('zip-code');
+    zipCodeInput.addEventListener('input', function() {
+        // Remove non-numeric characters
+        this.value = this.value.replace(/[^0-9]/g, '');
+        
+        // Limit to 5 digits
+        if (this.value.length > 5) {
+            this.value = this.value.slice(0, 5);
+        }
+    });
     
     // Get references to the elements for default calculations
     const propertyTaxInput = document.getElementById('buyer-property-tax');

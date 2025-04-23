@@ -154,6 +154,7 @@
                         
                         <!-- Escrow Fields Container - Initially Hidden -->
                         <div id="escrow-fields" class="escrow-fields">
+
                             <!-- Property Taxes -->
                             <div class="input-group">
                                 <input type="number" id="buyer-property-tax" placeholder="Annual Property Taxes ($)" data-lang="buyer_property_tax" aria-label="Property Taxes" min="0" step="100">
@@ -178,6 +179,73 @@
                             <div class="input-group">
                                 <input type="number" id="buyer-cdd" placeholder="Monthly CDD Fees ($)" data-lang="buyer_cdd" aria-label="CDD Fees" min="0" step="10">
                                 <label for="buyer-cdd" data-lang="buyer_cdd">CDD Fees ($/month)</label>
+                            </div>
+                        </div>
+                        
+                        <!-- Affordability Calculator Option -->
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="affordability-toggle">
+                            <label for="affordability-toggle" data-lang="affordability_toggle">Affordability Calculator</label>
+                        </div>
+                        
+                        <!-- Affordability Fields Container - Initially Hidden -->
+                        <div id="affordability-fields" class="escrow-fields">
+                            <!-- Household Income -->
+                            <div class="input-group">
+                                <input type="number" id="household-income" placeholder="Household Income ($/year)" data-lang="household_income" aria-label="Household Income" min="0" step="1000">
+                                <label for="household-income" data-lang="household_income">Household Income ($/year)</label>
+                            </div>
+                            
+                            <!-- Monthly Debt -->
+                            <div class="input-group">
+                                <input type="number" id="monthly-debt" placeholder="Monthly Debt ($)" data-lang="monthly_debt" aria-label="Monthly Debt" min="0" step="100">
+                                <label for="monthly-debt" data-lang="monthly_debt">Monthly Debt ($)</label>
+                            </div>
+                            
+                            <!-- Credit Score -->
+                            <div class="input-group">
+                                <select id="credit-score" aria-label="Credit Score" data-lang="credit_score">
+                                    <option value="below620">Below 620</option>
+                                    <option value="620-679">620-679</option>
+                                    <option value="680-739">680-739</option>
+                                    <option value="740plus" selected>740+</option>
+                                </select>
+                                <label for="credit-score" data-lang="credit_score">Credit Score</label>
+                            </div>
+                            
+                            <!-- ZIP Code -->
+                            <div class="input-group">
+                                <input type="text" id="zip-code" placeholder="ZIP Code" data-lang="zip_code" aria-label="ZIP Code" maxlength="5" pattern="[0-9]{5}">
+                                <label for="zip-code" data-lang="zip_code">ZIP Code</label>
+                            </div>
+                            
+                            <!-- First-Time Buyer -->
+                            <div class="checkbox-group nested-checkbox">
+                                <input type="checkbox" id="first-time-buyer">
+                                <label for="first-time-buyer" data-lang="first_time_buyer">First-Time Buyer</label>
+                            </div>
+                            
+                            <!-- Crypto Down Payment -->
+                            <div class="checkbox-group nested-checkbox">
+                                <input type="checkbox" id="crypto-down-payment">
+                                <label for="crypto-down-payment" data-lang="crypto_down_payment">Crypto Down Payment</label>
+                            </div>
+                            
+                            <!-- Crypto Fields - Initially Hidden -->
+                            <div id="crypto-fields" class="crypto-fields">
+                                <div class="input-group">
+                                    <select id="crypto-currency" aria-label="Cryptocurrency" data-lang="crypto_currency">
+                                        <option value="BTC">Bitcoin (BTC)</option>
+                                        <option value="ETH">Ethereum (ETH)</option>
+                                        <option value="USDC">USDC</option>
+                                    </select>
+                                    <label for="crypto-currency" data-lang="crypto_currency">Cryptocurrency</label>
+                                </div>
+                                
+                                <div class="input-group">
+                                    <input type="number" id="crypto-amount" placeholder="Amount" data-lang="crypto_amount" aria-label="Cryptocurrency Amount" min="0" step="0.001">
+                                    <label for="crypto-amount" data-lang="crypto_amount">Amount</label>
+                                </div>
                             </div>
                         </div>
                         
