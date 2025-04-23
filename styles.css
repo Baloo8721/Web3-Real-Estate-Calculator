@@ -355,9 +355,10 @@ p.subtitle {
 }
 
 .escrow-fields.active {
-    max-height: 500px;
+    max-height: 800px;
     opacity: 1;
     margin-bottom: 20px;
+    overflow-y: auto;
 }
 
 .crypto-fields {
@@ -373,9 +374,10 @@ p.subtitle {
 }
 
 .crypto-fields.active {
-    max-height: 500px;
+    max-height: 300px;
     opacity: 1;
     margin-bottom: 20px;
+    overflow-y: auto;
 }
 
 .checkbox-group:hover {
@@ -402,6 +404,24 @@ p.subtitle {
     padding: 8px 12px;
     background: rgba(255, 255, 255, 0.03);
     border-radius: 6px;
+}
+
+/* Ensure the calculator container expands properly */
+.calc-card {
+    overflow: visible;
+}
+
+/* Make sure the affordability section has proper padding on mobile */
+@media only screen and (max-width: 768px) {
+    .escrow-fields.active,
+    .crypto-fields.active {
+        padding-bottom: 20px;
+    }
+    
+    .nested-checkbox {
+        margin-left: 8px;
+        margin-right: 8px;
+    }
 }
 
 /* Styling for field information text */
