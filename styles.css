@@ -507,7 +507,7 @@ p.subtitle {
 
 /* Loan Summary Styling for Calculation Results */
 .loan-summary-results {
-    margin: 0 0 16px 0;
+    margin: 0 0 8px 0;
     padding: 6px 10px;
     background-color: rgba(20, 35, 55, 0.85);
     border-radius: 8px;
@@ -591,7 +591,7 @@ p.subtitle {
 
 /* Affordability Results Styling - Condensed */
 .affordability-results {
-    margin: 0 0 16px 0;
+    margin: 0 0 8px 0;
     padding: 6px 10px;
     background: rgba(0, 221, 235, 0.05);
     border-radius: 8px;
@@ -639,7 +639,7 @@ p.subtitle {
 
 /* First-Time Buyer Resources Styling - Condensed */
 .first-time-buyer-resources {
-    margin: 0 0 16px 0;
+    margin: 0 0 8px 0;
     padding: 6px 10px;
     border-radius: 8px;
     font-size: 13px;
@@ -866,7 +866,7 @@ a.field-info:focus {
     background: rgba(255, 255, 255, 0.08);
     border-radius: 10px;
     padding: 16px;
-    margin-bottom: 30px;
+    margin-bottom: 8px;
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -876,12 +876,23 @@ a.field-info:focus {
     padding: 0;
 }
 
+/* Force ZERO margins on all result sections first */
+#buyer-result > div {
+    margin: 0 !important;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+}
+
+/* Add a very small consistent gap between adjacent sections */
+#buyer-result > div + div {
+    margin-top: 2px !important;
+}
 
 .result-section h4 {
     color: #00ddeb;
     margin: 0 0 12px 0;
     font-size: 1.1em;
-    font-weight: 500;
+    font-weight: 600;
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
     padding-bottom: 8px;
 }
@@ -895,7 +906,7 @@ a.field-info:focus {
 
 /* More condensed styling for Monthly Costs section - matching Loan Summary */
 .monthly-costs-section {
-    margin: 0 0 16px 0;
+    margin: 0 0 8px 0;
     padding: 6px 10px;
     border-radius: 8px;
     font-size: 13px;
@@ -950,7 +961,7 @@ a.field-info:focus {
 
 /* Extra Payment Details Section - Condensed */
 .extra-payment-section {
-    margin: 0 0 16px 0;
+    margin: 0 0 8px 0;
     padding: 6px 10px;
     border-radius: 8px;
     font-size: 13px;
@@ -991,7 +1002,7 @@ a.field-info:focus {
 
 /* Upfront Costs Section - Condensed */
 .upfront-costs-section {
-    margin: 0 0 16px 0;
+    margin: 0 0 8px 0;
     padding: 6px 10px;
     border-radius: 8px;
     font-size: 13px;
