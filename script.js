@@ -1449,20 +1449,73 @@ function initializeBuyerCalculator() {
             const [min, max] = this.value.split('-').map(Number);
             priceInput.value = Math.round((min + max) / 2);
         }
-        // Update down payment if percentage is selected
-        updateDownPaymentFromPercent();
-        // Update other default values based on home price
-        updateDefaultValues();
+        
+        // Manually trigger the input event on the price input to update all fields
+        if (priceInput.value) {
+            const event = new Event('input');
+            priceInput.dispatchEvent(event);
+        }
     });
     
-    // When price is manually entered, switch dropdown to 'custom'
+    // Direct event handler to update all dependent fields when price changes
     priceInput.addEventListener('input', function() {
+        // Switch dropdown to 'custom'
         priceRangeSelect.value = 'custom';
-        updateDefaultValues();
+        
+        // Get the price value
+        const price = parseFloat(this.value) || 0;
+        
+        // Only proceed if price is valid
+        if (price > 0) {
+            // Update closing costs (3% of home price)
+            const closingCosts = Math.round(price * 0.03);
+            document.getElementById('buyer-closing-costs').value = closingCosts;
+            document.getElementById('buyer-closing-costs').dataset.auto = 'true';
+            
+            // Update property tax (0.82% of home value)
+            const propertyTax = Math.round(price * 0.0082);
+            document.getElementById('buyer-property-tax').value = propertyTax;
+            document.getElementById('buyer-property-tax').dataset.auto = 'true';
+            
+            // Update homeowners insurance (based on $2,325/year for $300k home)
+            const baseRate = 2325;
+            const baseValue = 300000;
+            const insurance = Math.round(baseRate * (price / baseValue));
+            document.getElementById('buyer-insurance').value = insurance;
+            document.getElementById('buyer-insurance').dataset.auto = 'true';
+            
+            // Update down payment if percentage is selected
+            updateDownPaymentFromPercent();
+            
+            // Update PMI rate
+            updatePMIRate();
+            
+            console.log('Auto-populated fields based on price:', price);
+            console.log('- Closing costs:', closingCosts);
+            console.log('- Property tax:', propertyTax);
+            console.log('- Insurance:', insurance);
+        }
     });
     
-    // Also update defaults when price is manually changed
-    priceInput.addEventListener('change', updateDefaultValues);
+    // Also handle change event for browsers that might not fire input events
+    priceInput.addEventListener('change', function() {
+        // Only trigger if input event hasn't already handled it
+        if (this.dataset.inputFired !== 'true') {
+            const event = new Event('input');
+            this.dispatchEvent(event);
+        }
+        this.dataset.inputFired = 'false';
+    });
+    
+    // Handle blur event to ensure updates happen when focus leaves the field
+    priceInput.addEventListener('blur', function() {
+        // Only trigger if input event hasn't already handled it
+        if (this.dataset.inputFired !== 'true') {
+            const event = new Event('input');
+            this.dispatchEvent(event);
+        }
+        this.dataset.inputFired = 'false';
+    });
     
     // Down Payment percentage dropdown - now combined with input
     const downPercentSelect = document.getElementById('buyer-down-percent');
@@ -1676,15 +1729,16 @@ function initializeBuyerCalculator() {
             if (!propertyTaxInput.value || propertyTaxInput.dataset.auto === 'true') {
                 propertyTaxInput.value = annualTax;
                 propertyTaxInput.dataset.auto = 'true';
+                console.log('Updated property tax to:', annualTax);
             }
         }
     }
     
-    // Function to update homeowners insurance (scaled from $4,419/year for $300k value)
+    // Function to update homeowners insurance (scaled from $2,325/year for $300k value)
     function updateInsurance() {
         const price = parseFloat(priceInput.value) || 0;
         if (price > 0) {
-            // Base rate of $4,419 for $300,000 home, scale proportionally
+            // Base rate of $2,325 for $300,000 home, scale proportionally
             const baseRate = 2325;
             const baseValue = 300000;
             const annualInsurance = Math.round(baseRate * (price / baseValue));
@@ -1692,6 +1746,7 @@ function initializeBuyerCalculator() {
             if (!insuranceInput.value || insuranceInput.dataset.auto === 'true') {
                 insuranceInput.value = annualInsurance;
                 insuranceInput.dataset.auto = 'true';
+                console.log('Updated insurance to:', annualInsurance);
             }
         }
     }
@@ -1743,7 +1798,19 @@ function initializeBuyerCalculator() {
             if (!closingCostsInput.value || closingCostsInput.dataset.auto === 'true') {
                 closingCostsInput.value = closingCosts;
                 closingCostsInput.dataset.auto = 'true';
+                
+                // Update the closing costs info text to show the percentage
+                updateClosingCostsInfoText(3);
+                console.log('Updated closing costs to:', closingCosts);
             }
+        }
+    }
+    
+    // Function to update the closing costs info text with the current percentage
+    function updateClosingCostsInfoText(percentage) {
+        const closingCostsInfo = document.querySelector('label[for="buyer-closing-costs"] + .field-info');
+        if (closingCostsInfo) {
+            closingCostsInfo.textContent = `Currently: ${percentage.toFixed(1)}% of home price (typical range: 2-5%)`;
         }
     }
     
@@ -1758,6 +1825,20 @@ function initializeBuyerCalculator() {
     // Initialize with default values if price is already set
     if (parseFloat(priceInput.value) > 0) {
         updateDefaultValues();
+        
+        // Also initialize the closing costs percentage display
+        const price = parseFloat(priceInput.value) || 0;
+        const closingCosts = parseFloat(closingCostsInput.value) || 0;
+        if (price > 0 && closingCosts > 0) {
+            const percentage = (closingCosts / price) * 100;
+            updateClosingCostsInfoText(percentage);
+        }
+    } else {
+        // Set data-auto attributes to true initially
+        propertyTaxInput.dataset.auto = 'true';
+        insuranceInput.dataset.auto = 'true';
+        closingCostsInput.dataset.auto = 'true';
+        pmiRateInput.dataset.auto = 'true';
     }
     
     // Listen for user edits on fields that have automatic calculations
@@ -1774,7 +1855,24 @@ function initializeBuyerCalculator() {
     closingCostsInput.addEventListener('input', function() {
         // If user manually edits the field, mark it as non-auto
         this.dataset.auto = 'false';
+        
+        // Calculate and update the percentage based on the manually entered value
+        const price = parseFloat(priceInput.value) || 0;
+        if (price > 0) {
+            const closingCosts = parseFloat(this.value) || 0;
+            const percentage = (closingCosts / price) * 100;
+            updateClosingCostsInfoText(percentage);
+            console.log('Manually updated closing costs to:', closingCosts, '(', percentage.toFixed(2), '% of home price)');
+        }
     });
+    
+    // Function to update the closing costs info text with the current percentage
+    function updateClosingCostsInfoText(percentage) {
+        const closingCostsInfo = document.querySelector('label[for="buyer-closing-costs"] + .field-info');
+        if (closingCostsInfo) {
+            closingCostsInfo.textContent = `Currently: ${percentage.toFixed(1)}% of home price (typical range: 2-5%)`;
+        }
+    }
     
     document.getElementById('buyer-pmi-rate').addEventListener('input', function() {
         // If user manually edits the field, mark it as non-auto
@@ -2171,100 +2269,126 @@ function calculateBuyer() {
 }
 
 function calculateAffordability(householdIncome, monthlyDebt, creditScore, interestRate) {
-    // 2025 Affordability Calculator based on updated financial standards
+    // Updated Affordability Calculator using both front-end (31%) and back-end (43%) DTI ratios
     
     // Convert annual income to monthly
     const monthlyIncome = householdIncome / 12;
     
-    // Calculate debt-to-income ratio (DTI)
-    const dti = (monthlyDebt / monthlyIncome) * 100;
+    // Set DTI ratios
+    const frontEndDti = 0.31; // 31% front-end DTI (housing costs only)
+    const backEndDti = 0.43; // 43% back-end DTI (all debt including housing)
     
-    // Get maximum DTI based on credit score (2025 standards)
-    let maxDti = 0;
-    let downPaymentPercent = 0;
-    let interestRateAdjustment = 0;
-    
-    // Determine credit score tier and set parameters
+    // Determine interest rate based on credit score tier
+    let effectiveRate;
     switch(creditScore) {
         case 'below620':
-            maxDti = 36; // More conservative DTI for lower credit scores
-            downPaymentPercent = 10; // Higher down payment requirement
-            interestRateAdjustment = 1.5; // Higher interest rate
+            effectiveRate = 8.5; // 300-619: 8.5% interest
             break;
         case '620-679':
-            maxDti = 41;
-            downPaymentPercent = 7.5;
-            interestRateAdjustment = 0.75;
+            effectiveRate = 7.0; // 620-679: 7.0% interest
             break;
         case '680-739':
-            maxDti = 43;
-            downPaymentPercent = 5;
-            interestRateAdjustment = 0.25;
+            effectiveRate = 6.5; // 680-739: 6.5% interest
             break;
         case '740plus':
         default:
-            maxDti = 45; // 2025 standard for excellent credit
-            downPaymentPercent = 3.5; // Lower down payment requirement
-            interestRateAdjustment = 0; // No adjustment
+            effectiveRate = 6.0; // 740+: 6.0% interest
             break;
     }
     
-    // Calculate adjusted interest rate (2025 market conditions)
-    const adjustedRate = interestRate + interestRateAdjustment;
+    // Step 1: Calculate maximum housing payment using front-end DTI (31%)
+    const frontEndMaxHousingPayment = monthlyIncome * frontEndDti;
     
-    // Calculate housing expense ratio (28% of monthly income is standard in 2025)
-    const housingRatio = 0.28;
+    // Step 2: Calculate maximum total debt payment using back-end DTI (43%)
+    const backEndMaxDebtPayment = monthlyIncome * backEndDti;
     
-    // Calculate maximum monthly payment for housing
-    // This accounts for both the housing ratio and the remaining DTI after other debts
-    const availableDti = Math.min(maxDti / 100, 0.45) - (monthlyDebt / monthlyIncome);
-    const maxMonthlyPayment = Math.min(monthlyIncome * housingRatio, monthlyIncome * availableDti);
+    // Step 3: Calculate max housing payment based on back-end DTI
+    // (max debt payment minus existing monthly debt)
+    const backEndMaxHousingPayment = backEndMaxDebtPayment - monthlyDebt;
     
-    // Calculate maximum loan amount based on payment, rate, and term
-    const monthlyInterestRate = adjustedRate / 100 / 12;
-    const termInMonths = 30 * 12; // 30-year fixed is still standard in 2025
+    // Step 4: Use the more restrictive of the two housing payment limits
+    const maxHousingPayment = Math.min(frontEndMaxHousingPayment, backEndMaxHousingPayment);
     
-    // Present value formula to determine loan amount from payment
-    let maxLoanAmount = 0;
-    if (monthlyInterestRate > 0) {
-        maxLoanAmount = maxMonthlyPayment * ((1 - Math.pow(1 + monthlyInterestRate, -termInMonths)) / monthlyInterestRate);
-    } else {
-        maxLoanAmount = maxMonthlyPayment * termInMonths;
+    // Step 5: Fixed amount for taxes/insurance/PMI ($733)
+    const taxesInsurancePMI = 733;
+    
+    // Step 6: Calculate principal and interest payment
+    const principalInterest = Math.max(0, maxHousingPayment - taxesInsurancePMI);
+    
+    // Step 7: Calculate loan amount using the formula provided
+    // Loan Amount = Principal/Interest × [(1 - (1 + Monthly Rate)^(-360)) ÷ Monthly Rate]
+    const monthlyRate = effectiveRate / 100 / 12;
+    const termInMonths = 360; // 30 years
+    
+    let loanAmount = 0;
+    if (monthlyRate > 0 && principalInterest > 0) {
+        // This is the exact formula from the specifications
+        const factor = (1 - Math.pow(1 + monthlyRate, -termInMonths)) / monthlyRate;
+        loanAmount = principalInterest * factor;
     }
     
-    // Calculate maximum home price based on loan amount and down payment percentage
-    const maxHomePrice = maxLoanAmount / (1 - (downPaymentPercent / 100));
+    // Step 8: Down payment percentage (3.5%)
+    const downPaymentPercent = 3.5;
     
-    // Calculate recommended down payment
+    // Step 9: Calculate maximum home price
+    // Home Price = Loan Amount / (1 - Down Payment Percentage/100)
+    const maxHomePrice = loanAmount / (1 - (downPaymentPercent / 100));
+    
+    // Step 10: Calculate recommended down payment
     const recommendedDownPayment = maxHomePrice * (downPaymentPercent / 100);
     
-    // Calculate estimated closing costs (2025 average is 2-5% of home price)
-    const closingCostPercent = 3.5; // 2025 average
+    // Step 11: Calculate estimated closing costs (3% of home price)
+    const closingCostPercent = 3.0;
     const estimatedClosingCosts = maxHomePrice * (closingCostPercent / 100);
     
-    // Calculate total cash needed
+    // Step 12: Calculate total cash needed
     const totalCashNeeded = recommendedDownPayment + estimatedClosingCosts;
     
-    // Calculate recommended monthly payment (PITI)
-    // Principal and Interest
-    const loanAmount = maxHomePrice - recommendedDownPayment;
-    const principalAndInterest = (loanAmount * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, termInMonths)) / (Math.pow(1 + monthlyInterestRate, termInMonths) - 1);
+    // Step 13: Calculate recommended monthly payment
+    const recommendedMonthlyPayment = principalInterest + taxesInsurancePMI;
     
-    // Taxes and Insurance (estimated at 1.5% of home value annually for taxes, 0.5% for insurance in 2025)
-    const monthlyTaxes = (maxHomePrice * 0.015) / 12;
-    const monthlyInsurance = (maxHomePrice * 0.005) / 12;
+    // Step 14: Calculate actual DTI ratios
+    // Front-end DTI: housing costs as percentage of income
+    const actualFrontEndDti = (maxHousingPayment / monthlyIncome) * 100;
+    // Back-end DTI: all debt (housing + other debt) as percentage of income
+    const actualBackEndDti = ((maxHousingPayment + monthlyDebt) / monthlyIncome) * 100;
     
-    const recommendedMonthlyPayment = principalAndInterest + monthlyTaxes + monthlyInsurance;
+    // Log detailed calculation steps for verification
+    console.log('Affordability calculation details:', {
+        monthlyIncome: monthlyIncome.toFixed(2),
+        frontEndDti: (frontEndDti * 100) + '%',
+        backEndDti: (backEndDti * 100) + '%',
+        frontEndMaxHousingPayment: frontEndMaxHousingPayment.toFixed(2),
+        backEndMaxDebtPayment: backEndMaxDebtPayment.toFixed(2),
+        backEndMaxHousingPayment: backEndMaxHousingPayment.toFixed(2),
+        maxHousingPayment: maxHousingPayment.toFixed(2),
+        monthlyDebt: monthlyDebt.toFixed(2),
+        taxesInsurancePMI,
+        principalInterest: principalInterest.toFixed(2),
+        effectiveRate,
+        monthlyRate: monthlyRate.toFixed(6),
+        loanAmount: loanAmount.toFixed(2),
+        downPaymentPercent,
+        maxHomePrice: maxHomePrice.toFixed(2),
+        recommendedDownPayment: recommendedDownPayment.toFixed(2),
+        estimatedClosingCosts: estimatedClosingCosts.toFixed(2),
+        totalCashNeeded: totalCashNeeded.toFixed(2),
+        actualFrontEndDti: actualFrontEndDti.toFixed(1) + '%',
+        actualBackEndDti: actualBackEndDti.toFixed(1) + '%',
+        limitingFactor: frontEndMaxHousingPayment < backEndMaxHousingPayment ? 'Front-end DTI' : 'Back-end DTI'
+    });
     
+    // Return the results with proper rounding
     return {
         maxHomePrice: Math.round(maxHomePrice),
-        recommendedMonthlyPayment: Math.round(recommendedMonthlyPayment),
-        dti: dti,
+        recommendedMonthlyPayment: Math.round(maxHousingPayment),
+        dti: backEndDti * 100, // Return the back-end DTI (43%)
+        frontEndDti: frontEndDti * 100, // Return the front-end DTI (31%)
         recommendedDownPayment: Math.round(recommendedDownPayment),
         downPaymentPercent: downPaymentPercent,
         estimatedClosingCosts: Math.round(estimatedClosingCosts),
         totalCashNeeded: Math.round(totalCashNeeded),
-        adjustedInterestRate: adjustedRate
+        adjustedInterestRate: effectiveRate
     };
 }
 
