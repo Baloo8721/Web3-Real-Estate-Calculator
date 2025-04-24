@@ -2621,7 +2621,6 @@ async function calculateBuyer() {
                     <span>${formatter.format(totalUpfrontCosts)}</span>
                 </div>
             </div>
-            <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
         `;
         
         // Display affordability results if the calculator is enabled
@@ -2704,6 +2703,7 @@ async function calculateBuyer() {
                     </div>
                 </div>
             </div>
+            <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
         `;
         
         // Save the inputs and results
