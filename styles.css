@@ -1204,5 +1204,48 @@ footer {
     .input-group label {
         font-size: 0.9em;
     }
+    
+    /* Fix for loan summary section on mobile */
+    .loan-summary-results {
+        background-color: rgba(20, 35, 55, 0.85);
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 20px;
+    }
+    
+    .loan-summary-results .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .loan-summary-results .detail-row:last-child {
+        border-bottom: none;
+    }
+    
+    .loan-summary-results .detail-row span:first-child {
+        color: #ccc;
+        font-weight: 500;
+    }
+    
+    .loan-summary-results .detail-row span:last-child {
+        font-weight: 600;
+        color: white;
+        text-align: right;
+    }
+    
+    .loan-summary-results .detail-row.underlined {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .loan-summary-results .detail-row.total {
+        padding-top: 8px;
+    }
+    
+    .loan-summary-results .detail-row.total span:last-child {
+        color: #00ddeb;
+        font-weight: 700;
+    }
 
 }
