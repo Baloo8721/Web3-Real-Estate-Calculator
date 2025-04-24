@@ -1334,26 +1334,80 @@ function loadFromUrlParams() {
 }
 
 // Function to fetch mortgage rate from Nasdaq Data Link API
-async function fetchMortgageRate() {
-    const apiKey = 'GiDm4nHttVk7WKFzx7A8'; // Your Nasdaq Data Link API key
-    const url = `https://data.nasdaq.com/api/v3/datasets/FMAC/30US/data.json?api_key=${apiKey}&limit=1`;
+async function fetchMortgageRate(loanTerm = 30) {
+    // Use different dataset codes based on loan term
+    const datasetCode = loanTerm === 15 ? 'FMAC/15US' : 'FMAC/30US';
+    
+    // For now, use hardcoded rates based on current market data (April 2025)
+    // These will be used as fallbacks when the API is unavailable
+    const fallbackRates = {
+        '15': 0.0635, // 6.35% for 15-year fixed
+        '30': 0.0683  // 6.83% for 30-year fixed
+    };
+    
+    // First try to get from localStorage with term-specific key
+    const cachedRate = localStorage.getItem(`mortgageRate_${loanTerm}`);
+    const rateUpdated = localStorage.getItem(`rateUpdated_${loanTerm}`);
+    
+    // Check if we have a recent cached rate (less than a day old)
+    if (cachedRate && rateUpdated) {
+        const lastUpdate = new Date(rateUpdated);
+        const now = new Date();
+        const oneDay = 24 * 60 * 60 * 1000;
+        
+        if ((now - lastUpdate) < oneDay) {
+            console.log(`Using cached ${loanTerm}-year rate:`, parseFloat(cachedRate) * 100 + '%');
+            return parseFloat(cachedRate);
+        }
+    }
+    
+    // If no valid cached rate, try to fetch from API
     try {
+        const apiKey = 'GiDm4nHttVk7WKFzx7A8'; // Your Nasdaq Data Link API key
+        const url = `https://data.nasdaq.com/api/v3/datasets/${datasetCode}/data.json?api_key=${apiKey}&limit=1`;
+        
+        console.log(`Fetching ${loanTerm}-year mortgage rate from API...`);
         const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`API returned status ${response.status}`);
+        }
+        
         const data = await response.json();
-        const latestRate = parseFloat(data.dataset_data.data[0][1]) / 100; // e.g., 6.83 -> 0.0683
-        localStorage.setItem('mortgageRate', latestRate);
-        localStorage.setItem('rateUpdated', new Date().toISOString());
-        console.log('Fetched mortgage rate:', latestRate * 100 + '%');
-        return latestRate;
+        
+        // Check if we have valid data
+        if (data && data.dataset_data && data.dataset_data.data && data.dataset_data.data.length > 0) {
+            const latestRate = parseFloat(data.dataset_data.data[0][1]) / 100; // e.g., 6.83 -> 0.0683
+            const fetchDate = new Date(data.dataset_data.data[0][0]); // Get the date of the rate
+            
+            // Store in localStorage with term-specific keys
+            localStorage.setItem(`mortgageRate_${loanTerm}`, latestRate);
+            localStorage.setItem(`rateUpdated_${loanTerm}`, new Date().toISOString());
+            localStorage.setItem(`rateDate_${loanTerm}`, fetchDate.toISOString());
+            
+            console.log(`Fetched ${loanTerm}-year mortgage rate:`, latestRate * 100 + '%', 'as of', fetchDate.toLocaleDateString());
+            return latestRate;
+        } else {
+            throw new Error('Invalid data structure from API');
+        }
     } catch (error) {
-        console.error('Error fetching rate:', error);
-        return parseFloat(localStorage.getItem('mortgageRate')) || 0.06; // Fallback to 6.0%
+        console.error(`Error fetching ${loanTerm}-year rate:`, error);
+        
+        // Use fallback rate for the specific term
+        const fallbackRate = fallbackRates[loanTerm.toString()] || 0.06;
+        console.log(`Using fallback ${loanTerm}-year rate:`, fallbackRate * 100 + '%');
+        
+        // Store the fallback rate to avoid repeated failed API calls
+        localStorage.setItem(`mortgageRate_${loanTerm}`, fallbackRate);
+        localStorage.setItem(`rateUpdated_${loanTerm}`, new Date().toISOString());
+        
+        return fallbackRate;
     }
 }
 
 // Check if the cached rate is still valid (less than a week old)
-function isRateCacheValid() {
-    const updated = localStorage.getItem('rateUpdated');
+function isRateCacheValid(loanTerm = 30) {
+    const updated = localStorage.getItem(`rateUpdated_${loanTerm}`);
     if (!updated) return false;
     const lastUpdate = new Date(updated);
     const now = new Date();
@@ -1361,10 +1415,17 @@ function isRateCacheValid() {
     return (now - lastUpdate) < oneWeek;
 }
 
-// Get mortgage rate adjusted for credit score
-async function getMortgageRate(creditScore) {
-    let rate = isRateCacheValid() ? parseFloat(localStorage.getItem('mortgageRate')) : await fetchMortgageRate();
-    if (!rate) rate = 0.06; // Fallback to 6.0%
+// Get mortgage rate adjusted for credit score and loan term
+async function getMortgageRate(creditScore, loanTerm = 30) {
+    // Get base rate for the specified loan term
+    let rate = isRateCacheValid(loanTerm) ? 
+        parseFloat(localStorage.getItem(`mortgageRate_${loanTerm}`)) : 
+        await fetchMortgageRate(loanTerm);
+    
+    if (!rate) {
+        // Fallback rates if nothing is available
+        rate = loanTerm === 15 ? 0.0635 : 0.0683;
+    }
     
     // Adjust rate based on credit score
     let adjustedRate;
@@ -1385,8 +1446,93 @@ async function getMortgageRate(creditScore) {
             break;
     }
     
-    console.log('Credit-adjusted rate:', adjustedRate * 100 + '%', 'for score:', creditScore);
+    console.log(`Credit-adjusted ${loanTerm}-year rate:`, adjustedRate * 100 + '%', 'for score:', creditScore);
     return adjustedRate;
+}
+
+// Function to update the "Current Market Rate" option text with the actual rate
+function updateMarketRateOption(rate, loanTerm = 30) {
+    const marketRateOption = document.querySelector('#buyer-rate-preset option[value="market"]');
+    if (!marketRateOption) return;
+    
+    // If rate is provided, update the option text
+    if (rate) {
+        const rateValue = (rate * 100).toFixed(2);
+        marketRateOption.textContent = `Current Market Rate (${rateValue}%)`;
+        
+        // Also update the selected option text if it's currently selected
+        const ratePresetSelect = document.getElementById('buyer-rate-preset');
+        if (ratePresetSelect && ratePresetSelect.value === 'market') {
+            // This updates what's visibly shown in the dropdown
+            ratePresetSelect.selectedOptions[0].textContent = `Current Market Rate (${rateValue}%)`;
+        }
+    } else {
+        // Try to get rate from localStorage with term-specific key
+        const cachedRate = localStorage.getItem(`mortgageRate_${loanTerm}`);
+        const rateDate = localStorage.getItem(`rateDate_${loanTerm}`);
+        
+        let rateValue;
+        let optionText;
+        
+        if (cachedRate) {
+            rateValue = (parseFloat(cachedRate) * 100).toFixed(2);
+            optionText = `Current Market Rate (${rateValue}%)`;
+            
+            // Add date if available (but only in the option list, not in the selected text)
+            if (rateDate) {
+                const date = new Date(rateDate);
+                // Only add date to the option in the dropdown list
+                marketRateOption.textContent = optionText + ` as of ${date.toLocaleDateString()}`;
+            } else {
+                marketRateOption.textContent = optionText;
+            }
+        } else {
+            // Use fallback rates based on term
+            rateValue = loanTerm === 15 ? 6.35 : 6.83;
+            optionText = `Current Market Rate (${rateValue}%)`;
+            marketRateOption.textContent = optionText;
+        }
+        
+        // Update the visible selected text if market rate is currently selected
+        const ratePresetSelect = document.getElementById('buyer-rate-preset');
+        if (ratePresetSelect && ratePresetSelect.value === 'market') {
+            // This updates what's visibly shown in the dropdown when closed
+            ratePresetSelect.selectedOptions[0].textContent = optionText;
+        }
+    }
+}
+
+// Function to handle rate preset dropdown changes
+function handleRatePresetChange() {
+    const ratePresetSelect = document.getElementById('buyer-rate-preset');
+    const rateInput = document.getElementById('buyer-rate');
+    const rateCustomGroup = document.getElementById('buyer-rate-custom-group');
+    const loanTerm = parseInt(document.getElementById('buyer-term').value) || 30;
+    
+    if (ratePresetSelect.value === 'custom') {
+        rateCustomGroup.style.display = 'block';
+        rateInput.focus();
+    } else {
+        rateCustomGroup.style.display = 'none';
+        
+        if (ratePresetSelect.value === 'market') {
+            // Get rate from localStorage or fetch it, using the correct loan term
+            const cachedRate = localStorage.getItem(`mortgageRate_${loanTerm}`);
+            if (cachedRate) {
+                rateInput.value = (parseFloat(cachedRate) * 100).toFixed(2);
+            } else {
+                // Set a loading value and fetch the rate
+                rateInput.value = loanTerm === 15 ? '6.35' : '6.83'; // Default while loading
+                fetchMortgageRate(loanTerm).then(rate => {
+                    rateInput.value = (rate * 100).toFixed(2);
+                    updateMarketRateOption(rate, loanTerm);
+                });
+            }
+        } else {
+            // For numeric presets, just use the value
+            rateInput.value = ratePresetSelect.value;
+        }
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1396,9 +1542,20 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialize by fetching the current mortgage rate
         fetchMortgageRate().then(rate => {
             console.log('Initial mortgage rate loaded:', (rate * 100).toFixed(2) + '%');
+            
+            // Update the "Current Market Rate" option text to show the actual rate
+            updateMarketRateOption(rate);
+            
+            // If market rate is selected, update the rate field
+            if (document.getElementById('buyer-rate-preset').value === 'market') {
+                document.getElementById('buyer-rate').value = (rate * 100).toFixed(2);
+            }
         }).catch(error => {
             console.error('Error initializing mortgage rate:', error);
         });
+        
+        // Add event listener for the rate preset dropdown
+        document.getElementById('buyer-rate-preset').addEventListener('change', handleRatePresetChange);
         
         // Check for URL parameters to load saved calculations
         loadFromUrlParams();
@@ -1443,10 +1600,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialize calculator buttons
         document.getElementById('buyer-calc')?.addEventListener('click', () => {
             calculateBuyer();
-            // Scroll just slightly to show the beginning of results section
+            // Scroll to show the entire Loan Summary section
             const results = document.getElementById('buyer-result');
             if (results) {
-                results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Changed from 'start' to 'center' to show more of the Loan Summary
+                results.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         });
         document.getElementById('seller-calc').addEventListener('click', () => {
@@ -1627,7 +1785,7 @@ function initializeBuyerCalculator() {
     // Update down payment when changed manually
     downInput.addEventListener('change', updatePMIRate);
     
-    // Loan term dropdown
+    // Term preset dropdown
     const termPresetSelect = document.getElementById('buyer-term-preset');
     const termCustomGroup = document.getElementById('buyer-term-custom-group');
     const termInput = document.getElementById('buyer-term');
@@ -1635,9 +1793,24 @@ function initializeBuyerCalculator() {
     termPresetSelect.addEventListener('change', function() {
         if (this.value === 'custom') {
             termCustomGroup.style.display = 'block';
+            termInput.focus();
         } else {
             termCustomGroup.style.display = 'none';
             termInput.value = this.value;
+            
+            // IMPORTANT: When the loan term changes, update the interest rate if market rate is selected
+            if (document.getElementById('buyer-rate-preset').value === 'market') {
+                const loanTerm = parseInt(this.value) || 30;
+                const newRate = loanTerm === 15 ? 6.35 : 6.83;
+                
+                // Update the rate input and dropdown text
+                updateInterestRateForTerm(loanTerm);
+                
+                // Force a recalculation
+                setTimeout(() => {
+                    document.getElementById('buyer-calculate').click();
+                }, 50);
+            }
         }
     });
     
@@ -1646,14 +1819,153 @@ function initializeBuyerCalculator() {
     const rateCustomGroup = document.getElementById('buyer-rate-custom-group');
     const rateInput = document.getElementById('buyer-rate');
     
-    ratePresetSelect.addEventListener('change', function() {
-        if (this.value === 'custom') {
-            rateCustomGroup.style.display = 'block';
+    // Use the new handleRatePresetChange function for the dropdown
+    ratePresetSelect.addEventListener('change', handleRatePresetChange);
+    
+    // Initial setup of the market rate option
+    updateMarketRateOption();
+    
+    // Define a function to update the interest rate based on loan term
+    function updateInterestRateForTerm(loanTerm) {
+        // Get the interest rate dropdown and input field
+        const ratePresetSelect = document.getElementById('buyer-rate-preset');
+        const rateInput = document.getElementById('buyer-rate');
+        
+        // Set the correct rate based on the loan term
+        const newRate = loanTerm === 15 ? 6.35 : 6.83;
+        console.log(`Updating interest rate for ${loanTerm}-year term to ${newRate}%`);
+        
+        // BRUTE FORCE APPROACH: Completely rebuild the dropdown
+        // This ensures the visual display updates immediately
+        
+        // 1. Save the current selection
+        const currentValue = ratePresetSelect.value;
+        
+        // 2. Create a new select element with the same ID and attributes
+        const newSelect = document.createElement('select');
+        newSelect.id = 'buyer-rate-preset';
+        newSelect.setAttribute('aria-label', 'Interest Rate Preset');
+        
+        // 3. Add all options, updating the market rate option with the correct rate
+        const options = [
+            { value: 'market', text: `Current Market Rate (${newRate}%)` },
+            { value: '3', text: '3.0%' },
+            { value: '3.5', text: '3.5%' },
+            { value: '4', text: '4.0%' },
+            { value: '4.5', text: '4.5%' },
+            { value: '5', text: '5.0%' },
+            { value: '5.5', text: '5.5%' },
+            { value: '6', text: '6.0%' },
+            { value: '6.5', text: '6.5%' },
+            { value: '7', text: '7.0%' },
+            { value: 'custom', text: 'Custom' }
+        ];
+        
+        options.forEach(opt => {
+            const option = document.createElement('option');
+            option.value = opt.value;
+            option.textContent = opt.text;
+            if (opt.value === 'custom') {
+                option.setAttribute('data-lang', 'custom_rate');
+            }
+            newSelect.appendChild(option);
+        });
+        
+        // 4. Set the same selection as before
+        newSelect.value = currentValue;
+        
+        // 5. Add the same event listener
+        newSelect.addEventListener('change', handleRatePresetChange);
+        
+        // 6. Replace the old select with the new one
+        const parent = ratePresetSelect.parentNode;
+        parent.replaceChild(newSelect, ratePresetSelect);
+        
+        // 7. If market rate was selected, update the rate input field
+        if (currentValue === 'market') {
+            rateInput.value = newRate.toFixed(2);
+        }
+    }
+    
+    // Define a function to update the rate based on term
+    function updateRateForTerm(loanTerm) {
+        const ratePresetSelect = document.getElementById('buyer-rate-preset');
+        const rateInput = document.getElementById('buyer-rate');
+        
+        console.log(`Updating rate for ${loanTerm}-year term`);
+        
+        // Get the appropriate rate for this term
+        let rateValue;
+        const cachedRate = localStorage.getItem(`mortgageRate_${loanTerm}`);
+        
+        if (cachedRate) {
+            rateValue = parseFloat(cachedRate) * 100;
+            console.log(`Using cached rate: ${rateValue.toFixed(2)}%`);
         } else {
-            rateCustomGroup.style.display = 'none';
-            rateInput.value = this.value;
+            // Use fallback rates
+            rateValue = loanTerm === 15 ? 6.35 : 6.83;
+            console.log(`Using fallback rate: ${rateValue.toFixed(2)}%`);
+            
+            // Store this fallback rate temporarily
+            localStorage.setItem(`mortgageRate_${loanTerm}`, (rateValue / 100).toString());
+            
+            // Also fetch the current rate in the background
+            fetchMortgageRate(loanTerm).then(rate => {
+                const apiRate = rate * 100;
+                console.log(`API returned rate: ${apiRate.toFixed(2)}%`);
+                localStorage.setItem(`mortgageRate_${loanTerm}`, rate.toString());
+                
+                // Update UI with the API rate
+                if (ratePresetSelect.value === 'market') {
+                    rateInput.value = apiRate.toFixed(2);
+                    
+                    // Update the dropdown text
+                    const marketRateOption = document.querySelector('#buyer-rate-preset option[value="market"]');
+                    if (marketRateOption) {
+                        marketRateOption.textContent = `Current Market Rate (${apiRate.toFixed(2)}%)`;
+                    }
+                    
+                    // Also update the selected option text
+                    if (ratePresetSelect.selectedOptions[0].value === 'market') {
+                        ratePresetSelect.selectedOptions[0].textContent = `Current Market Rate (${apiRate.toFixed(2)}%)`;
+                    }
+                }
+            });
+        }
+        
+        // Update the market rate option and selected text immediately
+        const marketRateOption = document.querySelector('#buyer-rate-preset option[value="market"]');
+        if (marketRateOption) {
+            marketRateOption.textContent = `Current Market Rate (${rateValue.toFixed(2)}%)`;
+        }
+        
+        // If market rate is selected, update the selected option text and input field
+        if (ratePresetSelect.value === 'market') {
+            // Update the selected option text (what's visible in the dropdown)
+            ratePresetSelect.selectedOptions[0].textContent = `Current Market Rate (${rateValue.toFixed(2)}%)`;
+            
+            // Update the rate input field
+            rateInput.value = rateValue.toFixed(2);
+        }
+    }
+    
+    // Add event listener to the custom term input field
+    termInput.addEventListener('change', function() {
+        // Only update if market rate is selected
+        if (document.getElementById('buyer-rate-preset').value === 'market') {
+            const loanTerm = parseInt(this.value) || 30;
+            updateInterestRateForTerm(loanTerm);
+            
+            // Force a recalculation
+            setTimeout(() => {
+                document.getElementById('buyer-calculate').click();
+            }, 50);
         }
     });
+    
+    // Initialize with the correct rate for the current term
+    const initialTerm = parseInt(termPresetSelect.value) || 30;
+    updateRateForTerm(initialTerm);
     
     // Loan type changes
     const loanTypeSelect = document.getElementById('buyer-loan-type');
@@ -2052,12 +2364,16 @@ async function calculateBuyer() {
         const loanType = document.getElementById('buyer-loan-type').value;
         const creditScore = document.getElementById('credit-score').value || '740plus';
 
-        // If rate is not provided by user, get it from Nasdaq Data Link API
-        if (rate === 0) {
-            rate = await getMortgageRate(creditScore) * 100; // Convert to percentage for display
-            console.log('Using API rate:', rate + '%');
+        // If market rate is selected or rate is not provided, get it from Nasdaq Data Link API
+        if (document.getElementById('buyer-rate-preset').value === 'market' || rate === 0) {
+            // Get rate based on the selected loan term
+            rate = await getMortgageRate(creditScore, term) * 100; // Convert to percentage for display
+            console.log('Using API rate:', rate + '%', 'for', term, 'year term');
             // Update the rate input field with the fetched rate
             document.getElementById('buyer-rate').value = rate.toFixed(2);
+            
+            // Update the market rate option text
+            updateMarketRateOption(rate/100, term);
         }
 
         // Check if affordability calculator is enabled
@@ -2193,9 +2509,8 @@ async function calculateBuyer() {
             termPresetElement.options[termPresetElement.selectedIndex].text;
         
         const ratePresetElement = document.getElementById('buyer-rate-preset');
-        const interestRateText = ratePresetElement.value === 'custom' ? 
-            rate + '%' : 
-            ratePresetElement.value + '%';
+        // Always use the actual calculated rate for display, not the dropdown value
+        const interestRateText = rate.toFixed(2) + '%';
         
         document.getElementById('buyer-result').innerHTML = `
             <div class="loan-summary-results">
