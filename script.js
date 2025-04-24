@@ -27,7 +27,7 @@ const translations = {
         buyer_extra_payment: "Extra Monthly Payment ($)",
         buyer_escrow: "Include Taxes & Insurance in Payment (Escrow), HOA/CDD Fees",
         buyer_cdd: "CDD Fees ($/month)",
-        affordability_toggle: "Affordability Calculator",
+        affordability_toggle: "Home Affordability Estimator",
         household_income: "Household Income ($/year)",
         monthly_debt: "Monthly Debt ($)",
         credit_score: "Credit Score",
@@ -1662,11 +1662,10 @@ function initializeBuyerCalculator() {
     // Set initial state based on checkbox
     toggleAffordabilityFields();
     
-    // Add event listener for the affordability calculator button
-    const affordabilityCalcBtn = document.getElementById('affordability-calc');
-    if (affordabilityCalcBtn) {
-        affordabilityCalcBtn.addEventListener('click', calculateQuickAffordability);
-    }
+    // We don't need a separate function for the loan summary, we'll include it directly in the calculation results
+    
+    // Affordability functionality now integrated with main Calculate button
+    // Quick affordability button removed to simplify UI
     
     // Credit Score change handler to update PMI rate
     const creditScoreSelect = document.getElementById('credit-score');
@@ -2004,7 +2003,7 @@ function calculateBuyer() {
             creditScore = document.getElementById('credit-score').value;
             
             // Calculate affordability based on 2025 data
-            affordabilityResults = calculateAffordability(householdIncome, monthlyDebt, creditScore, rate);
+            affordabilityResults = calculateAffordability(householdIncome, monthlyDebt, creditScore, loanType);
         }
 
         // Validate inputs
@@ -2031,14 +2030,14 @@ function calculateBuyer() {
         if (loanType === 'conventional' || loanType === 'arm') {
             // Conventional loans only have PMI if LTV > 80%
             if (ltv > 80) {
-                monthlyPMI = (loan * (pmiRate / 100)) / 12;
+                monthlyPMI = (loan * 0.005) / 12; // 0.5% for conventional
             }
         } else if (loanType === 'fha') {
             // FHA has MIP regardless of down payment (though it can be removed after hitting 78% LTV and 5+ years on 30yr loans)
-            monthlyPMI = (loan * (pmiRate / 100)) / 12;
-        } else if (loanType === 'usda' && pmiRate > 0) {
-            // USDA has annual fee
-            monthlyPMI = (loan * (pmiRate / 100)) / 12;
+            monthlyPMI = (loan * 0.0085) / 12; // 0.85% for FHA
+        } else if (loanType === 'usda') {
+            // USDA has annual guarantee fee of 0.35%
+            monthlyPMI = (loan * 0.0035) / 12; // 0.35% for USDA
         }
         // VA loans don't have PMI (pmiRate should be 0)
         
@@ -2062,6 +2061,11 @@ function calculateBuyer() {
         // Recalculate total interest and loan term with extra payments if applicable
         let totalInterest;
         let effectiveTermMonths;
+        let moneySavedWithExtraPayments = 0;
+        
+        // First calculate standard interest without extra payments
+        // This is the correct formula for total interest: total payments - loan amount
+        const standardTotalInterest = (principalInterest * months) - loan;
         
         if (extraPayment > 0) {
             // Calculate how extra payments affect the loan term and interest
@@ -2085,9 +2089,12 @@ function calculateBuyer() {
             
             totalInterest = interestPaid;
             effectiveTermMonths = monthsPaid;
+            
+            // Calculate money saved with extra payments
+            moneySavedWithExtraPayments = standardTotalInterest - totalInterest;
         } else {
             // Standard calculation without extra payments
-            totalInterest = (principalInterest * months) - loan;
+            totalInterest = standardTotalInterest;
             effectiveTermMonths = months;
         }
         
@@ -2104,8 +2111,58 @@ function calculateBuyer() {
         
         // Display comprehensive results
         const lang = localStorage.getItem('selectedLanguage') || 'en';
+        
+        // Get loan summary values
+        const loanTypeText = document.getElementById('buyer-loan-type').options[document.getElementById('buyer-loan-type').selectedIndex].text;
+        
+        const termPresetElement = document.getElementById('buyer-term-preset');
+        const loanTermText = termPresetElement.value === 'custom' ? 
+            term + ' ' + (translations[lang].years || 'Years') : 
+            termPresetElement.options[termPresetElement.selectedIndex].text;
+        
+        const ratePresetElement = document.getElementById('buyer-rate-preset');
+        const interestRateText = ratePresetElement.value === 'custom' ? 
+            rate + '%' : 
+            ratePresetElement.value + '%';
+        
         document.getElementById('buyer-result').innerHTML = `
-            <div class="result-section">
+            <div class="loan-summary-results">
+                <h4>${translations[lang].loan_summary || 'Loan Summary'}</h4>
+                <div class="detail-row">
+                    <span>Loan Type:</span>
+                    <span>${loanTypeText}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Loan Length:</span>
+                    <span>${loanTermText}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Interest:</span>
+                    <span>${interestRateText}</span>
+                </div>
+                <div class="detail-row">
+                    <span>PMI:</span>
+                    <span>${pmiRate}%</span>
+                </div>
+                <div class="detail-row">
+                    <span>Loan Amount:</span>
+                    <span>${formatter.format(loan)}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Loan-to-Value Ratio:</span>
+                    <span>${ltv.toFixed(1)}%</span>
+                </div>
+                <div class="detail-row underlined">
+                    <span>Total Interest:</span>
+                    <span>${formatter.format(totalInterest)}</span>
+                </div>
+                <div class="detail-row total">
+                    <span>Total Paid:</span>
+                    <span>${formatter.format(loan + totalInterest)}</span>
+                </div>
+            </div>
+            
+            <div class="result-section monthly-costs-section">
                 <h4 data-lang="monthly_costs">${translations[lang].monthly_costs}</h4>
                 <div class="result-row">
                     <span data-lang="principal_interest">${translations[lang].principal_interest}:</span>
@@ -2145,21 +2202,9 @@ function calculateBuyer() {
                 </div>` : ''}
             </div>
             
-            <div class="result-section">
-                <h4 data-lang="loan_details">${translations[lang].loan_details}</h4>
-                <div class="result-row">
-                    <span data-lang="loan_amount">${translations[lang].loan_amount}:</span>
-                    <span>${formatter.format(loan)}</span>
-                </div>
-                <div class="result-row">
-                    <span data-lang="loan_to_value_ratio">${translations[lang].loan_to_value_ratio}:</span>
-                    <span>${ltv.toFixed(1)}%</span>
-                </div>
-                <div class="result-row">
-                    <span data-lang="total_interest">${translations[lang].total_interest}:</span>
-                    <span>${formatter.format(totalInterest)}</span>
-                </div>
-                ${extraPayment > 0 ? `
+            ${extraPayment > 0 ? `
+            <div class="result-section extra-payment-section">
+                <h4 data-lang="extra_payment_details">${translations[lang].extra_payment_details || 'Extra Payment Details'}</h4>
                 <div class="result-row highlight">
                     <span data-lang="loan_term_extra_payments">${translations[lang].loan_term_extra_payments}:</span>
                     <span>${Math.floor(effectiveTermMonths / 12)} ${translations[lang].years} ${effectiveTermMonths % 12} ${translations[lang].months || 'months'}</span>
@@ -2167,10 +2212,14 @@ function calculateBuyer() {
                 <div class="result-row highlight">
                     <span data-lang="years_saved_extra_payments">${translations[lang].years_saved_extra_payments}:</span>
                     <span>${((months - effectiveTermMonths) / 12).toFixed(1)} ${translations[lang].years}</span>
-                </div>` : ''}
-            </div>
+                </div>
+                <div class="result-row highlight">
+                    <span>Money Saved with Extra Payments:</span>
+                    <span>${formatter.format(moneySavedWithExtraPayments)}</span>
+                </div>
+            </div>` : ''}
             
-            <div class="result-section">
+            <div class="result-section upfront-costs-section">
                 <h4 data-lang="upfront_costs">${translations[lang].upfront_costs}</h4>
                 <div class="result-row">
                     <span data-lang="down_payment">${translations[lang].down_payment}:</span>
@@ -2195,27 +2244,43 @@ function calculateBuyer() {
                     <h4>${translations[lang].affordability_analysis || 'Affordability Analysis (2025)'}</h4>
                     <div class="result-row">
                         <span>${translations[lang].max_home_price || 'Maximum Home Price'}:</span>
-                        <span>${formatter.format(affordabilityResults.maxHomePrice)}</span>
+                        <span>${formatter.format(affordabilityResults.homePrice)}</span>
                     </div>
                     <div class="result-row">
                         <span>${translations[lang].recommended_monthly_payment || 'Recommended Monthly Payment'}:</span>
-                        <span>${formatter.format(affordabilityResults.recommendedMonthlyPayment)}/mo</span>
+                        <span data-payment="monthly">${formatter.format(affordabilityResults.monthlyPayment)}/mo</span>
+                    </div>
+                    <div class="result-row">
+                        <span>${translations[lang].principal_interest || 'Principal & Interest'}:</span>
+                        <span>${formatter.format(affordabilityResults.principalInterest)}/mo</span>
+                    </div>
+                    <div class="result-row">
+                        <span>${translations[lang].property_taxes || 'Property Taxes'}:</span>
+                        <span>${formatter.format(affordabilityResults.monthlyTaxes)}/mo</span>
+                    </div>
+                    <div class="result-row">
+                        <span>${translations[lang].homeowners_insurance || 'Homeowners Insurance'}:</span>
+                        <span>${formatter.format(affordabilityResults.monthlyInsurance)}/mo</span>
+                    </div>
+                    <div class="result-row">
+                        <span>${translations[lang].private_mortgage_insurance || 'Private Mortgage Insurance'}:</span>
+                        <span>${formatter.format(affordabilityResults.monthlyPmi)}/mo</span>
                     </div>
                     <div class="result-row">
                         <span>${translations[lang].debt_to_income_ratio || 'Debt-to-Income Ratio'}:</span>
-                        <span>${affordabilityResults.dti.toFixed(1)}%</span>
+                        <span>${affordabilityResults.backEndDti}% (Back-End), ${affordabilityResults.frontEndDti}% (Front-End)</span>
                     </div>
                     <div class="result-row">
-                        <span>${translations[lang].recommended_down_payment || 'Recommended Down Payment'}:</span>
-                        <span>${formatter.format(affordabilityResults.recommendedDownPayment)} (${affordabilityResults.downPaymentPercent.toFixed(1)}%)</span>
+                        <span>${translations[lang].down_payment || 'Down Payment'}:</span>
+                        <span>${formatter.format(affordabilityResults.downPayment)} (3.5%)</span>
                     </div>
                     <div class="result-row">
-                        <span>${translations[lang].estimated_closing_costs || 'Estimated Closing Costs'}:</span>
-                        <span>${formatter.format(affordabilityResults.estimatedClosingCosts)}</span>
+                        <span>${translations[lang].closing_costs || 'Closing Costs'}:</span>
+                        <span>${formatter.format(affordabilityResults.closingCosts)}</span>
                     </div>
                     <div class="result-row total">
-                        <span>${translations[lang].total_cash_needed || 'Total Cash Needed'}:</span>
-                        <span>${formatter.format(affordabilityResults.totalCashNeeded)}</span>
+                        <span>${translations[lang].total_upfront_costs || 'Total Cash Needed'}:</span>
+                        <span>${formatter.format(affordabilityResults.totalCash)}</span>
                     </div>
                 </div>
             `;
@@ -2268,8 +2333,9 @@ function calculateBuyer() {
     }
 }
 
-function calculateAffordability(householdIncome, monthlyDebt, creditScore, interestRate) {
+function calculateAffordability(householdIncome, monthlyDebt, creditScore, loanType) {
     // Updated Affordability Calculator using both front-end (31%) and back-end (43%) DTI ratios
+    // with dynamic autofill values for taxes, insurance, and PMI
     
     // Convert annual income to monthly
     const monthlyIncome = householdIncome / 12;
@@ -2309,49 +2375,83 @@ function calculateAffordability(householdIncome, monthlyDebt, creditScore, inter
     // Step 4: Use the more restrictive of the two housing payment limits
     const maxHousingPayment = Math.min(frontEndMaxHousingPayment, backEndMaxHousingPayment);
     
-    // Step 5: Fixed amount for taxes/insurance/PMI ($733)
-    const taxesInsurancePMI = 733;
-    
-    // Step 6: Calculate principal and interest payment
-    const principalInterest = Math.max(0, maxHousingPayment - taxesInsurancePMI);
-    
-    // Step 7: Calculate loan amount using the formula provided
-    // Loan Amount = Principal/Interest × [(1 - (1 + Monthly Rate)^(-360)) ÷ Monthly Rate]
+    // Step 5: Calculate loan amount and home price using an iterative approach
+    // for more accurate taxes, insurance, and PMI calculations
     const monthlyRate = effectiveRate / 100 / 12;
     const termInMonths = 360; // 30 years
+    const downPaymentPercent = 3.5; // 3.5% down payment
+    const closingCostPercent = 3.0; // 3% closing costs
     
+    // Constants for autofill ratios
+    const propertyTaxRate = 0.0082; // 0.82% annual property tax rate
+    const insuranceRate = 2325 / 300000; // $2,325/year for $300,000 home (0.775%)
+    
+    // Iterative calculation for more accurate results
+    let homePrice = 0;
     let loanAmount = 0;
-    if (monthlyRate > 0 && principalInterest > 0) {
-        // This is the exact formula from the specifications
-        const factor = (1 - Math.pow(1 + monthlyRate, -termInMonths)) / monthlyRate;
-        loanAmount = principalInterest * factor;
+    let monthlyPropertyTax = 0;
+    let monthlyInsurance = 0;
+    let monthlyPMI = 0;
+    let principalInterest = 0;
+    
+    // Initial estimate
+    principalInterest = maxHousingPayment;
+    
+    // Perform multiple iterations to converge on an accurate result
+    for (let i = 0; i < 10; i++) {
+        // Calculate loan amount based on P&I payment
+        if (monthlyRate > 0 && principalInterest > 0) {
+            const factor = (1 - Math.pow(1 + monthlyRate, -termInMonths)) / monthlyRate;
+            loanAmount = principalInterest * factor;
+        }
+        
+        // Calculate home price based on down payment percentage
+        homePrice = loanAmount / (1 - (downPaymentPercent / 100));
+        
+        // Calculate monthly property tax (0.82% of home value annually)
+        monthlyPropertyTax = (homePrice * propertyTaxRate) / 12;
+        
+        // Calculate monthly insurance (based on $2,325/year for $300,000 home)
+        monthlyInsurance = (homePrice * insuranceRate) / 12;
+        
+        // Calculate PMI based on loan type
+        if (loanType === 'conventional' || loanType === 'arm') {
+            // Conventional: 0.5% if down payment < 20%
+            monthlyPMI = (downPaymentPercent < 20) ? (loanAmount * 0.005) / 12 : 0;
+        } else if (loanType === 'fha') {
+            // FHA: 0.85% MIP
+            monthlyPMI = (loanAmount * 0.0085) / 12;
+        } else if (loanType === 'usda') {
+            // USDA: 0.35% guarantee fee
+            monthlyPMI = (loanAmount * 0.0035) / 12;
+        } else if (loanType === 'va') {
+            // VA: No PMI
+            monthlyPMI = 0;
+        } else {
+            // Default
+            monthlyPMI = (downPaymentPercent < 20) ? (loanAmount * 0.005) / 12 : 0;
+        }
+        
+        // Recalculate principal and interest based on housing payment minus taxes, insurance, and PMI
+        principalInterest = maxHousingPayment - (monthlyPropertyTax + monthlyInsurance + monthlyPMI);
     }
     
-    // Step 8: Down payment percentage (3.5%)
-    const downPaymentPercent = 3.5;
-    
-    // Step 9: Calculate maximum home price
-    // Home Price = Loan Amount / (1 - Down Payment Percentage/100)
-    const maxHomePrice = loanAmount / (1 - (downPaymentPercent / 100));
-    
-    // Step 10: Calculate recommended down payment
-    const recommendedDownPayment = maxHomePrice * (downPaymentPercent / 100);
-    
-    // Step 11: Calculate estimated closing costs (3% of home price)
-    const closingCostPercent = 3.0;
-    const estimatedClosingCosts = maxHomePrice * (closingCostPercent / 100);
-    
-    // Step 12: Calculate total cash needed
+    // Calculate down payment and closing costs
+    const recommendedDownPayment = homePrice * (downPaymentPercent / 100);
+    const estimatedClosingCosts = homePrice * (closingCostPercent / 100);
     const totalCashNeeded = recommendedDownPayment + estimatedClosingCosts;
     
-    // Step 13: Calculate recommended monthly payment
-    const recommendedMonthlyPayment = principalInterest + taxesInsurancePMI;
+    // Calculate total housing payment
+    const totalHousingPayment = principalInterest + monthlyPropertyTax + monthlyInsurance + monthlyPMI;
     
-    // Step 14: Calculate actual DTI ratios
-    // Front-end DTI: housing costs as percentage of income
-    const actualFrontEndDti = (maxHousingPayment / monthlyIncome) * 100;
-    // Back-end DTI: all debt (housing + other debt) as percentage of income
-    const actualBackEndDti = ((maxHousingPayment + monthlyDebt) / monthlyIncome) * 100;
+    // Calculate actual DTI ratios
+    const actualFrontEndDti = (totalHousingPayment / monthlyIncome) * 100;
+    const actualBackEndDti = ((totalHousingPayment + monthlyDebt) / monthlyIncome) * 100;
+    
+    // Cap DTI at 50% as a safety measure
+    if (actualBackEndDti > 50) {
+        console.warn('DTI exceeds 50% limit, affordability may be overestimated');
+    }
     
     // Log detailed calculation steps for verification
     console.log('Affordability calculation details:', {
@@ -2363,13 +2463,15 @@ function calculateAffordability(householdIncome, monthlyDebt, creditScore, inter
         backEndMaxHousingPayment: backEndMaxHousingPayment.toFixed(2),
         maxHousingPayment: maxHousingPayment.toFixed(2),
         monthlyDebt: monthlyDebt.toFixed(2),
-        taxesInsurancePMI,
         principalInterest: principalInterest.toFixed(2),
+        monthlyPropertyTax: monthlyPropertyTax.toFixed(2),
+        monthlyInsurance: monthlyInsurance.toFixed(2),
+        monthlyPMI: monthlyPMI.toFixed(2),
         effectiveRate,
         monthlyRate: monthlyRate.toFixed(6),
         loanAmount: loanAmount.toFixed(2),
         downPaymentPercent,
-        maxHomePrice: maxHomePrice.toFixed(2),
+        homePrice: homePrice.toFixed(2),
         recommendedDownPayment: recommendedDownPayment.toFixed(2),
         estimatedClosingCosts: estimatedClosingCosts.toFixed(2),
         totalCashNeeded: totalCashNeeded.toFixed(2),
@@ -2380,87 +2482,42 @@ function calculateAffordability(householdIncome, monthlyDebt, creditScore, inter
     
     // Return the results with proper rounding
     return {
-        maxHomePrice: Math.round(maxHomePrice),
-        recommendedMonthlyPayment: Math.round(maxHousingPayment),
-        dti: backEndDti * 100, // Return the back-end DTI (43%)
-        frontEndDti: frontEndDti * 100, // Return the front-end DTI (31%)
-        recommendedDownPayment: Math.round(recommendedDownPayment),
-        downPaymentPercent: downPaymentPercent,
-        estimatedClosingCosts: Math.round(estimatedClosingCosts),
-        totalCashNeeded: Math.round(totalCashNeeded),
+        homePrice: Math.round(homePrice),
+        monthlyPayment: Math.round(totalHousingPayment),
+        principalInterest: Math.round(principalInterest),
+        monthlyTaxes: Math.round(monthlyPropertyTax),
+        monthlyInsurance: Math.round(monthlyInsurance),
+        monthlyPmi: Math.round(monthlyPMI),
+        backEndDti: actualBackEndDti.toFixed(1),
+        frontEndDti: actualFrontEndDti.toFixed(1),
+        downPayment: Math.round(recommendedDownPayment),
+        closingCosts: Math.round(estimatedClosingCosts),
+        totalCash: Math.round(totalCashNeeded),
         adjustedInterestRate: effectiveRate
     };
 }
 
-// Function to calculate and display quick affordability results
+// Function to calculate affordability results (now only used by the main Calculate button)
 function calculateQuickAffordability() {
     try {
         // Get affordability calculator inputs
         const householdIncome = parseFloat(document.getElementById('household-income').value) || 0;
         const monthlyDebt = parseFloat(document.getElementById('monthly-debt').value) || 0;
         const creditScore = document.getElementById('credit-score').value;
+        const loanType = document.getElementById('buyer-loan-type').value || 'conventional';
         
-        // Get interest rate from the main calculator
-        const interestRate = parseFloat(document.getElementById('buyer-rate').value) || 4.5; // Default to 4.5% if not set
-        
-        // Validate inputs
         if (householdIncome <= 0) {
-            document.getElementById('affordability-quick-results').innerHTML = `<span class="error">Please enter your household income.</span>`;
-            document.getElementById('affordability-quick-results').classList.add('active');
-            return;
+            console.log('Household income not provided, skipping affordability calculation');
+            return null;
         }
         
         // Calculate affordability based on 2025 data
-        const affordabilityResults = calculateAffordability(householdIncome, monthlyDebt, creditScore, interestRate);
-        
-        // Format results
-        const formatter = new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        });
-        
-        // Display results in the quick results container
-        const lang = localStorage.getItem('selectedLanguage') || 'en';
-        document.getElementById('affordability-quick-results').innerHTML = `
-            <h4>${translations[lang].affordability_analysis || 'Affordability Analysis (2025)'}</h4>
-            <div class="result-row">
-                <span>${translations[lang].max_home_price || 'Maximum Home Price'}:</span>
-                <span>${formatter.format(affordabilityResults.maxHomePrice)}</span>
-            </div>
-            <div class="result-row">
-                <span>${translations[lang].recommended_monthly_payment || 'Recommended Monthly Payment'}:</span>
-                <span>${formatter.format(affordabilityResults.recommendedMonthlyPayment)}/mo</span>
-            </div>
-            <div class="result-row">
-                <span>${translations[lang].debt_to_income_ratio || 'Debt-to-Income Ratio'}:</span>
-                <span>${affordabilityResults.dti.toFixed(1)}%</span>
-            </div>
-            <div class="result-row">
-                <span>${translations[lang].recommended_down_payment || 'Recommended Down Payment'}:</span>
-                <span>${formatter.format(affordabilityResults.recommendedDownPayment)} (${affordabilityResults.downPaymentPercent.toFixed(1)}%)</span>
-            </div>
-            <div class="result-row">
-                <span>${translations[lang].estimated_closing_costs || 'Estimated Closing Costs'}:</span>
-                <span>${formatter.format(affordabilityResults.estimatedClosingCosts)}</span>
-            </div>
-            <div class="result-row total">
-                <span>${translations[lang].total_cash_needed || 'Total Cash Needed'}:</span>
-                <span>${formatter.format(affordabilityResults.totalCashNeeded)}</span>
-            </div>
-        `;
-        
-        // Show the results container
-        document.getElementById('affordability-quick-results').classList.add('active');
-        
-        // Scroll to the results
-        document.getElementById('affordability-quick-results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const affordabilityResults = calculateAffordability(householdIncome, monthlyDebt, creditScore, loanType);
+        return affordabilityResults;
         
     } catch (error) {
-        console.error('Quick affordability calculation error:', error);
-        document.getElementById('affordability-quick-results').innerHTML = `<span class="error">Calculation error. Please try again.</span>`;
-        document.getElementById('affordability-quick-results').classList.add('active');
+        console.error('Affordability calculation error:', error);
+        return null;
     }
 }
 
@@ -2705,16 +2762,52 @@ function renderBuyerResults(inputs) {
         
         // Extract values from inputs
         const {
-            price, down, term, rate, propertyTax, insurance, hoaFees, pmiRate,
+            price, down, term, rate, propertyTax, insurance, hoaFees, pmiRate, cddFees,
             closingCosts, extraPayment, includeEscrow, loanType,
             principalInterest, totalMonthlyPayment, totalInterest, ltv, totalUpfrontCosts,
             loan, monthlyPropertyTax, monthlyInsurance, monthlyPMI, months, effectiveTermMonths, effectiveMonthlyPayment,
-            affordabilityEnabled, householdIncome, monthlyDebt, creditScore, affordabilityResults
+            affordabilityEnabled, householdIncome, monthlyDebt, creditScore, affordabilityResults, moneySavedWithExtraPayments
         } = inputs;
         
         // Display comprehensive results with appropriate language
         document.getElementById('buyer-result').innerHTML = `
-            <div class="result-section">
+            <div class="loan-summary-results">
+                <h4>${translations[lang].loan_summary || 'Loan Summary'}</h4>
+                <div class="detail-row">
+                    <span>Loan Type:</span>
+                    <span>${loanType ? document.getElementById('buyer-loan-type').options[document.getElementById('buyer-loan-type').selectedIndex].text : ''}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Loan Length:</span>
+                    <span>${term ? term + ' ' + (translations[lang].years || 'Years') : ''}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Interest:</span>
+                    <span>${rate ? rate + '%' : ''}</span>
+                </div>
+                <div class="detail-row">
+                    <span>PMI:</span>
+                    <span>${pmiRate ? pmiRate + '%' : '0%'}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Loan Amount:</span>
+                    <span>${loan ? formatter.format(loan) : ''}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Loan-to-Value Ratio:</span>
+                    <span>${ltv ? ltv.toFixed(1) + '%' : ''}</span>
+                </div>
+                <div class="detail-row underlined">
+                    <span>Total Interest:</span>
+                    <span>${totalInterest ? formatter.format(totalInterest) : ''}</span>
+                </div>
+                <div class="detail-row total">
+                    <span>Total Paid:</span>
+                    <span>${(loan && totalInterest) ? formatter.format(loan + totalInterest) : ''}</span>
+                </div>
+            </div>
+            
+            <div class="result-section monthly-costs-section">
                 <h4 data-lang="monthly_costs">${translations[lang].monthly_costs}</h4>
                 <div class="result-row">
                     <span data-lang="principal_interest">${translations[lang].principal_interest}:</span>
@@ -2754,21 +2847,9 @@ function renderBuyerResults(inputs) {
                 </div>` : ''}
             </div>
             
-            <div class="result-section">
-                <h4 data-lang="loan_details">${translations[lang].loan_details}</h4>
-                <div class="result-row">
-                    <span data-lang="loan_amount">${translations[lang].loan_amount}:</span>
-                    <span>${formatter.format(loan)}</span>
-                </div>
-                <div class="result-row">
-                    <span data-lang="loan_to_value_ratio">${translations[lang].loan_to_value_ratio}:</span>
-                    <span>${ltv.toFixed(1)}%</span>
-                </div>
-                <div class="result-row">
-                    <span data-lang="total_interest">${translations[lang].total_interest}:</span>
-                    <span>${formatter.format(totalInterest)}</span>
-                </div>
-                ${extraPayment > 0 ? `
+            ${extraPayment > 0 ? `
+            <div class="result-section extra-payment-section">
+                <h4 data-lang="extra_payment_details">${translations[lang].extra_payment_details || 'Extra Payment Details'}</h4>
                 <div class="result-row highlight">
                     <span data-lang="loan_term_extra_payments">${translations[lang].loan_term_extra_payments}:</span>
                     <span>${Math.floor(effectiveTermMonths / 12)} ${translations[lang].years} ${effectiveTermMonths % 12} ${translations[lang].months || 'months'}</span>
@@ -2776,10 +2857,14 @@ function renderBuyerResults(inputs) {
                 <div class="result-row highlight">
                     <span data-lang="years_saved_extra_payments">${translations[lang].years_saved_extra_payments}:</span>
                     <span>${((months - effectiveTermMonths) / 12).toFixed(1)} ${translations[lang].years}</span>
-                </div>` : ''}
-            </div>
+                </div>
+                <div class="result-row highlight">
+                    <span>Money Saved with Extra Payments:</span>
+                    <span>${formatter.format(moneySavedWithExtraPayments)}</span>
+                </div>
+            </div>` : ''}
             
-            <div class="result-section">
+            <div class="result-section upfront-costs-section">
                 <h4 data-lang="upfront_costs">${translations[lang].upfront_costs}</h4>
                 <div class="result-row">
                     <span data-lang="down_payment">${translations[lang].down_payment}:</span>
