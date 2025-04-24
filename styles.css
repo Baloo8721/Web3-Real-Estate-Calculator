@@ -155,6 +155,7 @@ p.subtitle {
     justify-content: center;
     margin-bottom: 32px;
     position: relative;
+    z-index: 1;
 }
 
 .tab-label {
@@ -457,6 +458,116 @@ p.subtitle {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* Loan Details Summary Styling */
+#loan-details-summary {
+    display: none;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    background-color: rgba(20, 35, 55, 0.85);
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.3;
+}
+
+#loan-details-summary.active {
+    display: block;
+}
+
+#loan-details-summary h4 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 5px;
+}
+
+#loan-details-summary .detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 3px;
+    padding-bottom: 3px;
+}
+
+#loan-details-summary .detail-row:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+#loan-details-summary .detail-row span:first-child {
+    color: #ccc;
+    font-weight: 500;
+}
+
+#loan-details-summary .detail-row span:last-child {
+    font-weight: 600;
+    color: white;
+}
+
+/* Loan Summary Styling for Calculation Results */
+.loan-summary-results {
+    margin: 0 0 16px 0;
+    padding: 6px 10px;
+    background-color: rgba(20, 35, 55, 0.85);
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.1;
+}
+
+.loan-summary-results h4 {
+    margin-top: 0;
+    margin-bottom: 4px;
+    font-size: 14px;
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 3px;
+    text-align: center;
+}
+
+.loan-summary-results .detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+.loan-summary-results .detail-row:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.loan-summary-results .detail-row span:first-child {
+    color: #ccc;
+    font-weight: 500;
+    padding-right: 8px;
+}
+
+.loan-summary-results .detail-row span:last-child {
+    font-weight: 600;
+    color: white;
+    text-align: right;
+}
+
+/* Underline for Total Interest row */
+.loan-summary-results .detail-row.underlined {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+}
+
+/* Total Paid styling */
+.loan-summary-results .detail-row.total span:last-child {
+    font-weight: 700;
+    font-size: 1.05em;
+}
+
+/* Make Total Paid value blue */
+.loan-summary-results .detail-row.total span:last-child {
+    color: #00ddeb;
+}
+
 /* Affordability Quick Results Styling */
 #affordability-quick-results {
     margin-top: 16px;
@@ -478,60 +589,139 @@ p.subtitle {
     border: 1px dashed rgba(0, 221, 235, 0.3);
 }
 
-/* Affordability Results Styling */
+/* Affordability Results Styling - Condensed */
 .affordability-results {
-    margin-top: 20px;
-    border-top: 1px solid rgba(0, 221, 235, 0.3);
-    padding-top: 20px;
+    margin: 0 0 16px 0;
+    padding: 6px 10px;
     background: rgba(0, 221, 235, 0.05);
     border-radius: 8px;
-    padding: 20px;
+    font-size: 13px;
+    line-height: 1.1;
 }
 
 .affordability-results h4 {
+    margin-top: 0;
+    margin-bottom: 4px;
+    font-size: 14px;
     color: #00ddeb;
-    margin-bottom: 15px;
     text-align: center;
+    border-bottom: 1px solid rgba(0, 221, 235, 0.3);
+    padding-bottom: 3px;
 }
 
-/* First-Time Buyer Resources Styling */
+.affordability-results .result-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+.affordability-results .result-row:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.affordability-results .result-row span:first-child {
+    font-weight: 500;
+    padding-right: 8px;
+}
+
+.affordability-results .result-row span:last-child {
+    font-weight: 600;
+    text-align: right;
+}
+
+/* Make only the Recommended Monthly Payment value blue */
+.affordability-results .result-row:nth-of-type(2) span:last-child {
+    color: #00ddeb !important;
+}
+
+/* First-Time Buyer Resources Styling - Condensed */
 .first-time-buyer-resources {
-    margin-top: 20px;
-    border-top: 1px solid rgba(0, 221, 235, 0.3);
-    padding-top: 20px;
+    margin: 0 0 16px 0;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.1;
+}
+
+.first-time-buyer-resources h4 {
+    margin-top: 0;
+    margin-bottom: 4px;
+    font-size: 14px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 3px;
+}
+
+.first-time-buyer-resources .result-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+.first-time-buyer-resources .result-row:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.first-time-buyer-resources .result-row span:first-child {
+    font-weight: 500;
+    padding-right: 8px;
+}
+
+.first-time-buyer-resources .result-row span:last-child {
+    font-weight: 600;
+    text-align: right;
 }
 
 .condensed-resources {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    margin-top: 10px;
+    margin-top: 6px;
+    gap: 5px;
 }
 
 .resource-column {
     flex: 1;
-    min-width: 150px;
-    padding: 0 10px;
+    min-width: 120px;
+    padding: 0 5px;
     text-align: left;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .resource-column h5 {
     color: #00ddeb;
-    margin-bottom: 8px;
-    font-size: 1em;
+    margin-bottom: 4px;
+    font-size: 0.95em;
     text-align: center;
+    padding-bottom: 2px;
+    border-bottom: 1px solid rgba(0, 221, 235, 0.2);
 }
 
 .resource-column ul {
-    padding-left: 15px;
-    margin-bottom: 10px;
-    font-size: 0.9em;
+    padding-left: 10px;
+    margin: 0;
+    font-size: 0.85em;
+    list-style-type: none;
 }
 
 .resource-column li {
-    margin-bottom: 6px;
-    line-height: 1.3;
+    margin-bottom: 3px;
+    line-height: 1.2;
+    position: relative;
+    padding-left: 10px;
+}
+
+.resource-column li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #00ddeb;
 }
 
 .resource-column a {
@@ -703,6 +893,52 @@ a.field-info:focus {
     font-size: 0.95em;
 }
 
+/* More condensed styling for Monthly Costs section - matching Loan Summary */
+.monthly-costs-section {
+    margin: 0 0 16px 0;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.1;
+}
+
+.monthly-costs-section h4 {
+    margin-top: 0;
+    margin-bottom: 4px;
+    font-size: 14px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 3px;
+}
+
+.monthly-costs-section .result-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+.monthly-costs-section .result-row:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.monthly-costs-section .result-row span:first-child {
+    font-weight: 500;
+    padding-right: 8px;
+}
+
+.monthly-costs-section .result-row span:last-child {
+    font-weight: 600;
+    text-align: right;
+}
+
+.monthly-costs-section .result-row.total {
+    margin-top: 4px;
+    padding-top: 3px;
+}
+
 .result-row span:first-child {
     color: rgba(255, 255, 255, 0.85);
 }
@@ -710,6 +946,93 @@ a.field-info:focus {
 .result-row span:last-child {
     font-weight: 500;
     color: #fff;
+}
+
+/* Extra Payment Details Section - Condensed */
+.extra-payment-section {
+    margin: 0 0 16px 0;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.1;
+}
+
+.extra-payment-section h4 {
+    margin-top: 0;
+    margin-bottom: 4px;
+    font-size: 14px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 3px;
+}
+
+.extra-payment-section .result-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+.extra-payment-section .result-row:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.extra-payment-section .result-row span:first-child {
+    font-weight: 500;
+    padding-right: 8px;
+}
+
+.extra-payment-section .result-row span:last-child {
+    font-weight: 600;
+    text-align: right;
+}
+
+/* Upfront Costs Section - Condensed */
+.upfront-costs-section {
+    margin: 0 0 16px 0;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.1;
+}
+
+.upfront-costs-section h4 {
+    margin-top: 0;
+    margin-bottom: 4px;
+    font-size: 14px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 3px;
+}
+
+.upfront-costs-section .result-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+.upfront-costs-section .result-row:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.upfront-costs-section .result-row span:first-child {
+    font-weight: 500;
+    padding-right: 8px;
+}
+
+.upfront-costs-section .result-row span:last-child {
+    font-weight: 600;
+    text-align: right;
+}
+
+.upfront-costs-section .result-row.total {
+    margin-top: 4px;
+    padding-top: 3px;
 }
 
 .result-row.total {
