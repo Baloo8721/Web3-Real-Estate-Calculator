@@ -275,6 +275,14 @@ p.subtitle {
     z-index: 1;
 }
 
+/* Prevent wrapping for property taxes and homeowners insurance labels in all views */
+#buyer-property-tax:not(:placeholder-shown) + label,
+#buyer-insurance:not(:placeholder-shown) + label {
+    white-space: nowrap;
+    font-size: 0.7em; /* Slightly smaller font to fit better */
+    max-width: 90%; /* Ensure it doesn't overflow the container */
+}
+
 /* Fix for select dropdowns to always show labels above */
 .input-group select + label {
     top: 0;
@@ -873,4 +881,5 @@ footer {
     .input-group label {
         font-size: 0.9em;
     }
+
 }
