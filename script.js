@@ -1333,9 +1333,72 @@ function loadFromUrlParams() {
     }
 }
 
+// Function to fetch mortgage rate from Nasdaq Data Link API
+async function fetchMortgageRate() {
+    const apiKey = 'GiDm4nHttVk7WKFzx7A8'; // Your Nasdaq Data Link API key
+    const url = `https://data.nasdaq.com/api/v3/datasets/FMAC/30US/data.json?api_key=${apiKey}&limit=1`;
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const latestRate = parseFloat(data.dataset_data.data[0][1]) / 100; // e.g., 6.83 -> 0.0683
+        localStorage.setItem('mortgageRate', latestRate);
+        localStorage.setItem('rateUpdated', new Date().toISOString());
+        console.log('Fetched mortgage rate:', latestRate * 100 + '%');
+        return latestRate;
+    } catch (error) {
+        console.error('Error fetching rate:', error);
+        return parseFloat(localStorage.getItem('mortgageRate')) || 0.06; // Fallback to 6.0%
+    }
+}
+
+// Check if the cached rate is still valid (less than a week old)
+function isRateCacheValid() {
+    const updated = localStorage.getItem('rateUpdated');
+    if (!updated) return false;
+    const lastUpdate = new Date(updated);
+    const now = new Date();
+    const oneWeek = 7 * 24 * 60 * 60 * 1000;
+    return (now - lastUpdate) < oneWeek;
+}
+
+// Get mortgage rate adjusted for credit score
+async function getMortgageRate(creditScore) {
+    let rate = isRateCacheValid() ? parseFloat(localStorage.getItem('mortgageRate')) : await fetchMortgageRate();
+    if (!rate) rate = 0.06; // Fallback to 6.0%
+    
+    // Adjust rate based on credit score
+    let adjustedRate;
+    switch(creditScore) {
+        case 'below620':
+        case '300-619':
+            adjustedRate = rate + 0.025; // +2.5% for poor credit
+            break;
+        case '620-679':
+            adjustedRate = rate + 0.01; // +1.0% for fair credit
+            break;
+        case '680-739':
+            adjustedRate = rate + 0.005; // +0.5% for good credit
+            break;
+        case '740plus':
+        default:
+            adjustedRate = rate; // Base rate for excellent credit
+            break;
+    }
+    
+    console.log('Credit-adjusted rate:', adjustedRate * 100 + '%', 'for score:', creditScore);
+    return adjustedRate;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     try {
         console.log('Initializing calculator...');
+        
+        // Initialize by fetching the current mortgage rate
+        fetchMortgageRate().then(rate => {
+            console.log('Initial mortgage rate loaded:', (rate * 100).toFixed(2) + '%');
+        }).catch(error => {
+            console.error('Error initializing mortgage rate:', error);
+        });
         
         // Check for URL parameters to load saved calculations
         loadFromUrlParams();
@@ -1971,13 +2034,13 @@ function changeLanguage(lang) {
     }
 }
 
-function calculateBuyer() {
+async function calculateBuyer() {
     try {
         // Get all input values
         const price = parseFloat(document.getElementById('buyer-price').value) || 0;
         const down = parseFloat(document.getElementById('buyer-down').value) || 0;
         const term = parseFloat(document.getElementById('buyer-term').value) || 30;
-        const rate = parseFloat(document.getElementById('buyer-rate').value) || 0;
+        let rate = parseFloat(document.getElementById('buyer-rate').value) || 0;
         const propertyTax = parseFloat(document.getElementById('buyer-property-tax').value) || 0;
         const insurance = parseFloat(document.getElementById('buyer-insurance').value) || 0;
         const hoaFees = parseFloat(document.getElementById('buyer-hoa').value) || 0;
@@ -1987,6 +2050,15 @@ function calculateBuyer() {
         const extraPayment = parseFloat(document.getElementById('buyer-extra-payment').value) || 0;
         const includeEscrow = document.getElementById('buyer-escrow').checked;
         const loanType = document.getElementById('buyer-loan-type').value;
+        const creditScore = document.getElementById('credit-score').value || '740plus';
+
+        // If rate is not provided by user, get it from Nasdaq Data Link API
+        if (rate === 0) {
+            rate = await getMortgageRate(creditScore) * 100; // Convert to percentage for display
+            console.log('Using API rate:', rate + '%');
+            // Update the rate input field with the fetched rate
+            document.getElementById('buyer-rate').value = rate.toFixed(2);
+        }
 
         // Check if affordability calculator is enabled
         const affordabilityEnabled = document.getElementById('affordability-toggle')?.checked || false;
@@ -1994,16 +2066,14 @@ function calculateBuyer() {
         // Get affordability calculator inputs if enabled
         let householdIncome = 0;
         let monthlyDebt = 0;
-        let creditScore = '';
         let affordabilityResults = null;
         
         if (affordabilityEnabled) {
             householdIncome = parseFloat(document.getElementById('household-income').value) || 0;
             monthlyDebt = parseFloat(document.getElementById('monthly-debt').value) || 0;
-            creditScore = document.getElementById('credit-score').value;
             
-            // Calculate affordability based on 2025 data
-            affordabilityResults = calculateAffordability(householdIncome, monthlyDebt, creditScore, loanType);
+            // Calculate affordability based on 2025 data with real-time rates
+            affordabilityResults = await calculateAffordability(householdIncome, monthlyDebt, creditScore, loanType);
         }
 
         // Validate inputs
@@ -2040,6 +2110,8 @@ function calculateBuyer() {
             monthlyPMI = (loan * 0.0035) / 12; // 0.35% for USDA
         }
         // VA loans don't have PMI (pmiRate should be 0)
+        
+        console.log('Mortgage calculation with rate:', rate + '%', 'for loan type:', loanType);
         
         // Calculate monthly payment with or without escrow
         let baseMonthlyPayment = principalInterest;
@@ -2333,7 +2405,7 @@ function calculateBuyer() {
     }
 }
 
-function calculateAffordability(householdIncome, monthlyDebt, creditScore, loanType) {
+async function calculateAffordability(householdIncome, monthlyDebt, creditScore, loanType, taxes = null, insurance = null, pmi = null, closingCosts = null, dtiOption = '43%') {
     // Updated Affordability Calculator using both front-end (31%) and back-end (43%) DTI ratios
     // with dynamic autofill values for taxes, insurance, and PMI
     
@@ -2344,23 +2416,9 @@ function calculateAffordability(householdIncome, monthlyDebt, creditScore, loanT
     const frontEndDti = 0.31; // 31% front-end DTI (housing costs only)
     const backEndDti = 0.43; // 43% back-end DTI (all debt including housing)
     
-    // Determine interest rate based on credit score tier
-    let effectiveRate;
-    switch(creditScore) {
-        case 'below620':
-            effectiveRate = 8.5; // 300-619: 8.5% interest
-            break;
-        case '620-679':
-            effectiveRate = 7.0; // 620-679: 7.0% interest
-            break;
-        case '680-739':
-            effectiveRate = 6.5; // 680-739: 6.5% interest
-            break;
-        case '740plus':
-        default:
-            effectiveRate = 6.0; // 740+: 6.0% interest
-            break;
-    }
+    // Get interest rate from Nasdaq Data Link API, adjusted for credit score
+    const effectiveRate = await getMortgageRate(creditScore);
+    console.log('Using effective rate for affordability:', effectiveRate * 100 + '%');
     
     // Step 1: Calculate maximum housing payment using front-end DTI (31%)
     const frontEndMaxHousingPayment = monthlyIncome * frontEndDti;
@@ -2498,7 +2556,7 @@ function calculateAffordability(householdIncome, monthlyDebt, creditScore, loanT
 }
 
 // Function to calculate affordability results (now only used by the main Calculate button)
-function calculateQuickAffordability() {
+async function calculateQuickAffordability() {
     try {
         // Get affordability calculator inputs
         const householdIncome = parseFloat(document.getElementById('household-income').value) || 0;
@@ -2511,8 +2569,8 @@ function calculateQuickAffordability() {
             return null;
         }
         
-        // Calculate affordability based on 2025 data
-        const affordabilityResults = calculateAffordability(householdIncome, monthlyDebt, creditScore, loanType);
+        // Calculate affordability based on 2025 data with real-time rates
+        const affordabilityResults = await calculateAffordability(householdIncome, monthlyDebt, creditScore, loanType);
         return affordabilityResults;
         
     } catch (error) {
