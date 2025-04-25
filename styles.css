@@ -131,10 +131,10 @@ h1 {
 p.subtitle {
     font-size: 1.2em;
     color: #d5e1ef;
-    font-weight: 300;
+    font-weight: 500;
     letter-spacing: 0.01em;
     margin-bottom: 24px;
-    opacity: 0.9;
+    opacity: 0.95;
 }
 
 .calc-box {
@@ -874,6 +874,90 @@ a.field-info:focus {
 #buyer-result, #seller-result, #investor-result, #crypto-result {
     background: transparent;
     padding: 0;
+}
+
+/* Chart styles */
+.chart-container {
+    max-height: 200px;
+    width: 100%;
+    margin-top: 15px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+/* Special height for extra payment chart to ensure labels are visible */
+.extra-payment-section .chart-container {
+    min-height: 280px; /* Fixed minimum height to ensure enough vertical space */
+    height: 280px; /* Fixed height to ensure enough vertical space */
+    max-height: none; /* Remove max-height constraint */
+    padding-top: 25px; /* Add significant padding at the top for the y-axis label */
+    margin-top: 25px; /* Add margin at the top as well */
+    margin-left: -15px; /* Negative margin to move chart to the left */
+    width: calc(100% + 15px); /* Compensate for the negative margin */
+    position: relative; /* Ensure proper positioning */
+}
+
+/* Special styling for monthly costs pie chart */
+.monthly-costs-section .chart-container {
+    min-height: 300px; /* Further increased minimum height */
+    height: 300px; /* Further increased fixed height */
+    max-height: none; /* Remove max-height constraint */
+    padding: 5px 5px 45px 5px; /* Slightly reduced bottom padding */
+    margin-top: 15px; /* Keep consistent margin */
+    margin-bottom: 25px; /* Slightly reduced bottom margin */
+    background-color: transparent; /* Ensure no background */
+    overflow: visible; /* Allow content to overflow if needed */
+}
+
+/* Extend the Monthly Costs section to fit the full chart and legend */
+.monthly-costs-section {
+    padding-bottom: 65px !important; /* Slightly reduced padding at the bottom */
+    margin-bottom: 15px !important; /* Slightly reduced margin at the bottom */
+}
+
+@media (max-width: 576px) {
+    .chart-container {
+        max-height: 150px;
+    }
+}
+
+/* Include chart containers within result sections */
+.result-section .chart-container,
+.loan-summary-results .chart-container,
+.first-time-buyer-resources .chart-container {
+    margin-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 15px;
+    position: relative;
+}
+
+/* Enhance chart readability with consistent styling */
+.chart-container canvas {
+    /* Apply consistent styling to all charts */
+    filter: brightness(1.1);
+}
+
+/* Add text shadow to chart text for better visibility on all backgrounds */
+.chart-container {
+    /* This creates a subtle shadow effect around text in charts */
+    text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.8), 0px 0px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Style for loan summary chart container - keep dark background */
+.loan-summary-results .chart-container {
+    /* Keep existing dark styling */
+    border-radius: 4px;
+    padding: 5px;
+    margin-top: 15px;
+}
+
+/* Style for chart containers in other sections */
+.result-section .chart-container,
+.first-time-buyer-resources .chart-container {
+    /* No dark background, just subtle styling */
+    border-radius: 4px;
+    padding: 5px;
+    margin-top: 15px;
 }
 
 /* Force ZERO margins on all result sections first */

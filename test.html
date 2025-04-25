@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auto-Population Test</title>
+</head>
+<body>
+    <h1>Auto-Population Test</h1>
+    <input type="number" id="price" placeholder="Enter home price">
+    <input type="number" id="closing" placeholder="Closing costs">
+    <input type="number" id="tax" placeholder="Property tax">
+    <input type="number" id="insurance" placeholder="Insurance">
+    
+    <script>
+        // Simple test script
+        document.getElementById('price').addEventListener('input', function() {
+            const price = parseFloat(this.value) || 0;
+            if (price > 0) {
+                // 3% closing costs
+                document.getElementById('closing').value = Math.round(price * 0.03);
+                // 0.82% property tax
+                document.getElementById('tax').value = Math.round(price * 0.0082);
+                // Insurance based on $2,325 for $300k home
+                document.getElementById('insurance').value = Math.round(2325 * (price / 300000));
+                
+                console.log('Auto-populated fields based on price:', price);
+            }
+        });
+    </script>
+</body>
+</html>
