@@ -1390,15 +1390,17 @@ async function fetchMortgageRate(loanTerm = 30) {
         // Check if we have cached rates that are less than 1 hour old
         const cachedRates = localStorage.getItem('mortgageRates');
         const cacheTime = localStorage.getItem('mortgageRatesTime');
+        const rateSource = localStorage.getItem('mortgageRateSource');
         
-        if (cachedRates && cacheTime) {
+        if (cachedRates && cacheTime && rateSource === 'api') {
             const cacheAge = Date.now() - parseInt(cacheTime);
             // Use cache if it's less than 1 hour old
             if (cacheAge < 3600000) { // 1 hour in milliseconds
-                console.log('Using cached mortgage rates');
+                console.log('Using cached mortgage rates from API');
                 const rates = JSON.parse(cachedRates);
                 const termKey = loanTerm === 15 ? '15-year' : '30-year';
-                return rates.find(r => r.term === termKey)?.rate / 100 || fallbackRates[loanTerm.toString()];
+                const rate = rates.find(r => r.term === termKey)?.rate / 100 || fallbackRates[loanTerm.toString()];
+                return { rate, source: 'api' };
             }
         }
         
@@ -1421,9 +1423,18 @@ async function fetchMortgageRate(loanTerm = 30) {
             throw new Error('Invalid rates format in rates.json');
         }
         
+        // Check if rates match fallback rates exactly (indicating they haven't been updated by API)
+        const thirtyYearRate = rates.find(r => r.term === '30-year')?.rate;
+        const fifteenYearRate = rates.find(r => r.term === '15-year')?.rate;
+        
+        // If both rates match the fallback rates exactly, they're probably not from the API
+        const isFromFallback = thirtyYearRate === 6.81 && fifteenYearRate === 6.10;
+        const source = isFromFallback ? 'fallback' : 'api';
+        
         // Store all rates in localStorage for future use
         localStorage.setItem('mortgageRates', JSON.stringify(rates));
         localStorage.setItem('mortgageRatesTime', Date.now().toString());
+        localStorage.setItem('mortgageRateSource', source);
         
         // Find the rate for the requested term
         const termKey = loanTerm === 15 ? '15-year' : '30-year';
@@ -1433,17 +1444,17 @@ async function fetchMortgageRate(loanTerm = 30) {
             throw new Error(`Invalid rate for ${termKey} in rates.json`);
         }
         
-        console.log(`Successfully fetched ${loanTerm}-year rate: ${rate}%`);
+        console.log(`Successfully fetched ${loanTerm}-year rate: ${rate}% (Source: ${source})`);
         
-        // Convert from percentage to decimal (e.g., 6.81 to 0.0681)
-        return rate / 100;
+        // Convert from percentage to decimal (e.g., 6.81 to 0.0681) and include source
+        return { rate: rate / 100, source };
     } catch (error) {
         // Log the error but don't alert the user
         console.error(`Error fetching ${loanTerm}-year mortgage rate:`, error);
         
         // Use our fallback rates which are up-to-date as of April 2025
         console.log(`Using fallback ${loanTerm}-year rate: ${fallbackRates[loanTerm.toString()] * 100}%`);
-        return fallbackRates[loanTerm.toString()] || 0.06;
+        return { rate: fallbackRates[loanTerm.toString()] || 0.06, source: 'fallback' };
     }
 }
 
@@ -1493,18 +1504,35 @@ async function getMortgageRate(creditScore, loanTerm = 30) {
 }
 
 // Function to update the "Current Market Rate" option text with the actual rate
-function updateMarketRateOption(rate, loanTerm = 30) {
+function updateMarketRateOption(rateData, loanTerm = 30) {
     const marketRateOption = document.querySelector('#buyer-rate-preset option[value="market"]');
     if (!marketRateOption) return;
     
-    // If we have a rate, use it directly
-    if (rate) {
+    // If we have rate data, use it directly
+    if (rateData) {
+        const rate = typeof rateData === 'object' ? rateData.rate : rateData;
+        const source = typeof rateData === 'object' ? rateData.source : 'api';
         const rateValue = (rate * 100).toFixed(2);
-        marketRateOption.textContent = `Current Market Rate (${rateValue}%)`;
+        
+        // Use different text based on the source
+        const optionText = source === 'api' 
+            ? `Current Market Rate (${rateValue}%)` 
+            : `Average Market (${rateValue}%)`;
+        
+        marketRateOption.textContent = optionText;
+        
+        // Also update the selected option text if it's currently selected
+        const ratePresetSelect = document.getElementById('buyer-rate-preset');
+        if (ratePresetSelect && ratePresetSelect.value === 'market') {
+            // This updates what's visibly shown in the dropdown
+            if (ratePresetSelect.selectedOptions && ratePresetSelect.selectedOptions[0]) {
+                ratePresetSelect.selectedOptions[0].textContent = optionText;
+            }
+        }
     } else {
         // Get the appropriate rate for this term based on our fallback values
         const rateValue = loanTerm === 15 ? 6.10 : 6.81;
-        const optionText = `Current Market Rate (${rateValue}%)`;
+        const optionText = `Average Market (${rateValue}%)`;
         
         // Update the option in the dropdown list
         marketRateOption.textContent = optionText;
@@ -1633,8 +1661,17 @@ document.addEventListener('DOMContentLoaded', () => {
         Promise.all([
             fetchMortgageRate(30),
             fetchMortgageRate(15)
-        ]).then(([rate30, rate15]) => {
-            console.log('Mortgage rates loaded - 30-year:', (rate30 * 100).toFixed(2) + '%', '15-year:', (rate15 * 100).toFixed(2) + '%');
+        ]).then(([rate30Data, rate15Data]) => {
+            // Extract rates and sources from the returned data
+            const rate30 = rate30Data.rate;
+            const rate15 = rate15Data.rate;
+            const source30 = rate30Data.source;
+            const source15 = rate15Data.source;
+            
+            console.log('Mortgage rates loaded - 30-year:', (rate30 * 100).toFixed(2) + '%', 
+                        '(Source: ' + source30 + ')', 
+                        '15-year:', (rate15 * 100).toFixed(2) + '%',
+                        '(Source: ' + source15 + ')');
             
             // ALWAYS initialize with the 30-year rate first
             const termSelect = document.getElementById('buyer-term');
@@ -1649,7 +1686,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             // Always update both rates in the background
-            updateMarketRateOption(rate30, 30);
+            updateMarketRateOption(rate30Data, 30);
             
             // If market rate is selected, update the rate field with the 30-year rate
             const ratePresetSelect = document.getElementById('buyer-rate-preset');
@@ -1951,6 +1988,10 @@ function initializeBuyerCalculator() {
         const newRate = loanTerm === 15 ? 6.10 : 6.81;
         console.log(`Updating interest rate for ${loanTerm}-year term to ${newRate}%`);
         
+        // Check if we should use 'Current Market Rate' or 'Average Market' text
+        const rateSource = localStorage.getItem('mortgageRateSource') || 'fallback';
+        const marketRateText = rateSource === 'api' ? 'Current Market Rate' : 'Average Market';
+        
         // BRUTE FORCE APPROACH: Completely rebuild the dropdown
         // This ensures the visual display updates immediately
         
@@ -1964,7 +2005,7 @@ function initializeBuyerCalculator() {
         
         // 3. Add all options, updating the market rate option with the correct rate
         const options = [
-            { value: 'market', text: `Current Market Rate (${newRate}%)` },
+            { value: 'market', text: `${marketRateText} (${newRate}%)` },
             { value: '3', text: '3.0%' },
             { value: '3.5', text: '3.5%' },
             { value: '4', text: '4.0%' },
@@ -2003,7 +2044,7 @@ function initializeBuyerCalculator() {
         }
         
         // 8. Update the market rate option text to show the actual rate
-        updateMarketRateOption(null, loanTerm);
+        updateMarketRateOption({ rate: newRate / 100, source: rateSource }, loanTerm);
     }
     
     // Define a function to update the rate based on term
