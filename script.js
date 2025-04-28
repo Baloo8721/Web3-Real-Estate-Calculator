@@ -1663,7 +1663,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     rateInput.value = (rate30 * 100).toFixed(2);
                     
                     // Make sure the dropdown shows the correct rate
-                    updateInterestRateForTerm(30);
+                    // Add a try/catch to prevent errors if the function isn't defined yet
+                    try {
+                        // Check if the function exists before calling it
+                        if (typeof updateInterestRateForTerm === 'function') {
+                            updateInterestRateForTerm(30);
+                        } else {
+                            console.log('updateInterestRateForTerm not defined yet, will update later');
+                            // Set the rate input value directly as a fallback
+                            rateInput.value = (rate30 * 100).toFixed(2);
+                        }
+                    } catch (err) {
+                        console.warn('Error updating interest rate:', err);
+                    }
                 }
             }
         }).catch(error => {
@@ -1905,7 +1917,12 @@ function initializeBuyerCalculator() {
                 
                 // Force a recalculation
                 setTimeout(() => {
-                    document.getElementById('buyer-calculate').click();
+                    const calculateButton = document.getElementById('buyer-calculate');
+                    if (calculateButton) {
+                        calculateButton.click();
+                    } else {
+                        console.warn('Calculate button (buyer-calculate) not found');
+                    }
                 }, 50);
             }
         }
@@ -2060,7 +2077,12 @@ function initializeBuyerCalculator() {
             
             // Force a recalculation
             setTimeout(() => {
-                document.getElementById('buyer-calculate').click();
+                const calculateButton = document.getElementById('buyer-calculate');
+                if (calculateButton) {
+                    calculateButton.click();
+                } else {
+                    console.warn('Calculate button (buyer-calculate) not found');
+                }
             }, 50);
         }
     });
