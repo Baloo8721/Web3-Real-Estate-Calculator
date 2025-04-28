@@ -6,6 +6,7 @@ const translations = {
         seller: "Seller",
         investor: "Investor/Agent",
         crypto: "Crypto",
+        crypto_type: "Cryptocurrency Type",
         buyer_calc: "Buyer Calculator",
         seller_calc: "Seller Calculator",
         investor_calc: "Investor/Agent Calculator",
@@ -1627,12 +1628,31 @@ function clearRateCache() {
     localStorage.removeItem('rateDate_30');
     localStorage.removeItem('rateDate_15');
     
+    // Check if API key is available
+    const apiKeyElement = document.querySelector('meta[name="nasdaq-api-key"]');
+    const apiKey = apiKeyElement ? apiKeyElement.getAttribute('content') : null;
+    
+    if (!apiKey || apiKey === 'YOUR_API_KEY_HERE') {
+        alert('API key not found. Using fallback rates.');
+        // Update UI with fallback rates
+        updateMarketRateOption(0.0683, 30); // 6.83% for 30-year
+        updateMarketRateOption(0.0635, 15); // 6.35% for 15-year
+        return;
+    }
+    
     // Force fetch new rates
     fetchAllMortgageRates(true).then(() => {
         // Update UI with new rates
-        updateMarketRateOption(parseFloat(localStorage.getItem('mortgageRate_30')), 30);
-        updateMarketRateOption(parseFloat(localStorage.getItem('mortgageRate_15')), 15);
-        alert('Mortgage rates have been updated to the latest values!');
+        const rate30 = parseFloat(localStorage.getItem('mortgageRate_30'));
+        const rate15 = parseFloat(localStorage.getItem('mortgageRate_15'));
+        
+        updateMarketRateOption(rate30, 30);
+        updateMarketRateOption(rate15, 15);
+        
+        alert(`Mortgage rates updated!\n30-year: ${(rate30 * 100).toFixed(2)}%\n15-year: ${(rate15 * 100).toFixed(2)}%`);
+    }).catch(error => {
+        console.error('Error updating rates:', error);
+        alert('Error updating rates. Please try again later.');
     });
 }
 
@@ -2180,15 +2200,17 @@ function initializeBuyerCalculator() {
     
     // ZIP Code validation
     const zipCodeInput = document.getElementById('zip-code');
-    zipCodeInput.addEventListener('input', function() {
-        // Remove non-numeric characters
-        this.value = this.value.replace(/[^0-9]/g, '');
-        
-        // Limit to 5 digits
-        if (this.value.length > 5) {
-            this.value = this.value.slice(0, 5);
-        }
-    });
+    if (zipCodeInput) {
+        zipCodeInput.addEventListener('input', function() {
+            // Remove non-numeric characters
+            this.value = this.value.replace(/[^0-9]/g, '');
+            
+            // Limit to 5 digits
+            if (this.value.length > 5) {
+                this.value = this.value.slice(0, 5);
+            }
+        });
+    }
     
     // Get references to the elements for default calculations
     const propertyTaxInput = document.getElementById('buyer-property-tax');
