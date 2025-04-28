@@ -1381,35 +1381,15 @@ async function fetchMortgageRate(loanTerm = 30) {
     // Use different dataset codes based on loan term
     const datasetCode = loanTerm === 15 ? 'FMAC/15US' : 'FMAC/30US';
     
-    // For now, use hardcoded rates based on current market data (April 2025)
+    // Updated rates based on Freddie Mac data (April 2025)
     // These will be used as fallbacks when the API is unavailable
     const fallbackRates = {
-        '15': 0.0635, // 6.35% for 15-year fixed
-        '30': 0.0683  // 6.83% for 30-year fixed
+        '15': 0.0610, // 6.10% for 15-year fixed (April 2025)
+        '30': 0.0681  // 6.81% for 30-year fixed (April 2025)
     };
     
-    // First try to get from localStorage with term-specific key
-    const cachedRate = localStorage.getItem(`mortgageRate_${loanTerm}`);
-    const rateUpdated = localStorage.getItem(`rateUpdated_${loanTerm}`);
-    
-    // Check if we should use the cached rate
-    if (cachedRate && rateUpdated) {
-        const lastUpdate = new Date(rateUpdated);
-        const now = new Date();
-        
-        // Check if we've already updated today
-        if (lastUpdate.toDateString() === now.toDateString()) {
-            console.log(`Using today's cached ${loanTerm}-year rate:`, parseFloat(cachedRate) * 100 + '%');
-            return parseFloat(cachedRate);
-        }
-        
-        // If it's a new day but we haven't reached midnight yet, use yesterday's rate
-        // This ensures we only update once per day at midnight
-        if (now.getHours() < 1) { // Just after midnight (12am-1am)
-            console.log(`Using yesterday's ${loanTerm}-year rate:`, parseFloat(cachedRate) * 100 + '%');
-            return parseFloat(cachedRate);
-        }
-    }
+    // We'll try to fetch fresh rates from the API every time
+    // This ensures we always have the most up-to-date rates
     
     // If no valid cached rate or it's time for a daily update, try to fetch from API
     try {
@@ -1660,22 +1640,29 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
         console.log('Initializing calculator...');
         
-        // Fetch mortgage rates once at startup
-        fetchAllMortgageRates();
+        // Force clear any cached rates to ensure we get fresh data
+        localStorage.removeItem('mortgageRate_30');
+        localStorage.removeItem('mortgageRate_15');
+        localStorage.removeItem('rateUpdated_30');
+        localStorage.removeItem('rateUpdated_15');
+        localStorage.removeItem('rateDate_30');
+        localStorage.removeItem('rateDate_15');
         
-        // Initialize by fetching the current mortgage rate
-        fetchMortgageRate().then(rate => {
-            console.log('Initial mortgage rate loaded:', (rate * 100).toFixed(2) + '%');
-            
-            // Update the "Current Market Rate" option text to show the actual rate
-            updateMarketRateOption(rate);
+        // Fetch both 15-year and 30-year rates
+        Promise.all([
+            fetchMortgageRate(30),
+            fetchMortgageRate(15)
+        ]).then(([rate30, rate15]) => {
+            console.log('Mortgage rates loaded - 30-year:', (rate30 * 100).toFixed(2) + '%', '15-year:', (rate15 * 100).toFixed(2) + '%');
+            updateMarketRateOption(rate30, 30);
+            updateMarketRateOption(rate15, 15);
             
             // If market rate is selected, update the rate field
             if (document.getElementById('buyer-rate-preset').value === 'market') {
-                document.getElementById('buyer-rate').value = (rate * 100).toFixed(2);
+                document.getElementById('buyer-rate').value = (rate30 * 100).toFixed(2);
             }
         }).catch(error => {
-            console.error('Error initializing mortgage rate:', error);
+            console.error('Error fetching mortgage rates:', error);
         });
         
         // Add event listener for the rate preset dropdown
