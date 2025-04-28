@@ -1376,18 +1376,24 @@ function loadFromUrlParams() {
     }
 }
 
-// Function to fetch the current mortgage rate from rates.json
+// Function to fetch current mortgage rates from web scraping
 async function fetchMortgageRate(loanTerm = 30) {
-    // Default fallback rates if we can't fetch from the API
+    console.log(`Fetching mortgage rate for ${loanTerm}-year loan...`);
+    
+    // Default fallback rates if we can't fetch from web scraping
     const fallbackRates = {
         '15': 0.0610, // 6.10% for 15-year fixed (April 2025)
-        '30': 0.0681  // 6.81% for 30-year fixed (April 2025)
+        '30': 0.0681,  // 6.81% for 30-year fixed (April 2025)
+        '10': 0.0681,  // Use 30-year rate for 10-year
+        '20': 0.0681   // Use 30-year rate for 20-year
     };
     
     // Fallback rates in percentage format for comparison
     const fallbackRatesPercent = {
         '15': 6.10,
-        '30': 6.81
+        '30': 6.81,
+        '10': 6.81,  // Use 30-year rate for 10-year
+        '20': 6.81   // Use 30-year rate for 20-year
     };
     
     try {
@@ -1424,13 +1430,34 @@ async function fetchMortgageRate(loanTerm = 30) {
         
         // Find the rate for the requested term
         const termKey = `${loanTerm}-year`;
-        const rateObj = rates.find(r => r.term === termKey);
+        let rateObj = rates.find(r => r.term === termKey);
+        
+        // If we don't have a specific rate for this term (10 or 20 year), use 30-year rate
+        if (!rateObj && (loanTerm === 10 || loanTerm === 20)) {
+            console.log(`No specific rate for ${loanTerm}-year term, using 30-year rate`);
+            rateObj = rates.find(r => r.term === '30-year');
+            
+            // If we still don't have a rate, use fallback
+            if (!rateObj) {
+                console.warn(`No 30-year rate found for fallback, using hardcoded fallback rate`);
+                return { 
+                    rate: fallbackRates[loanTerm.toString()], 
+                    source: 'fallback', 
+                    displayRate: fallbackRatesPercent[loanTerm.toString()] 
+                };
+            }
+        }
+        
         const rate = rateObj?.rate;
         
         // Validate the rate
         if (typeof rate !== 'number' || isNaN(rate) || rate <= 0) {
             console.warn(`Invalid rate for ${termKey}: ${rate}, using fallback rate`);
-            return { rate: fallbackRates[loanTerm.toString()], source: 'fallback' };
+            return { 
+                rate: fallbackRates[loanTerm.toString()], 
+                source: 'fallback', 
+                displayRate: fallbackRatesPercent[loanTerm.toString()] 
+            };
         }
         
         // Check if rates are valid
@@ -1443,7 +1470,7 @@ async function fetchMortgageRate(loanTerm = 30) {
             
         // Only use fallback source if rates are invalid
         // We don't check for exact match with fallback rates anymore since we want to display the scraped rates
-        const source = hasInvalidRates ? 'fallback' : 'api';
+        const source = hasInvalidRates ? 'fallback' : 'scraped';
         
         console.log(`Detected rates - 30-year: ${thirtyYearRate}%, 15-year: ${fifteenYearRate}%, Source: ${source}`);
         
@@ -1455,7 +1482,7 @@ async function fetchMortgageRate(loanTerm = 30) {
         localStorage.setItem('mortgageRateSource', source);
         
         // Return the appropriate rate based on source
-        if (source === 'api' && !isNaN(rate)) {
+        if (source === 'scraped' && !isNaN(rate)) {
             return { rate: rate / 100, source, displayRate: rate }; // Convert percentage to decimal for calculations, but keep original for display
         } else {
             return { rate: fallbackRates[loanTerm.toString()], source: 'fallback', displayRate: fallbackRatesPercent[loanTerm.toString()] };
@@ -1479,17 +1506,26 @@ function isRateCacheValid(loanTerm = 30) {
 
 // Get mortgage rate adjusted for credit score and loan term
 async function getMortgageRate(creditScore, loanTerm = 30) {
-    // Get base rate for the specified loan term
-    let rate = isRateCacheValid(loanTerm) ? 
-        parseFloat(localStorage.getItem(`mortgageRate_${loanTerm}`)) : 
-        await fetchMortgageRate(loanTerm);
+    console.log(`Getting mortgage rate for ${loanTerm}-year loan with credit score ${creditScore}`);
     
-    if (!rate) {
-        // Fallback rates if nothing is available
-        rate = loanTerm === 15 ? 0.0635 : 0.0683;
-    }
+    // First, try to get the rate from the API
+    const rateData = await fetchMortgageRate(loanTerm);
     
-    // Adjust rate based on credit score
+    // Apply credit score adjustment
+    const adjustedRate = adjustRateForCreditScore(rateData.rate, creditScore, loanTerm);
+    
+    console.log(`Final adjusted ${loanTerm}-year rate:`, adjustedRate * 100 + '%', 'Source:', rateData.source);
+    
+    // Return both the adjusted rate and the source
+    return {
+        rate: adjustedRate,
+        source: rateData.source,
+        displayRate: rateData.displayRate ? rateData.displayRate : adjustedRate * 100
+    };
+}
+
+// Function to adjust rate based on credit score
+function adjustRateForCreditScore(rate, creditScore, loanTerm) {
     let adjustedRate;
     switch(creditScore) {
         case 'below620':
@@ -1520,6 +1556,8 @@ function updateMarketRateOption(rateData, loanTerm = 30) {
     // Get the fallback rate for this term
     const fallbackRate = loanTerm === 15 ? 6.10 : 6.81;
     
+    console.log(`updateMarketRateOption called with loanTerm: ${loanTerm}, rateData:`, rateData);
+    
     // If we have rate data, try to use it
     if (rateData) {
         // Extract rate, display rate, and source, with validation
@@ -1527,11 +1565,13 @@ function updateMarketRateOption(rateData, loanTerm = 30) {
         let displayRate = typeof rateData === 'object' && rateData.displayRate ? rateData.displayRate : (rate * 100);
         const source = typeof rateData === 'object' ? rateData.source : 'fallback';
         
+        console.log(`Processing rate: ${rate}, displayRate: ${displayRate}, source: ${source}`);
+        
         // Check if the rate is valid
         const isValidRate = typeof rate === 'number' && !isNaN(rate) && rate > 0;
         
-        // If the rate is valid and from API, use it. Otherwise use fallback.
-        if (isValidRate && source === 'api') {
+        // If the rate is valid and from scraping, use it. Otherwise use fallback.
+        if (isValidRate && source === 'scraped') {
             // Format the rate with 2 decimal places
             const rateValue = displayRate.toFixed(2);
             const optionText = `Current Mortgage Rates (${rateValue}%)`;
@@ -2766,16 +2806,19 @@ async function calculateBuyer() {
         const loanType = document.getElementById('buyer-loan-type').value;
         const creditScore = document.getElementById('credit-score').value || '740plus';
 
-        // If market rate is selected or rate is not provided, get it from Nasdaq Data Link API
+        // If market rate is selected or rate is not provided, get it from scraped Mortgage News Daily data
         if (document.getElementById('buyer-rate-preset').value === 'market' || rate === 0) {
             // Get rate based on the selected loan term
-            rate = await getMortgageRate(creditScore, term) * 100; // Convert to percentage for display
-            console.log('Using API rate:', rate + '%', 'for', term, 'year term');
+            const rateData = await getMortgageRate(creditScore, term);
+            rate = rateData.rate * 100; // Convert to percentage for display
+            
+            console.log('Using rate:', rate.toFixed(2) + '%', 'for', term, 'year term', 'Source:', rateData.source);
+            
             // Update the rate input field with the fetched rate
             document.getElementById('buyer-rate').value = rate.toFixed(2);
             
-            // Update the market rate option text
-            updateMarketRateOption(rate/100, term);
+            // Update the market rate option text with the full rate data
+            updateMarketRateOption(rateData, term);
         }
 
         // Check if affordability calculator is enabled
