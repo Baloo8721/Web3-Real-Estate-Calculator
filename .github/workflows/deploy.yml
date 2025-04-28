@@ -1,0 +1,24 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+
+      - name: Inject API Key 🔑
+        run: |
+          # Replace placeholder with actual API key from GitHub Secrets
+          sed -i 's/content="YOUR_API_KEY_HERE"/content="${{ secrets.NASDAQ_API_KEY }}"/g' index.html
+          
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: .  # The folder the action should deploy
+          branch: gh-pages  # The branch the action should deploy to
