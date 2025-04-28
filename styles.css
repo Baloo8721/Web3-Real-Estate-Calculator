@@ -62,12 +62,20 @@ body::after {
 }
 
 .language-selector {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 14px;
-    color: #888;
+    position: fixed;
+    top: 0;
+    right: 0;
     z-index: 100;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    padding: 10px 20px;
+    border-radius: 0 0 0 20px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9em;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
     display: flex;
     align-items: center;
     gap: 10px;
