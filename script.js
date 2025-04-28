@@ -2070,16 +2070,12 @@ function initializeBuyerCalculator() {
             // IMPORTANT: When the loan term changes, update the interest rate if market rate is selected
             if (document.getElementById('buyer-rate-preset').value === 'market') {
                 const loanTerm = parseInt(this.value) || 30;
-                const newRate = loanTerm === 15 ? 6.10 : 6.81;
                 
-                // Update the rate input and dropdown text
+                // Update the rate input and dropdown text based on the selected loan term
                 updateInterestRateForTerm(loanTerm);
                 
-                // Update the rate input field directly
-                const rateInput = document.getElementById('buyer-rate');
-                if (rateInput) {
-                    rateInput.value = newRate.toFixed(2);
-                }
+                // No need to update the rate input field directly here
+                // as updateInterestRateForTerm will handle it
                 
                 // Force a recalculation
                 setTimeout(() => {
@@ -2106,20 +2102,36 @@ function initializeBuyerCalculator() {
     updateMarketRateOption();
     
     // Define a function to update the interest rate based on loan term
-    function updateInterestRateForTerm(loanTerm) {
+    async function updateInterestRateForTerm(loanTerm) {
         // Get the interest rate dropdown and input field
         const ratePresetSelect = document.getElementById('buyer-rate-preset');
         const rateInput = document.getElementById('buyer-rate');
         
         if (!ratePresetSelect || !rateInput) return; // Guard against null references
         
-        // Set the correct rate based on the loan term (using our updated fallback rates)
-        const newRate = loanTerm === 15 ? 6.10 : 6.81;
-        console.log(`Updating interest rate for ${loanTerm}-year term to ${newRate}%`);
+        console.log(`Updating interest rate for ${loanTerm}-year term...`);
         
-        // Check if we should use 'Current Market Rate' or 'Average Market' text
-        const rateSource = localStorage.getItem('mortgageRateSource') || 'fallback';
-        const marketRateText = rateSource === 'api' ? 'Current Market Rate' : 'Average Market';
+        // Get the credit score to pass to getMortgageRate
+        const creditScore = document.getElementById('credit-score').value || '740plus';
+        
+        // Get the current rate data from the scraper or fallback
+        const rateData = await getMortgageRate(creditScore, loanTerm);
+        
+        // Extract rate information
+        const rate = rateData.rate * 100; // Convert to percentage for display
+        const source = rateData.source;
+        const displayRate = rateData.displayRate;
+        
+        console.log(`Got rate data for ${loanTerm}-year term: rate=${rate}, source=${source}, displayRate=${displayRate}`);
+        
+        // Update the market rate option text with the full rate data
+        updateMarketRateOption(rateData, loanTerm);
+        
+        // Update the rate input field
+        rateInput.value = rate.toFixed(2);
+        
+        // Use the correct terminology based on source
+        const marketRateText = source === 'scraped' ? 'Current Mortgage Rates' : 'Average Mortgage Rates';
         
         // BRUTE FORCE APPROACH: Completely rebuild the dropdown
         // This ensures the visual display updates immediately
@@ -2134,7 +2146,7 @@ function initializeBuyerCalculator() {
         
         // 3. Add all options, updating the market rate option with the correct rate
         const options = [
-            { value: 'market', text: `${marketRateText} (${newRate}%)` },
+            { value: 'market', text: `${marketRateText} (${displayRate.toFixed(2)}%)` },
             { value: '3', text: '3.0%' },
             { value: '3.5', text: '3.5%' },
             { value: '4', text: '4.0%' },
@@ -2167,13 +2179,13 @@ function initializeBuyerCalculator() {
         const parent = ratePresetSelect.parentNode;
         parent.replaceChild(newSelect, ratePresetSelect);
         
-        // 7. If market rate was selected, update the rate input field
+        // If market rate is selected, update the rate input field
         if (currentValue === 'market') {
-            rateInput.value = newRate.toFixed(2);
+            rateInput.value = rate.toFixed(2);
         }
         
         // 8. Update the market rate option text to show the actual rate
-        updateMarketRateOption({ rate: newRate / 100, source: rateSource }, loanTerm);
+        updateMarketRateOption({ rate: rate / 100, source: source }, loanTerm);
     }
     
     // Define a function to update the rate based on term
