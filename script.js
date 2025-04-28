@@ -1534,7 +1534,7 @@ function updateMarketRateOption(rateData, loanTerm = 30) {
         if (isValidRate && source === 'api') {
             // Format the rate with 2 decimal places
             const rateValue = displayRate.toFixed(2);
-            const optionText = `Current Market Rate (${rateValue}%)`;
+            const optionText = `Current Mortgage Rates (${rateValue}%)`;
             
             marketRateOption.textContent = optionText;
             console.log(`Setting market rate option to: ${optionText}`);
@@ -1555,7 +1555,7 @@ function updateMarketRateOption(rateData, loanTerm = 30) {
             }
         } else {
             // Use fallback rate
-            const optionText = `Average Market (${fallbackRate}%)`;
+            const optionText = `Average Mortgage Rate (${fallbackRate}%)`;
             
             marketRateOption.textContent = optionText;
             console.log(`Setting fallback rate option to: ${optionText}`);
