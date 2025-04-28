@@ -1615,12 +1615,36 @@ document.addEventListener('DOMContentLoaded', () => {
             fetchMortgageRate(15)
         ]).then(([rate30, rate15]) => {
             console.log('Mortgage rates loaded - 30-year:', (rate30 * 100).toFixed(2) + '%', '15-year:', (rate15 * 100).toFixed(2) + '%');
-            updateMarketRateOption(rate30, 30);
-            updateMarketRateOption(rate15, 15);
             
-            // If market rate is selected, update the rate field
-            if (document.getElementById('buyer-rate-preset').value === 'market') {
-                document.getElementById('buyer-rate').value = (rate30 * 100).toFixed(2);
+            // ALWAYS initialize with the 30-year rate first
+            const termSelect = document.getElementById('buyer-term');
+            if (termSelect) {
+                // Force the term to 30 years
+                termSelect.value = '30';
+            }
+            
+            const termPresetSelect = document.getElementById('buyer-term-preset');
+            if (termPresetSelect) {
+                termPresetSelect.value = '30';
+            }
+            
+            // Always update both rates in the background
+            updateMarketRateOption(rate30, 30);
+            
+            // If market rate is selected, update the rate field with the 30-year rate
+            const ratePresetSelect = document.getElementById('buyer-rate-preset');
+            if (ratePresetSelect) {
+                // Make sure market rate is selected
+                ratePresetSelect.value = 'market';
+                
+                const rateInput = document.getElementById('buyer-rate');
+                if (rateInput) {
+                    // ALWAYS use the 30-year rate initially
+                    rateInput.value = (rate30 * 100).toFixed(2);
+                    
+                    // Make sure the dropdown shows the correct rate
+                    updateInterestRateForTerm(30);
+                }
             }
         }).catch(error => {
             console.error('Error fetching mortgage rates:', error);
@@ -1853,6 +1877,12 @@ function initializeBuyerCalculator() {
                 // Update the rate input and dropdown text
                 updateInterestRateForTerm(loanTerm);
                 
+                // Update the rate input field directly
+                const rateInput = document.getElementById('buyer-rate');
+                if (rateInput) {
+                    rateInput.value = newRate.toFixed(2);
+                }
+                
                 // Force a recalculation
                 setTimeout(() => {
                     document.getElementById('buyer-calculate').click();
@@ -2015,9 +2045,13 @@ function initializeBuyerCalculator() {
         }
     });
     
-    // Initialize with the correct rate for the current term
-    const initialTerm = parseInt(termPresetSelect.value) || 30;
-    updateRateForTerm(initialTerm);
+    // Always initialize with the 30-year term and rate
+    if (termPresetSelect && termInput) {
+        // Make sure the term is set to 30 years by default
+        termPresetSelect.value = '30';
+        termInput.value = '30';
+        updateRateForTerm(30);
+    }
     
     // Loan type changes
     const loanTypeSelect = document.getElementById('buyer-loan-type');
