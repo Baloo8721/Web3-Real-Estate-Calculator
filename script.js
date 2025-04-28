@@ -1384,6 +1384,12 @@ async function fetchMortgageRate(loanTerm = 30) {
         '30': 0.0681  // 6.81% for 30-year fixed (April 2025)
     };
     
+    // Fallback rates in percentage format for comparison
+    const fallbackRatesPercent = {
+        '15': 6.10,
+        '30': 6.81
+    };
+    
     try {
         // Add cache-busting parameter to prevent browser caching
         const cacheBuster = `?_=${new Date().getTime()}`;
@@ -1427,7 +1433,7 @@ async function fetchMortgageRate(loanTerm = 30) {
             return { rate: fallbackRates[loanTerm.toString()], source: 'fallback' };
         }
         
-        // Check if rates match fallback rates exactly or if any rates are invalid
+        // Check if rates are valid
         const thirtyYearRate = rates.find(r => r.term === '30-year')?.rate;
         const fifteenYearRate = rates.find(r => r.term === '15-year')?.rate;
         
@@ -1435,9 +1441,11 @@ async function fetchMortgageRate(loanTerm = 30) {
             typeof thirtyYearRate !== 'number' || isNaN(thirtyYearRate) || thirtyYearRate <= 0 ||
             typeof fifteenYearRate !== 'number' || isNaN(fifteenYearRate) || fifteenYearRate <= 0;
             
-        // Use fallback source if rates are invalid or match fallback rates exactly
-        const isFromFallback = hasInvalidRates || (thirtyYearRate === 6.81 && fifteenYearRate === 6.10);
-        const source = isFromFallback ? 'fallback' : 'api';
+        // Only use fallback source if rates are invalid
+        // We don't check for exact match with fallback rates anymore since we want to display the scraped rates
+        const source = hasInvalidRates ? 'fallback' : 'api';
+        
+        console.log(`Detected rates - 30-year: ${thirtyYearRate}%, 15-year: ${fifteenYearRate}%, Source: ${source}`);
         
         console.log(`Mortgage rates - 30-year: ${thirtyYearRate}%, 15-year: ${fifteenYearRate}%, Source: ${source}`);
         
@@ -1448,14 +1456,14 @@ async function fetchMortgageRate(loanTerm = 30) {
         
         // Return the appropriate rate based on source
         if (source === 'api' && !isNaN(rate)) {
-            return { rate: rate / 100, source }; // Convert percentage to decimal
+            return { rate: rate / 100, source, displayRate: rate }; // Convert percentage to decimal for calculations, but keep original for display
         } else {
-            return { rate: fallbackRates[loanTerm.toString()], source: 'fallback' };
+            return { rate: fallbackRates[loanTerm.toString()], source: 'fallback', displayRate: fallbackRatesPercent[loanTerm.toString()] };
         }
     } catch (error) {
         console.warn('Error fetching mortgage rates:', error);
         // Use fallback rates if we can't fetch from the API
-        return { rate: fallbackRates[loanTerm.toString()], source: 'fallback' };
+        return { rate: fallbackRates[loanTerm.toString()], source: 'fallback', displayRate: fallbackRatesPercent[loanTerm.toString()] };
     }
 }
 
@@ -1514,8 +1522,9 @@ function updateMarketRateOption(rateData, loanTerm = 30) {
     
     // If we have rate data, try to use it
     if (rateData) {
-        // Extract rate and source, with validation
+        // Extract rate, display rate, and source, with validation
         let rate = typeof rateData === 'object' ? rateData.rate : rateData;
+        let displayRate = typeof rateData === 'object' && rateData.displayRate ? rateData.displayRate : (rate * 100);
         const source = typeof rateData === 'object' ? rateData.source : 'fallback';
         
         // Check if the rate is valid
@@ -1524,10 +1533,11 @@ function updateMarketRateOption(rateData, loanTerm = 30) {
         // If the rate is valid and from API, use it. Otherwise use fallback.
         if (isValidRate && source === 'api') {
             // Format the rate with 2 decimal places
-            const rateValue = (rate * 100).toFixed(2);
+            const rateValue = displayRate.toFixed(2);
             const optionText = `Current Market Rate (${rateValue}%)`;
             
             marketRateOption.textContent = optionText;
+            console.log(`Setting market rate option to: ${optionText}`);
             
             // Also update the selected option text if it's currently selected
             const ratePresetSelect = document.getElementById('buyer-rate-preset');
@@ -1548,6 +1558,7 @@ function updateMarketRateOption(rateData, loanTerm = 30) {
             const optionText = `Average Market (${fallbackRate}%)`;
             
             marketRateOption.textContent = optionText;
+            console.log(`Setting fallback rate option to: ${optionText}`);
             
             // Also update the selected option text if it's currently selected
             const ratePresetSelect = document.getElementById('buyer-rate-preset');
