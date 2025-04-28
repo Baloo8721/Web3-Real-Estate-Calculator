@@ -1380,20 +1380,20 @@ function loadFromUrlParams() {
 async function fetchMortgageRate(loanTerm = 30) {
     console.log(`Fetching mortgage rate for ${loanTerm}-year loan...`);
     
-    // Default fallback rates if we can't fetch from web scraping
+    // Default fallback rates if we can't fetch from web scraping (as decimals for calculations)
     const fallbackRates = {
         '15': 0.0610, // 6.10% for 15-year fixed (April 2025)
-        '30': 0.0681,  // 6.81% for 30-year fixed (April 2025)
-        '10': 0.0681,  // Use 30-year rate for 10-year
-        '20': 0.0681   // Use 30-year rate for 20-year
+        '30': 0.0681, // 6.81% for 30-year fixed (April 2025)
+        '10': 0.0681, // Use 30-year rate for 10-year
+        '20': 0.0681  // Use 30-year rate for 20-year
     };
     
-    // Fallback rates in percentage format for comparison
+    // Fallback rates in percentage format for display
     const fallbackRatesPercent = {
         '15': 6.10,
         '30': 6.81,
-        '10': 6.81,  // Use 30-year rate for 10-year
-        '20': 6.81   // Use 30-year rate for 20-year
+        '10': 6.81,
+        '20': 6.81
     };
     
     try {
@@ -1443,7 +1443,7 @@ async function fetchMortgageRate(loanTerm = 30) {
                 return { 
                     rate: fallbackRates[loanTerm.toString()], 
                     source: 'fallback', 
-                    displayRate: fallbackRatesPercent[loanTerm.toString()] 
+                    displayRate: fallbackRatesPercent[loanTerm.toString()]
                 };
             }
         }
@@ -1483,9 +1483,29 @@ async function fetchMortgageRate(loanTerm = 30) {
         
         // Return the appropriate rate based on source
         if (source === 'scraped' && !isNaN(rate)) {
-            return { rate: rate / 100, source, displayRate: rate }; // Convert percentage to decimal for calculations, but keep original for display
+            // For 15-year term, return the specific 15-year rate
+            if (loanTerm === 15) {
+                const fifteenYearRate = rates.find(r => r.term === '15-year')?.rate;
+                if (typeof fifteenYearRate === 'number' && !isNaN(fifteenYearRate) && fifteenYearRate > 0) {
+                    return { 
+                        rate: fifteenYearRate / 100, 
+                        source, 
+                        displayRate: fifteenYearRate 
+                    };
+                }
+            }
+            // For other terms (10, 20, 30), return the 30-year rate
+            return { 
+                rate: rate / 100, 
+                source, 
+                displayRate: rate 
+            };
         } else {
-            return { rate: fallbackRates[loanTerm.toString()], source: 'fallback', displayRate: fallbackRatesPercent[loanTerm.toString()] };
+            return { 
+                rate: fallbackRates[loanTerm.toString()], 
+                source: 'fallback', 
+                displayRate: fallbackRatesPercent[loanTerm.toString()] 
+            };
         }
     } catch (error) {
         console.warn('Error fetching mortgage rates:', error);
@@ -1508,7 +1528,7 @@ function isRateCacheValid(loanTerm = 30) {
 async function getMortgageRate(creditScore, loanTerm = 30) {
     console.log(`Getting mortgage rate for ${loanTerm}-year loan with credit score ${creditScore}`);
     
-    // First, try to get the rate from the API
+    // First, try to get the rate from web scraping
     const rateData = await fetchMortgageRate(loanTerm);
     
     // Apply credit score adjustment
@@ -1587,7 +1607,7 @@ function updateMarketRateOption(rateData, loanTerm = 30) {
                     ratePresetSelect.selectedOptions[0].textContent = optionText;
                 }
                 
-                // Update the rate input field with the API rate
+                // Update the rate input field with the scraped rate
                 const rateInput = document.getElementById('buyer-rate');
                 if (rateInput) {
                     rateInput.value = rateValue;
@@ -1595,7 +1615,7 @@ function updateMarketRateOption(rateData, loanTerm = 30) {
             }
         } else {
             // Use fallback rate
-            const optionText = `Average Mortgage Rate (${fallbackRate}%)`;
+            const optionText = `Average Mortgage Rates (${fallbackRate}%)`;
             
             marketRateOption.textContent = optionText;
             console.log(`Setting fallback rate option to: ${optionText}`);
