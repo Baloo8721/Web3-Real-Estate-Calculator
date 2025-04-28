@@ -1391,21 +1391,35 @@ async function fetchMortgageRate(loanTerm = 30) {
     const cachedRate = localStorage.getItem(`mortgageRate_${loanTerm}`);
     const rateUpdated = localStorage.getItem(`rateUpdated_${loanTerm}`);
     
-    // Check if we have a recent cached rate (less than a day old)
+    // Check if we should use the cached rate
     if (cachedRate && rateUpdated) {
         const lastUpdate = new Date(rateUpdated);
         const now = new Date();
-        const oneDay = 24 * 60 * 60 * 1000;
         
-        if ((now - lastUpdate) < oneDay) {
-            console.log(`Using cached ${loanTerm}-year rate:`, parseFloat(cachedRate) * 100 + '%');
+        // Check if we've already updated today
+        if (lastUpdate.toDateString() === now.toDateString()) {
+            console.log(`Using today's cached ${loanTerm}-year rate:`, parseFloat(cachedRate) * 100 + '%');
+            return parseFloat(cachedRate);
+        }
+        
+        // If it's a new day but we haven't reached midnight yet, use yesterday's rate
+        // This ensures we only update once per day at midnight
+        if (now.getHours() < 1) { // Just after midnight (12am-1am)
+            console.log(`Using yesterday's ${loanTerm}-year rate:`, parseFloat(cachedRate) * 100 + '%');
             return parseFloat(cachedRate);
         }
     }
     
-    // If no valid cached rate, try to fetch from API
+    // If no valid cached rate or it's time for a daily update, try to fetch from API
     try {
-        const apiKey = 'GiDm4nHttVk7WKFzx7A8'; // Your Nasdaq Data Link API key
+        // Get API key from environment variable
+        const apiKeyElement = document.querySelector('meta[name="nasdaq-api-key"]');
+        const apiKey = apiKeyElement ? apiKeyElement.getAttribute('content') : null;
+        
+        if (!apiKey) {
+            throw new Error('API key not found');
+        }
+        
         const url = `https://data.nasdaq.com/api/v3/datasets/${datasetCode}/data.json?api_key=${apiKey}&limit=1`;
         
         console.log(`Fetching ${loanTerm}-year mortgage rate from API...`);
@@ -1577,9 +1591,37 @@ function handleRatePresetChange() {
     }
 }
 
+// Function to fetch both 15-year and 30-year rates at once
+async function fetchAllMortgageRates() {
+    console.log('Checking if mortgage rates need to be updated...');
+    
+    // Check if we already updated rates today
+    const rateUpdated30 = localStorage.getItem('rateUpdated_30');
+    
+    if (rateUpdated30) {
+        const lastUpdate = new Date(rateUpdated30);
+        const now = new Date();
+        
+        // If we've already updated today, don't fetch again
+        if (lastUpdate.toDateString() === now.toDateString()) {
+            console.log('Mortgage rates already updated today. Using cached rates.');
+            return;
+        }
+    }
+    
+    // Fetch both rates sequentially to avoid race conditions
+    await fetchMortgageRate(30);
+    await fetchMortgageRate(15);
+    
+    console.log('All mortgage rates updated successfully.');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     try {
         console.log('Initializing calculator...');
+        
+        // Fetch mortgage rates once at startup
+        fetchAllMortgageRates();
         
         // Initialize by fetching the current mortgage rate
         fetchMortgageRate().then(rate => {
