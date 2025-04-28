@@ -1388,9 +1388,15 @@ async function fetchMortgageRate(loanTerm = 30) {
         // Add cache-busting parameter to prevent browser caching
         const cacheBuster = `?_=${new Date().getTime()}`;
         
+        // Determine the correct path based on the hostname
+        // For GitHub Pages, we need to include the repo name in the path
+        const basePath = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+            ? 'rates.json' 
+            : '/Web3-Real-Estate-Calculator/rates.json';
+            
         // Try to fetch from rates.json with cache busting
-        console.log('Fetching mortgage rates with cache busting...');
-        const response = await fetch('rates.json' + cacheBuster);
+        console.log(`Fetching mortgage rates from ${basePath} with cache busting...`);
+        const response = await fetch(basePath + cacheBuster);
         
         if (!response.ok) {
             console.warn(`Failed to fetch rates: ${response.status}, using fallback rates`);

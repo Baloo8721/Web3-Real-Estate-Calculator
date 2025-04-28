@@ -22,6 +22,6 @@
   },
   "homepage": "https://github.com/Baloo8721/Web3-Real-Estate-Calculator#readme",
   "devDependencies": {
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.12"
   }
 }
