@@ -1376,94 +1376,80 @@ function loadFromUrlParams() {
     }
 }
 
-// Function to fetch mortgage rate from rates.json (updated daily by GitHub Actions)
+// Function to fetch the current mortgage rate from rates.json
 async function fetchMortgageRate(loanTerm = 30) {
-    // Updated rates based on Freddie Mac data (April 2025)
-    // These will be used as fallbacks when rates.json is unavailable
+    // Default fallback rates if we can't fetch from the API
     const fallbackRates = {
         '15': 0.0610, // 6.10% for 15-year fixed (April 2025)
         '30': 0.0681  // 6.81% for 30-year fixed (April 2025)
     };
     
-    // Try to fetch from rates.json which is updated daily by GitHub Actions
     try {
-        // Check if we have cached rates that are less than 1 hour old
-        const cachedRates = localStorage.getItem('mortgageRates');
-        const cacheTime = localStorage.getItem('mortgageRatesTime');
-        const rateSource = localStorage.getItem('mortgageRateSource');
+        // Add cache-busting parameter to prevent browser caching
+        const cacheBuster = `?_=${new Date().getTime()}`;
         
-        if (cachedRates && cacheTime && rateSource === 'api') {
-            const cacheAge = Date.now() - parseInt(cacheTime);
-            // Use cache if it's less than 1 hour old
-            if (cacheAge < 3600000) { // 1 hour in milliseconds
-                console.log('Using cached mortgage rates from API');
-                const rates = JSON.parse(cachedRates);
-                const termKey = loanTerm === 15 ? '15-year' : '30-year';
-                const rate = rates.find(r => r.term === termKey)?.rate / 100 || fallbackRates[loanTerm.toString()];
-                return { rate, source: 'api' };
-            }
-        }
-        
-        // Construct the path to rates.json
-        // For GitHub Pages, we need to include the repo name in the path
-        const url = '/Web3-Real-Estate-Calculator/rates.json';
-        
-        // Attempt to fetch from rates.json
-        console.log(`Fetching mortgage rates from rates.json...`);
-        const response = await fetch(url);
+        // Try to fetch from rates.json with cache busting
+        console.log('Fetching mortgage rates with cache busting...');
+        const response = await fetch('rates.json' + cacheBuster);
         
         if (!response.ok) {
-            throw new Error(`Failed to fetch rates.json with status ${response.status}`);
+            console.warn(`Failed to fetch rates: ${response.status}, using fallback rates`);
+            return { rate: fallbackRates[loanTerm.toString()], source: 'fallback' };
         }
         
-        const rates = await response.json();
-        
-        // Validate the rates
-        if (!Array.isArray(rates) || rates.length === 0) {
-            throw new Error('Invalid rates format in rates.json');
+        let rates;
+        try {
+            rates = await response.json();
+        } catch (parseError) {
+            console.warn('Error parsing rates.json:', parseError);
+            return { rate: fallbackRates[loanTerm.toString()], source: 'fallback' };
         }
         
-        // Check if rates are valid numbers and different from fallback rates
+        if (!Array.isArray(rates)) {
+            console.warn('Invalid rates format in rates.json, using fallback rates');
+            return { rate: fallbackRates[loanTerm.toString()], source: 'fallback' };
+        }
+        
+        // Find the rate for the requested term
+        const termKey = `${loanTerm}-year`;
+        const rateObj = rates.find(r => r.term === termKey);
+        const rate = rateObj?.rate;
+        
+        // Validate the rate
+        if (typeof rate !== 'number' || isNaN(rate) || rate <= 0) {
+            console.warn(`Invalid rate for ${termKey}: ${rate}, using fallback rate`);
+            return { rate: fallbackRates[loanTerm.toString()], source: 'fallback' };
+        }
+        
+        // Check if rates match fallback rates exactly or if any rates are invalid
         const thirtyYearRate = rates.find(r => r.term === '30-year')?.rate;
         const fifteenYearRate = rates.find(r => r.term === '15-year')?.rate;
         
-        // Always default to fallback source unless we're 100% sure it's from the API
-        // This ensures we show "Average Market" instead of "Current Market Rate" if there's any issue
-        let source = 'fallback';
+        const hasInvalidRates = 
+            typeof thirtyYearRate !== 'number' || isNaN(thirtyYearRate) || thirtyYearRate <= 0 ||
+            typeof fifteenYearRate !== 'number' || isNaN(fifteenYearRate) || fifteenYearRate <= 0;
+            
+        // Use fallback source if rates are invalid or match fallback rates exactly
+        const isFromFallback = hasInvalidRates || (thirtyYearRate === 6.81 && fifteenYearRate === 6.10);
+        const source = isFromFallback ? 'fallback' : 'api';
         
-        // Only consider it an API rate if both rates are valid numbers AND at least one is different from fallback
-        if (typeof thirtyYearRate === 'number' && !isNaN(thirtyYearRate) && 
-            typeof fifteenYearRate === 'number' && !isNaN(fifteenYearRate)) {
-            // Check if at least one rate is different from fallback rates (indicating API update)
-            if (thirtyYearRate !== 6.81 || fifteenYearRate !== 6.10) {
-                source = 'api';
-            }
-        }
+        console.log(`Mortgage rates - 30-year: ${thirtyYearRate}%, 15-year: ${fifteenYearRate}%, Source: ${source}`);
         
         // Store all rates in localStorage for future use
         localStorage.setItem('mortgageRates', JSON.stringify(rates));
         localStorage.setItem('mortgageRatesTime', Date.now().toString());
         localStorage.setItem('mortgageRateSource', source);
         
-        // Find the rate for the requested term
-        const termKey = loanTerm === 15 ? '15-year' : '30-year';
-        const rate = rates.find(r => r.term === termKey)?.rate;
-        
-        if (typeof rate !== 'number' || isNaN(rate)) {
-            throw new Error(`Invalid rate for ${termKey} in rates.json`);
+        // Return the appropriate rate based on source
+        if (source === 'api' && !isNaN(rate)) {
+            return { rate: rate / 100, source }; // Convert percentage to decimal
+        } else {
+            return { rate: fallbackRates[loanTerm.toString()], source: 'fallback' };
         }
-        
-        console.log(`Successfully fetched ${loanTerm}-year rate: ${rate}% (Source: ${source})`);
-        
-        // Convert from percentage to decimal (e.g., 6.81 to 0.0681) and include source
-        return { rate: rate / 100, source };
     } catch (error) {
-        // Log the error but don't alert the user
-        console.error(`Error fetching ${loanTerm}-year mortgage rate:`, error);
-        
-        // Use our fallback rates which are up-to-date as of April 2025
-        console.log(`Using fallback ${loanTerm}-year rate: ${fallbackRates[loanTerm.toString()] * 100}%`);
-        return { rate: fallbackRates[loanTerm.toString()] || 0.06, source: 'fallback' };
+        console.warn('Error fetching mortgage rates:', error);
+        // Use fallback rates if we can't fetch from the API
+        return { rate: fallbackRates[loanTerm.toString()], source: 'fallback' };
     }
 }
 
