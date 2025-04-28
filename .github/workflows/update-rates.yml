@@ -1,0 +1,34 @@
+name: Update Mortgage Rates
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs daily at midnight UTC
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  update-rates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install node-fetch --save-dev
+
+      - name: Fetch mortgage rates
+        env:
+          NASDAQ_API_KEY: ${{ secrets.NASDAQ_API_KEY }}
+        run: node scripts/fetch-rates.js
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add rates.json
+          git commit -m 'Update mortgage rates' || echo "No changes to commit"
+          git push

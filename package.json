@@ -1,0 +1,27 @@
+{
+  "name": "web3-real-estate-calculator",
+  "version": "1.0.0",
+  "description": "Web3 Real Estate Calculator with automated mortgage rate updates",
+  "scripts": {
+    "fetch-rates": "node scripts/fetch-rates.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Baloo8721/Web3-Real-Estate-Calculator.git"
+  },
+  "keywords": [
+    "real-estate",
+    "calculator",
+    "mortgage",
+    "rates"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Baloo8721/Web3-Real-Estate-Calculator/issues"
+  },
+  "homepage": "https://github.com/Baloo8721/Web3-Real-Estate-Calculator#readme",
+  "devDependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
