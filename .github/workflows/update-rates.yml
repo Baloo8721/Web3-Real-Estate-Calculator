@@ -2,7 +2,7 @@ name: Update Mortgage Rates
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Runs daily at midnight UTC
+    - cron: '0 22 * * *' # Runs daily at 10 PM UTC (~5 PM EST, after MND updates)
   workflow_dispatch: # Allows manual triggering
 
 jobs:
@@ -21,8 +21,6 @@ jobs:
         run: npm ci
 
       - name: Fetch mortgage rates
-        env:
-          NASDAQ_API_KEY: ${{ secrets.NASDAQ_API_KEY }}
         run: node scripts/fetch-rates.js
 
       - name: Commit and push changes
@@ -30,5 +28,5 @@ jobs:
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
           git add rates.json
-          git commit -m 'Update mortgage rates' || echo "No changes to commit"
+          git commit -m 'Update mortgage rates from Mortgage News Daily' || echo "No changes to commit"
           git push

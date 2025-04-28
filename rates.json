@@ -1,4 +1,10 @@
 [
-  { "term": "30-year", "rate": 6.81 },
-  { "term": "15-year", "rate": 6.10 }
+  {
+    "term": "30-year",
+    "rate": 6.82
+  },
+  {
+    "term": "15-year",
+    "rate": 6.23
+  }
 ]
