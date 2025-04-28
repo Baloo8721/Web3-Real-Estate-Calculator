@@ -1423,13 +1423,22 @@ async function fetchMortgageRate(loanTerm = 30) {
             throw new Error('Invalid rates format in rates.json');
         }
         
-        // Check if rates match fallback rates exactly (indicating they haven't been updated by API)
+        // Check if rates are valid numbers and different from fallback rates
         const thirtyYearRate = rates.find(r => r.term === '30-year')?.rate;
         const fifteenYearRate = rates.find(r => r.term === '15-year')?.rate;
         
-        // If both rates match the fallback rates exactly, they're probably not from the API
-        const isFromFallback = thirtyYearRate === 6.81 && fifteenYearRate === 6.10;
-        const source = isFromFallback ? 'fallback' : 'api';
+        // Always default to fallback source unless we're 100% sure it's from the API
+        // This ensures we show "Average Market" instead of "Current Market Rate" if there's any issue
+        let source = 'fallback';
+        
+        // Only consider it an API rate if both rates are valid numbers AND at least one is different from fallback
+        if (typeof thirtyYearRate === 'number' && !isNaN(thirtyYearRate) && 
+            typeof fifteenYearRate === 'number' && !isNaN(fifteenYearRate)) {
+            // Check if at least one rate is different from fallback rates (indicating API update)
+            if (thirtyYearRate !== 6.81 || fifteenYearRate !== 6.10) {
+                source = 'api';
+            }
+        }
         
         // Store all rates in localStorage for future use
         localStorage.setItem('mortgageRates', JSON.stringify(rates));
@@ -1508,31 +1517,64 @@ function updateMarketRateOption(rateData, loanTerm = 30) {
     const marketRateOption = document.querySelector('#buyer-rate-preset option[value="market"]');
     if (!marketRateOption) return;
     
-    // If we have rate data, use it directly
+    // Get the fallback rate for this term
+    const fallbackRate = loanTerm === 15 ? 6.10 : 6.81;
+    
+    // If we have rate data, try to use it
     if (rateData) {
-        const rate = typeof rateData === 'object' ? rateData.rate : rateData;
-        const source = typeof rateData === 'object' ? rateData.source : 'api';
-        const rateValue = (rate * 100).toFixed(2);
+        // Extract rate and source, with validation
+        let rate = typeof rateData === 'object' ? rateData.rate : rateData;
+        const source = typeof rateData === 'object' ? rateData.source : 'fallback';
         
-        // Use different text based on the source
-        const optionText = source === 'api' 
-            ? `Current Market Rate (${rateValue}%)` 
-            : `Average Market (${rateValue}%)`;
+        // Check if the rate is valid
+        const isValidRate = typeof rate === 'number' && !isNaN(rate) && rate > 0;
         
-        marketRateOption.textContent = optionText;
-        
-        // Also update the selected option text if it's currently selected
-        const ratePresetSelect = document.getElementById('buyer-rate-preset');
-        if (ratePresetSelect && ratePresetSelect.value === 'market') {
-            // This updates what's visibly shown in the dropdown
-            if (ratePresetSelect.selectedOptions && ratePresetSelect.selectedOptions[0]) {
-                ratePresetSelect.selectedOptions[0].textContent = optionText;
+        // If the rate is valid and from API, use it. Otherwise use fallback.
+        if (isValidRate && source === 'api') {
+            // Format the rate with 2 decimal places
+            const rateValue = (rate * 100).toFixed(2);
+            const optionText = `Current Market Rate (${rateValue}%)`;
+            
+            marketRateOption.textContent = optionText;
+            
+            // Also update the selected option text if it's currently selected
+            const ratePresetSelect = document.getElementById('buyer-rate-preset');
+            if (ratePresetSelect && ratePresetSelect.value === 'market') {
+                // This updates what's visibly shown in the dropdown
+                if (ratePresetSelect.selectedOptions && ratePresetSelect.selectedOptions[0]) {
+                    ratePresetSelect.selectedOptions[0].textContent = optionText;
+                }
+                
+                // Update the rate input field with the API rate
+                const rateInput = document.getElementById('buyer-rate');
+                if (rateInput) {
+                    rateInput.value = rateValue;
+                }
+            }
+        } else {
+            // Use fallback rate
+            const optionText = `Average Market (${fallbackRate}%)`;
+            
+            marketRateOption.textContent = optionText;
+            
+            // Also update the selected option text if it's currently selected
+            const ratePresetSelect = document.getElementById('buyer-rate-preset');
+            if (ratePresetSelect && ratePresetSelect.value === 'market') {
+                // This updates what's visibly shown in the dropdown
+                if (ratePresetSelect.selectedOptions && ratePresetSelect.selectedOptions[0]) {
+                    ratePresetSelect.selectedOptions[0].textContent = optionText;
+                }
+                
+                // Update the rate input field with the fallback rate
+                const rateInput = document.getElementById('buyer-rate');
+                if (rateInput) {
+                    rateInput.value = fallbackRate.toFixed(2);
+                }
             }
         }
     } else {
-        // Get the appropriate rate for this term based on our fallback values
-        const rateValue = loanTerm === 15 ? 6.10 : 6.81;
-        const optionText = `Average Market (${rateValue}%)`;
+        // No rate data provided, use fallback
+        const optionText = `Average Market (${fallbackRate}%)`;
         
         // Update the option in the dropdown list
         marketRateOption.textContent = optionText;
@@ -1543,6 +1585,12 @@ function updateMarketRateOption(rateData, loanTerm = 30) {
             // This updates what's visibly shown in the dropdown when closed
             if (ratePresetSelect.selectedOptions && ratePresetSelect.selectedOptions[0]) {
                 ratePresetSelect.selectedOptions[0].textContent = optionText;
+            }
+            
+            // Also update the rate input field
+            const rateInput = document.getElementById('buyer-rate');
+            if (rateInput) {
+                rateInput.value = fallbackRate.toFixed(2);
             }
         }
     }
@@ -1663,10 +1711,28 @@ document.addEventListener('DOMContentLoaded', () => {
             fetchMortgageRate(15)
         ]).then(([rate30Data, rate15Data]) => {
             // Extract rates and sources from the returned data
-            const rate30 = rate30Data.rate;
-            const rate15 = rate15Data.rate;
-            const source30 = rate30Data.source;
-            const source15 = rate15Data.source;
+            // Only validate if there are issues with the rates
+            const fallbackRate30 = 6.81 / 100; // Convert to decimal
+            const fallbackRate15 = 6.10 / 100; // Convert to decimal
+            
+            // Get the rates and sources
+            let rate30 = rate30Data.rate;
+            let source30 = rate30Data.source;
+            let rate15 = rate15Data.rate;
+            let source15 = rate15Data.source;
+            
+            // Check if there are any issues with the rates
+            const hasIssues = typeof rate30 !== 'number' || isNaN(rate30) || rate30 <= 0 || 
+                             typeof rate15 !== 'number' || isNaN(rate15) || rate15 <= 0;
+                             
+            // If there are issues, log them and use fallback rates
+            if (hasIssues) {
+                console.warn(`Issues detected with API rates, using fallback rates: 30-year: ${fallbackRate30 * 100}%, 15-year: ${fallbackRate15 * 100}%`);
+                rate30 = fallbackRate30;
+                rate15 = fallbackRate15;
+                source30 = 'fallback';
+                source15 = 'fallback';
+            }
             
             console.log('Mortgage rates loaded - 30-year:', (rate30 * 100).toFixed(2) + '%', 
                         '(Source: ' + source30 + ')', 
