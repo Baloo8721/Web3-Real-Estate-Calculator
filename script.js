@@ -1477,49 +1477,25 @@ function updateMarketRateOption(rate, loanTerm = 30) {
     const marketRateOption = document.querySelector('#buyer-rate-preset option[value="market"]');
     if (!marketRateOption) return;
     
-    // If rate is provided, update the option text
+    // If we have a rate, use it directly
     if (rate) {
         const rateValue = (rate * 100).toFixed(2);
         marketRateOption.textContent = `Current Market Rate (${rateValue}%)`;
-        
-        // Also update the selected option text if it's currently selected
-        const ratePresetSelect = document.getElementById('buyer-rate-preset');
-        if (ratePresetSelect && ratePresetSelect.value === 'market') {
-            // This updates what's visibly shown in the dropdown
-            ratePresetSelect.selectedOptions[0].textContent = `Current Market Rate (${rateValue}%)`;
-        }
     } else {
-        // Try to get rate from localStorage with term-specific key
-        const cachedRate = localStorage.getItem(`mortgageRate_${loanTerm}`);
-        const rateDate = localStorage.getItem(`rateDate_${loanTerm}`);
+        // Get the appropriate rate for this term based on our fallback values
+        const rateValue = loanTerm === 15 ? 6.10 : 6.81;
+        const optionText = `Current Market Rate (${rateValue}%)`;
         
-        let rateValue;
-        let optionText;
-        
-        if (cachedRate) {
-            rateValue = (parseFloat(cachedRate) * 100).toFixed(2);
-            optionText = `Current Market Rate (${rateValue}%)`;
-            
-            // Add date if available (but only in the option list, not in the selected text)
-            if (rateDate) {
-                const date = new Date(rateDate);
-                // Only add date to the option in the dropdown list
-                marketRateOption.textContent = optionText + ` as of ${date.toLocaleDateString()}`;
-            } else {
-                marketRateOption.textContent = optionText;
-            }
-        } else {
-            // Use fallback rates based on term
-            rateValue = loanTerm === 15 ? 6.35 : 6.83;
-            optionText = `Current Market Rate (${rateValue}%)`;
-            marketRateOption.textContent = optionText;
-        }
+        // Update the option in the dropdown list
+        marketRateOption.textContent = optionText;
         
         // Update the visible selected text if market rate is currently selected
         const ratePresetSelect = document.getElementById('buyer-rate-preset');
         if (ratePresetSelect && ratePresetSelect.value === 'market') {
             // This updates what's visibly shown in the dropdown when closed
-            ratePresetSelect.selectedOptions[0].textContent = optionText;
+            if (ratePresetSelect.selectedOptions && ratePresetSelect.selectedOptions[0]) {
+                ratePresetSelect.selectedOptions[0].textContent = optionText;
+            }
         }
     }
 }
@@ -1697,10 +1673,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('buyer-calc')?.addEventListener('click', () => {
             calculateBuyer();
             // Scroll to show the entire Loan Summary section
-            const results = document.getElementById('buyer-result');
-            const results = document.getElementById('crypto-result');
-            if (results) {
-                results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const buyerResults = document.getElementById('buyer-result');
+            if (buyerResults) {
+                buyerResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
         document.getElementById('saveBtn').addEventListener('click', saveResults);
@@ -1873,7 +1848,7 @@ function initializeBuyerCalculator() {
             // IMPORTANT: When the loan term changes, update the interest rate if market rate is selected
             if (document.getElementById('buyer-rate-preset').value === 'market') {
                 const loanTerm = parseInt(this.value) || 30;
-                const newRate = loanTerm === 15 ? 6.35 : 6.83;
+                const newRate = loanTerm === 15 ? 6.10 : 6.81;
                 
                 // Update the rate input and dropdown text
                 updateInterestRateForTerm(loanTerm);
@@ -1959,6 +1934,9 @@ function initializeBuyerCalculator() {
         if (currentValue === 'market') {
             rateInput.value = newRate.toFixed(2);
         }
+        
+        // 8. Update the market rate option text to show the actual rate
+        updateMarketRateOption(null, loanTerm);
     }
     
     // Define a function to update the rate based on term
