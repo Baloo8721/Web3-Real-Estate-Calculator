@@ -1592,13 +1592,13 @@ function handleRatePresetChange() {
 }
 
 // Function to fetch both 15-year and 30-year rates at once
-async function fetchAllMortgageRates() {
+async function fetchAllMortgageRates(forceUpdate = false) {
     console.log('Checking if mortgage rates need to be updated...');
     
     // Check if we already updated rates today
     const rateUpdated30 = localStorage.getItem('rateUpdated_30');
     
-    if (rateUpdated30) {
+    if (rateUpdated30 && !forceUpdate) {
         const lastUpdate = new Date(rateUpdated30);
         const now = new Date();
         
@@ -1614,6 +1614,26 @@ async function fetchAllMortgageRates() {
     await fetchMortgageRate(15);
     
     console.log('All mortgage rates updated successfully.');
+}
+
+// Function to force clear rate cache and fetch new rates
+function clearRateCache() {
+    console.log('Clearing mortgage rate cache...');
+    // Remove all rate-related items from localStorage
+    localStorage.removeItem('mortgageRate_30');
+    localStorage.removeItem('mortgageRate_15');
+    localStorage.removeItem('rateUpdated_30');
+    localStorage.removeItem('rateUpdated_15');
+    localStorage.removeItem('rateDate_30');
+    localStorage.removeItem('rateDate_15');
+    
+    // Force fetch new rates
+    fetchAllMortgageRates(true).then(() => {
+        // Update UI with new rates
+        updateMarketRateOption(parseFloat(localStorage.getItem('mortgageRate_30')), 30);
+        updateMarketRateOption(parseFloat(localStorage.getItem('mortgageRate_15')), 15);
+        alert('Mortgage rates have been updated to the latest values!');
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
