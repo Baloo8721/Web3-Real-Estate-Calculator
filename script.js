@@ -1900,6 +1900,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 buyerResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
+        
+        // Add seller calculator button event listener
+        document.getElementById('seller-calc')?.addEventListener('click', () => {
+            calculateSeller();
+            // Scroll to show results
+            const sellerResults = document.getElementById('seller-result');
+            if (sellerResults) {
+                sellerResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+        
+        // Add investor calculator button event listener
+        document.getElementById('investor-calc')?.addEventListener('click', () => {
+            calculateInvestor();
+            // Scroll to show results
+            const investorResults = document.getElementById('investor-result');
+            if (investorResults) {
+                investorResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+        
         document.getElementById('saveBtn').addEventListener('click', saveResults);
         document.getElementById('shareBtn').addEventListener('click', shareResults);
         
@@ -3902,17 +3923,12 @@ function calculateInvestor() {
     }
 }
 
-function calculateCrypto() {
+async function calculateCrypto() {
     try {
+        console.log('calculateCrypto called');
         const amount = parseFloat(document.getElementById('crypto-amount').value) || 0;
         const crypto = document.getElementById('crypto-type').value;
-
-        if (amount <= 0) {
-            document.getElementById('crypto-result').innerHTML = `<span class="error">${translations[localStorage.getItem('selectedLanguage') || 'en'].invalid_input}</span>`;
-            return;
-        }
-
-        const cryptoAmount = amount / cryptoPrices[crypto];
+        const resultDiv = document.getElementById('crypto-result');
         const lang = localStorage.getItem('selectedLanguage') || 'en';
         const formatter = new Intl.NumberFormat('en-US', {
             style: 'currency',
@@ -3920,42 +3936,174 @@ function calculateCrypto() {
             minimumFractionDigits: 2
         });
         
-        document.getElementById('crypto-result').innerHTML = `
-            <div class="result-section">
-                <h4 data-lang="crypto_calc">${translations[lang].crypto_calc || 'Crypto Calculator'}</h4>
-                <div class="result-row">
-                    <span data-lang="crypto_amount">${crypto}:</span>
-                    <span>${cryptoAmount.toFixed(6)}</span>
-                </div>
-                <div class="result-row">
-                    <span data-lang="usd_value">USD Value:</span>
-                    <span>${formatter.format(amount)}</span>
-                </div>
-                <div class="result-row">
-                    <span data-lang="exchange_rate">Exchange Rate:</span>
-                    <span>1 ${crypto} = ${formatter.format(cryptoPrices[crypto])}</span>
-                </div>
-            </div>
+        // Check if we're in crypto input mode (from the toggle in cryptoCalculator.js)
+        const cryptoInputMode = window.cryptoInputMode !== undefined ? window.cryptoInputMode : false;
+        console.log(`Calculation mode: ${cryptoInputMode ? 'Crypto → USD' : 'USD → Crypto'}`);
+
+        // Validate amount
+        if (amount <= 0) {
+            resultDiv.innerHTML = `<span class="error">${translations[lang].invalid_input}</span>`;
+            return;
+        }
+
+        // Show loading state
+        resultDiv.innerHTML = '<span class="loading">Fetching live crypto prices...</span>';
+
+        try {
+            // Get selected crypto and other major ones for comparison
+            const requiredCryptos = ['bitcoin', 'ethereum', crypto].filter((v, i, a) => a.indexOf(v) === i);
+            console.log('Fetching prices for:', requiredCryptos);
             
-            <div class="result-section">
-                <h4 data-lang="other_conversions">Other Conversions</h4>
-                <div class="result-row">
-                    <span>BTC Equivalent:</span>
-                    <span>${(amount / cryptoPrices.BTC).toFixed(8)} BTC</span>
+            // Fetch prices directly from CoinGecko
+            console.log('Calling getCryptoPrices to fetch live cryptocurrency prices...');
+            let prices = await window.getCryptoPrices(requiredCryptos);
+            console.log('Received raw prices from API:', prices);
+            
+            // Validate that we have a price for the selected crypto
+            if (!prices || typeof prices !== 'object') {
+                throw new Error('Invalid price data returned');
+            }
+            
+            // Make sure we have a valid price for the selected crypto
+            if (!prices[crypto] || typeof prices[crypto] !== 'number' || prices[crypto] <= 0) {
+                console.error(`Invalid price for ${crypto}:`, prices[crypto]);
+                throw new Error(`Cannot get valid price for ${crypto}`);
+            }
+            
+            console.log(`Using price for ${crypto}: $${prices[crypto]}`);
+            
+            // Get the selected crypto symbol from the dropdown for display
+            const cryptoOption = document.querySelector(`#crypto-type option[value="${crypto}"]`);
+            const cryptoSymbol = cryptoOption ? cryptoOption.innerText.split(' ')[1].replace(/[()]/g, '') : crypto.toUpperCase();
+            
+            // Variables to store both USD and crypto amounts
+            let cryptoAmount, usdAmount;
+            
+            // Important: CoinGecko returns prices as raw USD values (e.g. 95410 for Bitcoin)
+            if (cryptoInputMode) {
+                // CRYPTO TO USD: User entered crypto amount, calculate USD value
+                cryptoAmount = amount;
+                usdAmount = amount * prices[crypto];
+                console.log(`Calculation: ${cryptoAmount} ${cryptoSymbol} × $${prices[crypto]} = $${usdAmount}`);
+            } else {
+                // USD TO CRYPTO: User entered USD amount, calculate crypto value
+                usdAmount = amount;
+                cryptoAmount = amount / prices[crypto];
+                console.log(`Calculation: $${usdAmount} ÷ $${prices[crypto]} = ${cryptoAmount} ${cryptoSymbol}`);
+            }
+            
+            // Verify the result is valid
+            if (isNaN(cryptoAmount) || cryptoAmount <= 0 || isNaN(usdAmount) || usdAmount <= 0) {
+                console.error('Invalid calculation result:', { cryptoAmount, usdAmount });
+                throw new Error('Calculation produced invalid result');
+            }
+            
+            // Calculate equivalents in major cryptocurrencies
+            let btcEquivalent, ethEquivalent;
+            
+            if (cryptoInputMode) {
+                // If input is in crypto, calculate BTC/ETH from USD value
+                btcEquivalent = (prices['bitcoin'] && prices['bitcoin'] > 0) ? 
+                    (usdAmount / prices['bitcoin']).toFixed(8) : 'N/A';
+                    
+                ethEquivalent = (prices['ethereum'] && prices['ethereum'] > 0) ? 
+                    (usdAmount / prices['ethereum']).toFixed(6) : 'N/A';
+            } else {
+                // If input is in USD, use the same calculation as before
+                btcEquivalent = (prices['bitcoin'] && prices['bitcoin'] > 0) ? 
+                    (usdAmount / prices['bitcoin']).toFixed(8) : 'N/A';
+                    
+                ethEquivalent = (prices['ethereum'] && prices['ethereum'] > 0) ? 
+                    (usdAmount / prices['ethereum']).toFixed(6) : 'N/A';
+            }
+            
+            // Format the output with proper handling for potential NaN values
+            const cryptoDisplay = isNaN(cryptoAmount) ? 'Price unavailable' : cryptoAmount.toFixed(6);
+            const usdDisplay = isNaN(usdAmount) ? 'Price unavailable' : formatter.format(usdAmount);
+            const rateDisplay = isNaN(prices[crypto]) ? 'Price unavailable' : formatter.format(prices[crypto]);
+            
+            // Build the result HTML with proper error checking
+            resultDiv.innerHTML = `
+                <div class="result-section">
+                    <h4 data-lang="crypto_calc">${translations[lang].crypto_calc || 'Crypto Calculator'}</h4>
+                    <div class="result-row">
+                        <span data-lang="crypto_amount">${cryptoSymbol}:</span>
+                        <span>${cryptoDisplay}</span>
+                    </div>
+                    <div class="result-row">
+                        <span data-lang="usd_value">USD Value:</span>
+                        <span>${usdDisplay}</span>
+                    </div>
+                    <div class="result-row">
+                        <span data-lang="exchange_rate">Exchange Rate:</span>
+                        <span>1 ${cryptoSymbol} = ${rateDisplay}</span>
+                    </div>
                 </div>
-                <div class="result-row">
-                    <span>ETH Equivalent:</span>
-                    <span>${(amount / cryptoPrices.ETH).toFixed(6)} ETH</span>
+                <div class="result-section">
+                    <h4 data-lang="other_conversions">Other Conversions</h4>
+                    <div class="result-row">
+                        <span>BTC Equivalent:</span>
+                        <span>${btcEquivalent === 'N/A' ? 'N/A' : `${btcEquivalent} BTC`}</span>
+                    </div>
+                    <div class="result-row">
+                        <span>ETH Equivalent:</span>
+                        <span>${ethEquivalent === 'N/A' ? 'N/A' : `${ethEquivalent} ETH`}</span>
+                    </div>
                 </div>
-            </div>
-            <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
-        `;
-        saveInputs('crypto', { amount, crypto, cryptoAmount });
+                <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
+            `;
+            
+            // Save inputs for potential sharing
+            if (!isNaN(cryptoAmount)) {
+                saveInputs('crypto', { amount, crypto, cryptoAmount });
+            }
+            
+        } catch (apiError) {
+            // Handle API-specific errors
+            console.error('API error:', apiError);
+            resultDiv.innerHTML = `<span class="error">Unable to fetch cryptocurrency prices. Using fallback values.</span>`;
+            
+            // Use fallback values
+            const fallbackPrices = {
+                'bitcoin': 62000,
+                'ethereum': 3000
+            };
+            
+            // Use a reasonable default if we don't have a specific fallback
+            const cryptoPrice = fallbackPrices[crypto] || 10;
+            const cryptoAmount = amount / cryptoPrice;
+            
+            // Use fallback prices for display
+            resultDiv.innerHTML = `
+                <div class="result-section">
+                    <h4 data-lang="crypto_calc">${translations[lang].crypto_calc || 'Crypto Calculator'}</h4>
+                    <div class="result-row">
+                        <span data-lang="crypto_amount">${crypto}:</span>
+                        <span>${cryptoAmount.toFixed(6)}</span>
+                    </div>
+                    <div class="result-row">
+                        <span data-lang="usd_value">USD Value:</span>
+                        <span>${formatter.format(amount)}</span>
+                    </div>
+                    <div class="result-row">
+                        <span data-lang="exchange_rate">Exchange Rate:</span>
+                        <span>1 ${crypto} = ${formatter.format(cryptoPrice)} (Approximate)</span>
+                    </div>
+                </div>
+                <div class="note">Note: Using fallback prices due to API issues.</div>
+                <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
+            `;
+            
+            // Save inputs
+            saveInputs('crypto', { amount, crypto, cryptoAmount });
+        }
     } catch (error) {
+        // Handle unexpected errors
         console.error('Crypto calculation error:', error);
         document.getElementById('crypto-result').innerHTML = '<span class="error">Calculation error. Please try again.</span>';
     }
 }
+
 
 let lastInputs = {};
 let savedInputsByMode = {

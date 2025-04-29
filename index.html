@@ -288,16 +288,28 @@
                 <div class="calc-mode" id="crypto-mode">
                     <div class="calc-card">
                         <h3 data-lang="crypto_calc">Crypto Calculator</h3>
-                        <div class="input-group">
+                        
+                        <!-- Separate toggle wrapper outside of input group -->
+                        <div class="crypto-toggle-wrapper">
+                            <div class="crypto-toggle-switch">
+                                <input type="checkbox" id="crypto-direction-toggle">
+                                <label for="crypto-direction-toggle" class="crypto-toggle-label">
+                                    <span class="crypto-toggle-inner"></span>
+                                    <span class="crypto-toggle-switch-usd">USD</span>
+                                    <span class="crypto-toggle-switch-crypto">Crypto</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Regular input group without toggle inside -->
+                        <div class="input-group crypto-input-group">
                             <input type="number" id="crypto-amount" placeholder="Amount ($)" data-lang="crypto_amount" aria-label="Amount" min="0" step="100">
-                            <label for="crypto-amount" data-lang="crypto_amount">Amount ($)</label>
+                            <label for="crypto-amount" id="crypto-amount-label" data-lang="crypto_amount">Amount ($)</label>
                         </div>
                         <div class="input-group">
-                            <select id="crypto-type" aria-label="Crypto Type">
-                                <option value="BTC" data-lang="crypto_btc">Bitcoin (BTC)</option>
-                                <option value="ETH" data-lang="crypto_eth">Ethereum (ETH)</option>
-                                <option value="USDC" data-lang="crypto_usdc">USDC</option>
-                            </select>
+                            <select id="crypto-type" class="crypto-dropdown">
+  <!-- Options will be populated dynamically by cryptoCalculator.js -->
+</select>
                             <label for="crypto-type" data-lang="crypto_type">Crypto Type</label>
                         </div>
                         <button type="button" class="calc-btn" id="crypto-calc" data-lang="calculate">Calculate</button>
@@ -320,6 +332,7 @@
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <script src="cryptoCalculator.js"></script>
     <script src="script.js?v=20250428"></script>
 </body>
 </html>

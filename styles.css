@@ -897,6 +897,116 @@ a.field-info:focus {
     padding: 0;
 }
 
+/* Crypto Direction Toggle Styles */
+.crypto-input-group {
+    position: relative;
+}
+
+.crypto-toggle-wrapper {
+    position: relative; /* Change to relative positioning */
+    display: flex;
+    justify-content: center;
+    margin: 10px auto 25px; /* Add margin for spacing */
+    z-index: 10;
+    padding: 5px;
+    border-radius: 15px;
+    background: rgba(0, 0, 0, 0.1); /* Subtle background for the toggle area */
+    width: fit-content;
+}
+
+/* Restore the heading center alignment */
+.calc-mode#crypto-mode .calc-card h3 {
+    text-align: center; /* Re-center the heading */
+    margin-bottom: 10px; /* Standard margin */
+}
+
+.crypto-toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 150px;
+    height: 30px;
+}
+
+.crypto-toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.crypto-toggle-label {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.crypto-toggle-label:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.crypto-toggle-inner {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 75px;
+    left: 2px;
+    bottom: 2px;
+    background-color: #4db5ff;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+input:checked + .crypto-toggle-label .crypto-toggle-inner {
+    transform: translateX(71px);
+}
+
+.crypto-toggle-switch-usd,
+.crypto-toggle-switch-crypto {
+    position: absolute;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 75px;
+    height: 100%;
+    color: white;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.crypto-toggle-switch-usd {
+    left: 0;
+}
+
+.crypto-toggle-switch-crypto {
+    right: 0;
+}
+
+input:not(:checked) + .crypto-toggle-label .crypto-toggle-switch-usd {
+    color: #fff;
+}
+
+input:checked + .crypto-toggle-label .crypto-toggle-switch-crypto {
+    color: #fff;
+}
+
+input:not(:checked) + .crypto-toggle-label .crypto-toggle-switch-crypto {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+input:checked + .crypto-toggle-label .crypto-toggle-switch-usd {
+    color: rgba(255, 255, 255, 0.6);
+}
+
 /* Chart styles */
 .chart-container {
     max-height: 200px;
@@ -1007,6 +1117,7 @@ a.field-info:focus {
     justify-content: space-between;
     margin-bottom: 8px;
     font-size: 0.95em;
+    line-height: 1.4;
 }
 
 /* More condensed styling for Monthly Costs section - matching Loan Summary */
@@ -1016,6 +1127,71 @@ a.field-info:focus {
     border-radius: 8px;
     font-size: 13px;
     line-height: 1.1;
+}
+
+/* Tighter spacing for crypto, seller, and investor calculator results - matching buyer calculator */
+#crypto-result .result-section,
+#seller-result .result-section,
+#investor-result .result-section {
+    margin: 0 0 8px 0;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.1;
+}
+
+/* Ensure good spacing between label and value for all calculators */
+#crypto-result .result-row span:first-child,
+#seller-result .result-row span:first-child,
+#investor-result .result-row span:first-child {
+    padding-right: 10px;
+    flex: 1;
+}
+
+#crypto-result .result-row span:last-child,
+#seller-result .result-row span:last-child,
+#investor-result .result-row span:last-child {
+    text-align: right;
+    font-weight: 500;
+}
+
+/* Further optimize for mobile */
+@media (max-width: 480px) {
+    #crypto-result .result-section,
+    #seller-result .result-section,
+    #investor-result .result-section {
+        padding: 5px 8px;
+        margin-bottom: 6px;
+    }
+    
+    #crypto-result .result-row,
+    #seller-result .result-row,
+    #investor-result .result-row {
+        margin-bottom: 3px;
+        font-size: 0.9em;
+    }
+    
+    #crypto-result h4,
+    #seller-result h4,
+    #investor-result h4 {
+        margin-bottom: 5px;
+        font-size: 0.92em;
+    }
+}
+
+#crypto-result .result-row,
+#seller-result .result-row,
+#investor-result .result-row {
+    margin-bottom: 4px;
+    font-size: 0.93em;
+}
+
+#crypto-result h4,
+#seller-result h4,
+#investor-result h4 {
+    margin-bottom: 6px;
+    font-size: 0.95em;
+    font-weight: 600;
 }
 
 .monthly-costs-section h4 {
