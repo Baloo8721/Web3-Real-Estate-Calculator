@@ -995,51 +995,208 @@ a.field-info:focus {
 }
 
 .wallet-tx-list {
-    margin-top: 15px;
+    margin-top: 16px;
 }
 
 .wallet-tx {
-    padding: 8px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    font-size: 13px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.wallet-tx:hover {
+    background: rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
 }
 
 .wallet-tx:last-child {
-    border-bottom: none;
+    margin-bottom: 0;
 }
 
 .wallet-tx-header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 5px;
+    padding: 8px 12px;
 }
 
 .wallet-tx-hash {
-    font-size: 12px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: rgba(255, 255, 255, 0.7);
+    color: #00ddeb;
+    text-decoration: none;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+.wallet-tx-hash:hover {
+    text-decoration: underline;
 }
 
 .wallet-tx-time {
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
 }
 
 .wallet-tx-info {
     display: flex;
     justify-content: space-between;
-    font-size: 12px;
+    padding: 8px 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.wallet-tx-amount {
+.wallet-tx-direction {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
     font-weight: 500;
 }
 
-.wallet-paginator {
+.wallet-tx-direction.in {
+    background-color: rgba(0, 200, 83, 0.2);
+    color: #00c853;
+}
+
+.wallet-tx-direction.out {
+    background-color: rgba(255, 82, 82, 0.2);
+    color: #ff5252;
+}
+
+.wallet-tx-amount {
+    font-weight: 600;
+}
+
+.wallet-tx-chain {
+    font-size: 12px;
+    opacity: 0.7;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Transaction container with fixed structure - Tesla-inspired minimalism */
+.wallet-tx-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+    overflow: visible; /* Allow footer to be visible outside */
+    background: rgba(0, 0, 0, 0.1);
+    margin-top: 16px;
+    margin-bottom: 70px; /* Ensure space for footer */
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollable area for transactions */
+.wallet-tx-scrollable-area {
+    max-height: 550px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+    padding: 10px;
+}
+
+/* Custom scrollbar for webkit browsers */
+.wallet-tx-scrollable-area::-webkit-scrollbar {
+    width: 6px;
+}
+
+.wallet-tx-scrollable-area::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.wallet-tx-scrollable-area::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.wallet-tx-scrollable-area::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Initial transaction list */
+.wallet-tx-list {
+    margin-bottom: 16px;
+}
+
+/* Additional transactions when expanded */
+.wallet-tx-more {
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    padding-top: 16px;
+}
+
+/* Show more button container */
+.wallet-show-more-btn-container {
+    text-align: center;
+    margin: 10px 0;
+    padding: 5px;
+}
+
+.wallet-show-more-btn {
+    background: linear-gradient(to right, #00ddeb, #0288d1);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 10px auto;
+    display: block;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.wallet-show-more-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Tesla-inspired action bar for wallet transactions */
+.wallet-action-bar {
     display: flex;
     justify-content: space-between;
-    margin-top: 12px;
+    align-items: center;
+    padding: 16px 20px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    background: linear-gradient(to right, rgba(16, 25, 41, 0.8), rgba(10, 20, 35, 0.9));
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    /* Tesla-inspired styling */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tx-count {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.view-all-tx-link {
+    color: #00ddeb;
+    text-decoration: none;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.view-all-tx-link:hover {
+    text-decoration: underline;
+}
+
+.view-all-tx-link::after {
+    content: '→';
+    margin-left: 5px;
+}
+
+.wallet-paginator {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .paginator-btn {
@@ -1567,6 +1724,27 @@ input:checked + .crypto-toggle-label .crypto-toggle-switch-usd {
     background: linear-gradient(to right, #0288d1, #01579b);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 221, 235, 0.4);
+}
+
+/* Tesla-inspired explorer link */
+.explorer-link {
+    color: #00ddeb;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: rgba(0, 221, 235, 0.1);
+    border: 1px solid rgba(0, 221, 235, 0.2);
+}
+
+.explorer-link:hover {
+    color: #ffffff;
+    background: rgba(0, 221, 235, 0.25);
+    border-color: rgba(0, 221, 235, 0.4);
+    box-shadow: 0 0 12px rgba(0, 221, 235, 0.3);
 }
 
 .referral-link {
