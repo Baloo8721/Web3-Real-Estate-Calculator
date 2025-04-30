@@ -1161,33 +1161,87 @@ const translations = {
     }
 };
 
+// Store current active calculator tab
+function saveActiveTab() {
+    const activeTab = document.querySelector('.tab-label.active');
+    if (activeTab) {
+        const mode = activeTab.dataset.mode;
+        sessionStorage.setItem('activeCalculatorTab', mode);
+    }
+}
+
+// Reset calculator while preserving current tab and language
+function resetCalculator() {
+    // Save the current active tab
+    saveActiveTab();
+    
+    // Save the current language - use the same storage as the changeLanguage function
+    // Get current language from localStorage (where changeLanguage stores it)
+    const currentLang = localStorage.getItem('selectedLanguage') || 'en';
+    sessionStorage.setItem('calculatorLanguage', currentLang);
+    
+    // Set a flag to indicate this is a reset action, not a page refresh
+    sessionStorage.setItem('isResetAction', 'true');
+    
+    // Reload the page
+    window.location.href = window.location.pathname;
+}
+
 // Function to force scroll to top - only used on page refresh, not calculation
 function forceScrollToTop() {
-    // Use multiple methods for maximum compatibility
-    window.scrollTo(0, 0);
-    document.body.scrollTop = 0;
-    document.documentElement.scrollTop = 0;
-    
-    // Add fragment identifier to URL and force navigation
-    if (window.location.href.indexOf('#page-top') === -1) {
-        window.location.href = '#page-top';
+    if ('scrollBehavior' in document.documentElement.style) {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    } else {
+        // If all else fails, try to reset the scroll position with a delay
+        setTimeout(function() {
+            window.scrollTo(0, 0);
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }, 100);
     }
-    
-    // If all else fails, try to reset the scroll position with a delay
-    setTimeout(function() {
-        window.scrollTo(0, 0);
-        document.body.scrollTop = 0;
-        document.documentElement.scrollTop = 0;
-    }, 100);
 }
 
 // Apply on page load
 window.onload = function() {
-    // Set to English language
-    changeLanguage('en');
+    // Check if this is a reset action or regular page load
+    const isResetAction = sessionStorage.getItem('isResetAction') === 'true';
+    
+    if (isResetAction) {
+        // This is a reset action - keep the language and tab that were saved
+        const savedLanguage = sessionStorage.getItem('calculatorLanguage');
+        if (savedLanguage) {
+            changeLanguage(savedLanguage);
+        } else {
+            changeLanguage('en');
+        }
+        
+        // Clear the reset flag for next time
+        sessionStorage.removeItem('isResetAction');
+    } else {
+        // This is a regular page load/refresh - always revert to English
+        changeLanguage('en');
+        // Clear any saved tab/language as this is a fresh start
+        sessionStorage.removeItem('activeCalculatorTab');
+        sessionStorage.removeItem('calculatorLanguage');
+    }
     
     // Force scroll to top
     forceScrollToTop();
+    
+    // Restore active tab from session storage if this was a reset action
+    // otherwise, default tab will remain active (buyer)
+    if (isResetAction) {
+        const savedTab = sessionStorage.getItem('activeCalculatorTab');
+        if (savedTab) {
+            const tabToActivate = document.querySelector(`.tab-label[data-mode="${savedTab}"]`);
+            if (tabToActivate) {
+                tabToActivate.click();
+            }
+        }
+    }
 };
 
 // Use the more modern 'load' event as a backup
@@ -1888,6 +1942,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 tab.classList.add('active');
                 const modeId = tab.getAttribute('data-mode');
                 document.getElementById(`${modeId}-mode`).classList.add('active');
+                
+                // Save the currently active tab to session storage
+                sessionStorage.setItem('activeCalculatorTab', modeId);
             });
         });
 
@@ -3201,7 +3258,7 @@ async function calculateBuyer() {
                     </div>
                 </div>
             </div>
-            <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
+            <button class="reset-btn" onclick="resetCalculator();" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
         `;
         
         // Insert chart containers into the DOM
@@ -3831,7 +3888,7 @@ function calculateSeller() {
                     <span>${formatter.format(repairs)}</span>
                 </div>
             </div>
-            <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
+            <button class="reset-btn" onclick="resetCalculator();" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
         `;
         saveInputs('seller', { price, balance, commission, closing, repairs, netProceeds, totalCosts });
     } catch (error) {
@@ -3914,7 +3971,7 @@ function calculateInvestor() {
                     <span>${formatter.format(monthlyPayment)}/mo</span>
                 </div>
             </div>
-            <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
+            <button class="reset-btn" onclick="resetCalculator();" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
         `;
         saveInputs('investor', { price, down, term, rate, rental, expenses, cashFlow, capRate, cashOnCash });
     } catch (error) {
@@ -4050,7 +4107,7 @@ async function calculateCrypto() {
                         <span>${ethEquivalent === 'N/A' ? 'N/A' : `${ethEquivalent} ETH`}</span>
                     </div>
                 </div>
-                <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
+                <button class="reset-btn" onclick="resetCalculator();" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
             `;
             
             // Save inputs for potential sharing
@@ -4091,7 +4148,7 @@ async function calculateCrypto() {
                     </div>
                 </div>
                 <div class="note">Note: Using fallback prices due to API issues.</div>
-                <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
+                <button class="reset-btn" onclick="resetCalculator();" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
             `;
             
             // Save inputs
@@ -4256,7 +4313,7 @@ function renderBuyerResults(inputs) {
                     <span>${formatter.format(totalUpfrontCosts)}</span>
                 </div>
             </div>
-            <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
+            <button class="reset-btn" onclick="resetCalculator();" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
         `;
     } catch (error) {
         console.error('Error rendering buyer results:', error);
@@ -4302,7 +4359,7 @@ function renderSellerResults(inputs) {
                     <span>${formatter.format(netProceeds)}</span>
                 </div>
             </div>
-            <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
+            <button class="reset-btn" onclick="resetCalculator();" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
             
             <div class="result-section">
                 <h4>${translations[lang].cost_breakdown || 'Cost Breakdown'}</h4>
@@ -4319,7 +4376,7 @@ function renderSellerResults(inputs) {
                     <span>${formatter.format(repairs)}</span>
                 </div>
             </div>
-            <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
+            <button class="reset-btn" onclick="resetCalculator();" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
         `;
     } catch (error) {
         console.error('Error rendering seller results:', error);
@@ -4365,7 +4422,7 @@ function renderInvestorResults(inputs) {
                     <span>${cashOnCash.toFixed(2)}%</span>
                 </div>
             </div>
-            <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
+            <button class="reset-btn" onclick="resetCalculator();" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
             
             <div class="result-section">
                 <h4>${translations[lang].investment_details || 'Investment Details'}</h4>
@@ -4386,7 +4443,7 @@ function renderInvestorResults(inputs) {
                     <span>${formatter.format(expenses)}/mo</span>
                 </div>
             </div>
-            <button class="reset-btn" onclick="window.location.href = window.location.pathname;" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
+            <button class="reset-btn" onclick="resetCalculator();" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
         `;
     } catch (error) {
         console.error('Error rendering investor results:', error);
@@ -4764,6 +4821,60 @@ function shareResults() {
         
     } catch (error) {
         console.error('Share results error:', error);
+    }
+}
+
+// Handle crypto calculator and wallet search toggle
+document.addEventListener('DOMContentLoaded', function() {
+    const walletToggle = document.getElementById('crypto-wallet-toggle');
+    if (walletToggle) {
+        walletToggle.addEventListener('change', toggleCryptoView);
+    }
+});
+
+// Store the last crypto calculation result with complete HTML structure
+let lastCryptoResultHTML = '';
+
+function toggleCryptoView() {
+    const isWalletMode = document.getElementById('crypto-wallet-toggle').checked;
+    const calculatorView = document.getElementById('crypto-calculator-view');
+    const walletView = document.getElementById('wallet-search-view');
+    const cryptoResult = document.getElementById('crypto-result');
+    
+    if (isWalletMode) {
+        // Switching to wallet search view
+        calculatorView.classList.remove('active-view');
+        walletView.classList.add('active-view');
+        
+        // Save the current crypto calculation result with full HTML before hiding it
+        if (cryptoResult.innerHTML) {
+            lastCryptoResultHTML = cryptoResult.innerHTML;
+            // Store the calculation in sessionStorage as backup
+            sessionStorage.setItem('lastCryptoResult', lastCryptoResultHTML);
+        }
+    } else {
+        // Switching to crypto calculator view
+        walletView.classList.remove('active-view');
+        calculatorView.classList.add('active-view');
+        
+        // Try to get the result from memory or session storage
+        if (lastCryptoResultHTML) {
+            cryptoResult.innerHTML = lastCryptoResultHTML;
+        } else {
+            // Fallback to session storage if available
+            const savedResult = sessionStorage.getItem('lastCryptoResult');
+            if (savedResult) {
+                cryptoResult.innerHTML = savedResult;
+                lastCryptoResultHTML = savedResult;
+            }
+        }
+    }
+    
+    // Move focus to appropriate input field
+    if (isWalletMode) {
+        document.getElementById('wallet-address').focus();
+    } else {
+        document.getElementById('crypto-amount').focus();
     }
 }
 

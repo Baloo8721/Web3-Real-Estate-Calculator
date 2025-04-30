@@ -1237,10 +1237,89 @@ a.field-info:focus {
     width: fit-content;
 }
 
-/* Restore the heading center alignment */
-.calc-mode#crypto-mode .calc-card h3 {
-    text-align: center; /* Re-center the heading */
-    margin-bottom: 10px; /* Standard margin */
+.crypto-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+}
+
+.toggle-label {
+    margin-right: 10px;
+    font-size: 0.9rem;
+    color: #888;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background-color: #3e6ae1;
+}
+
+input:focus + .toggle-slider {
+    box-shadow: 0 0 1px #3e6ae1;
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(26px);
+}
+
+.crypto-view {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.crypto-view.active-view {
+    display: block;
+    opacity: 1;
+}
+
+/* Crypto toggle styles - Tesla-inspired design */
+.crypto-toggle-wrapper {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
 }
 
 .crypto-toggle-switch {
@@ -1248,6 +1327,7 @@ a.field-info:focus {
     display: inline-block;
     width: 150px;
     height: 30px;
+    margin: 0 auto;
 }
 
 .crypto-toggle-switch input {
@@ -1267,6 +1347,8 @@ a.field-info:focus {
     border-radius: 30px;
     transition: all 0.3s ease;
     overflow: hidden;
+    display: flex;
+    align-items: center;
 }
 
 .crypto-toggle-label:hover {
@@ -1286,12 +1368,7 @@ a.field-info:focus {
     z-index: 1;
 }
 
-input:checked + .crypto-toggle-label .crypto-toggle-inner {
-    transform: translateX(71px);
-}
-
-.crypto-toggle-switch-usd,
-.crypto-toggle-switch-crypto {
+.crypto-toggle-switch-usd, .crypto-toggle-switch-crypto {
     position: absolute;
     top: 0;
     display: flex;
@@ -1312,6 +1389,18 @@ input:checked + .crypto-toggle-label .crypto-toggle-inner {
 
 .crypto-toggle-switch-crypto {
     right: 0;
+}
+
+input:checked + .crypto-toggle-label .crypto-toggle-inner {
+    transform: translateX(71px);
+}
+
+input:checked + .crypto-toggle-label .crypto-toggle-switch-usd {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+input:not(:checked) + .crypto-toggle-label .crypto-toggle-switch-crypto {
+    color: rgba(255, 255, 255, 0.7);
 }
 
 input:not(:checked) + .crypto-toggle-label .crypto-toggle-switch-usd {
