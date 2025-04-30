@@ -1,0 +1,118 @@
+{
+  "ethereum": {
+    "address": "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
+    "balance": "0x4563918244f40000",
+    "transactions": [
+      {
+        "hash": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+        "timeStamp": "1682954153",
+        "from": "0x1234567890abcdef1234567890abcdef12345678",
+        "to": "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
+        "value": "0x38d7ea4c68000",
+        "gas": "21000",
+        "gasPrice": "0x4a817c800"
+      },
+      {
+        "hash": "0x2345678901abcdef2345678901abcdef2345678901abcdef2345678901abcdef",
+        "timeStamp": "1682954100",
+        "from": "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
+        "to": "0x2345678901abcdef2345678901abcdef23456789",
+        "value": "0x29a2241af62c0000",
+        "gas": "21000",
+        "gasPrice": "0x4a817c800"
+      }
+    ]
+  },
+  "bitcoin": {
+    "address": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+    "balance": 0.12345678,
+    "transactions": [
+      {
+        "txid": "f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16",
+        "time": 1682954153,
+        "amount": 0.05
+      },
+      {
+        "txid": "ea44e97271691990157559d0bdd9959e02790c34db6c006d779e82fa5aee708e",
+        "time": 1682953000,
+        "amount": 0.07345678
+      }
+    ]
+  },
+  "solana": {
+    "address": "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc145S2AMZZ",
+    "balance": {
+      "value": 12345000000
+    },
+    "transactions": [
+      {
+        "signature": "5UyfUMQCRm5R41UBbgYQoYpNKkfYDBKQonQMRrsdNnQjY7UewDbxPBTL4ySiiaSLdRBGY5X9ETjfNwj3KrgsqTM1",
+        "blockTime": 1682954153
+      },
+      {
+        "signature": "4Zc3GXvr8iRKgHFNQNFYhZcxnHpK2iKKaBV1qDTu6i92NfKwjMp2GuGPGFa9jXTkwGcBKZoXuUfMq8S8ZQwzjnxw",
+        "blockTime": 1682950000
+      }
+    ]
+  },
+  "arbitrum": {
+    "address": "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
+    "balance": "0x6c6b935b8bbd400000",
+    "transactions": [
+      {
+        "hash": "0x3456789012abcdef3456789012abcdef3456789012abcdef3456789012abcdef",
+        "timeStamp": "1682954000",
+        "from": "0x3456789012abcdef3456789012abcdef34567890",
+        "to": "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
+        "value": "0x1bc16d674ec80000",
+        "gas": "21000",
+        "gasPrice": "0x4a817c800"
+      }
+    ]
+  },
+  "polygon": {
+    "address": "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
+    "balance": "0x152d02c7e14af6800000",
+    "transactions": [
+      {
+        "hash": "0x456789012abcdef3456789012abcdef3456789012abcdef3456789012abcdef3",
+        "timeStamp": "1682953500",
+        "from": "0x456789012abcdef3456789012abcdef3456789012",
+        "to": "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
+        "value": "0x6c6b935b8bbd400000",
+        "gas": "21000",
+        "gasPrice": "0x4a817c800"
+      }
+    ]
+  },
+  "optimism": {
+    "address": "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
+    "balance": "0x3635c9adc5dea00000",
+    "transactions": [
+      {
+        "hash": "0x56789012abcdef3456789012abcdef3456789012abcdef3456789012abcdef34",
+        "timeStamp": "1682953000",
+        "from": "0x56789012abcdef3456789012abcdef34567890123",
+        "to": "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
+        "value": "0x3635c9adc5dea00000",
+        "gas": "21000",
+        "gasPrice": "0x4a817c800"
+      }
+    ]
+  },
+  "base": {
+    "address": "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
+    "balance": "0x1158e460913d00000",
+    "transactions": [
+      {
+        "hash": "0x6789012abcdef3456789012abcdef3456789012abcdef3456789012abcdef345",
+        "timeStamp": "1682952500", 
+        "from": "0x6789012abcdef3456789012abcdef345678901234",
+        "to": "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B", 
+        "value": "0x1158e460913d00000",
+        "gas": "21000",
+        "gasPrice": "0x4a817c800"
+      }
+    ]
+  }
+}

@@ -312,6 +312,16 @@
 </select>
                             <label for="crypto-type" data-lang="crypto_type">Crypto Type</label>
                         </div>
+                        
+                        <div class="wallet-search-container">
+                            <div class="input-group">
+                                <input type="text" id="wallet-address" placeholder="Enter wallet address" data-lang="wallet_address" aria-label="Wallet Address">
+                                <label for="wallet-address" data-lang="wallet_address">Wallet Address</label>
+                            </div>
+                            <button type="button" class="search-btn" id="wallet-search" data-lang="search_wallet">Search</button>
+                            <div id="wallet-search-result" class="wallet-result-container"></div>
+                        </div>
+                        
                         <button type="button" class="calc-btn" id="crypto-calc" data-lang="calculate">Calculate</button>
                         <p id="crypto-result" aria-live="polite"></p>
                     </div>
@@ -332,7 +342,8 @@
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-    <script src="cryptoCalculator.js"></script>
-    <script src="script.js?v=20250428"></script>
+    <script src="cryptoCalculator.js" type="module"></script>
+    <script src="walletSearch.js" type="module"></script>
+    <script src="script.js?v=20250429"></script>
 </body>
 </html>
