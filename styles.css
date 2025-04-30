@@ -902,6 +902,172 @@ a.field-info:focus {
     position: relative;
 }
 
+/* Wallet Search Styles */
+.wallet-search-container {
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+    position: relative;
+}
+
+.wallet-search-container .input-group {
+    margin-bottom: 12px;
+}
+
+.search-btn {
+    background: #4db5ff;
+    color: #000;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-bottom: 12px;
+    font-family: inherit;
+}
+
+.search-btn:hover {
+    background: #3d9fe8;
+    transform: translateY(-1px);
+}
+
+.search-btn:active {
+    transform: translateY(0);
+}
+
+.wallet-result-container {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+}
+
+.wallet-result-container.active {
+    max-height: 1000px;
+    margin-top: 15px;
+}
+
+.chain-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 6px;
+    margin-bottom: 6px;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.chain-badge.ethereum {
+    background: rgba(113, 89, 241, 0.2);
+    color: #9f8aff;
+}
+
+.chain-badge.bitcoin {
+    background: rgba(247, 147, 26, 0.2);
+    color: #f7931a;
+}
+
+.chain-badge.solana {
+    background: rgba(20, 241, 149, 0.2);
+    color: #14f195;
+}
+
+.chain-badge.arbitrum {
+    background: rgba(41, 103, 255, 0.2);
+    color: #2967ff;
+}
+
+.chain-badge.polygon {
+    background: rgba(130, 71, 229, 0.2);
+    color: #8247e5;
+}
+
+.chain-badge.optimism {
+    background: rgba(255, 4, 32, 0.2);
+    color: #ff0420;
+}
+
+.chain-badge.base {
+    background: rgba(0, 82, 255, 0.2);
+    color: #0052ff;
+}
+
+.wallet-tx-list {
+    margin-top: 15px;
+}
+
+.wallet-tx {
+    padding: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 13px;
+}
+
+.wallet-tx:last-child {
+    border-bottom: none;
+}
+
+.wallet-tx-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.wallet-tx-hash {
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.wallet-tx-time {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.wallet-tx-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+}
+
+.wallet-tx-amount {
+    font-weight: 500;
+}
+
+.wallet-paginator {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+}
+
+.paginator-btn {
+    background: rgba(77, 181, 255, 0.2);
+    color: #4db5ff;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.paginator-btn:hover {
+    background: rgba(77, 181, 255, 0.3);
+}
+
+.paginator-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.wallet-loading {
+    text-align: center;
+    padding: 20px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
 .crypto-toggle-wrapper {
     position: relative; /* Change to relative positioning */
     display: flex;
