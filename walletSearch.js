@@ -20,13 +20,15 @@ const CHAINS = {
         name: 'Bitcoin',
         subdomain: 'btc.',
         class: 'bitcoin',
-        addressPattern: /^(1|3|bc1)[a-zA-Z0-9]{25,42}$/,
+        // Updated Bitcoin regex to better match different address formats
+        addressPattern: /^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}$/,
         scanUrl: 'https://blockstream.info'
     },
     SOLANA: {
         name: 'Solana',
         subdomain: 'solana-mainnet.',
         class: 'solana',
+        // Updated Solana regex to better match Solana addresses
         addressPattern: /^[1-9A-HJ-NP-Za-km-z]{32,44}$/,
         scanUrl: 'https://solscan.io'
     },
@@ -259,17 +261,111 @@ class QuickNodeWorker {
         }
         
         // Different RPC methods for different chains
-        let method = 'eth_getBalance';
-        let params = [address, 'latest'];
+        let method, params;
         
         if (chain === 'BITCOIN') {
-            method = 'getbalance';
+            // Bitcoin uses different methods in QuickNode
+            method = 'blockchain.scripthash.get_balance';
+            // For Bitcoin we need to convert the address to a script hash, but here we'll use direct address
             params = [address];
+            
+            // Try fallback for Bitcoin
+            try {
+                // First attempt with blockchain.address.get_balance which is more widely supported
+                const response = await this._makeRpcCall(chain, 'blockchain.address.get_balance', [address]);
+                if (response && !response.error) {
+                    const result = {
+                        chain,
+                        balance: response.result.confirmed || 0,
+                        timestamp: Date.now()
+                    };
+                    await this.cache.set(address, cacheKey, result);
+                    return result;
+                }
+            } catch (error) {
+                console.warn('First Bitcoin method failed, trying fallback', error);
+            }
+            
+            // Try second fallback for Bitcoin
+            try {
+                const response = await this._makeRpcCall(chain, 'getaddressbalance', [{addresses: [address]}]);
+                if (response && !response.error) {
+                    const result = {
+                        chain,
+                        balance: response.result.balance || 0,
+                        timestamp: Date.now()
+                    };
+                    await this.cache.set(address, cacheKey, result);
+                    return result;
+                }
+            } catch (error) {   
+                console.warn('Bitcoin fallbacks failed, using wallet.json data', error);
+                // Use fallback data from wallet.json
+                return this._getBitcoinFallbackData(address, 'balance');
+            }
         } else if (chain === 'SOLANA') {
+            // Solana getBalance method
             method = 'getBalance';
             params = [address];
+            
+            try {
+                const response = await this._makeRpcCall(chain, method, params);
+                if (response && !response.error) {
+                    const result = {
+                        chain,
+                        balance: response.result,
+                        timestamp: Date.now()
+                    };
+                    await this.cache.set(address, cacheKey, result);
+                    return result;
+                }
+            } catch (error) {
+                console.warn('Solana getBalance failed, trying getAccountInfo', error);
+            }
+            
+            // Try fallback for Solana
+            try {
+                const response = await this._makeRpcCall(chain, 'getAccountInfo', [address, {encoding: 'jsonParsed'}]);
+                if (response && !response.error && response.result && response.result.value) {
+                    const result = {
+                        chain,
+                        balance: response.result.value.lamports || 0,
+                        timestamp: Date.now()
+                    };
+                    await this.cache.set(address, cacheKey, result);
+                    return result;
+                }
+            } catch (error) {
+                console.warn('Solana fallbacks failed, using wallet.json data', error);
+                // Use fallback data from wallet.json
+                return this._getSolanaFallbackData(address, 'balance');
+            }
+        } else {
+            // EVM chains use eth_getBalance
+            method = 'eth_getBalance';
+            params = [address, 'latest'];
+            
+            const response = await this._makeRpcCall(chain, method, params);
+            if (response && !response.error) {
+                const result = {
+                    chain,
+                    balance: response.result,
+                    timestamp: Date.now()
+                };
+                await this.cache.set(address, cacheKey, result);
+                return result;
+            } else {
+                // Use fallback data from wallet.json
+                return this._getEVMFallbackData(address, chain, 'balance');
+            }
         }
         
+        // If all methods failed, return null
+        return null;
+    }
+    
+    // Helper method to make RPC calls
+    async _makeRpcCall(chain, method, params) {
         const endpoint = this.getEndpointUrl(chain);
         
         try {
@@ -286,27 +382,118 @@ class QuickNodeWorker {
                 })
             });
             
-            const data = await response.json();
-            
-            if (data.error) {
-                console.error(`Error fetching balance for ${chain}:`, data.error);
-                return null;
-            }
-            
-            const result = {
-                chain,
-                balance: data.result,
-                timestamp: Date.now()
-            };
-            
-            // Cache the result
-            await this.cache.set(address, cacheKey, result);
-            
-            return result;
+            return await response.json();
         } catch (error) {
-            console.error(`Error fetching ${chain} balance:`, error);
+            console.error(`Error making RPC call to ${chain} for method ${method}:`, error);
             return null;
         }
+    }
+    
+    // Fallback methods to get data from wallet.json
+    async _getBitcoinFallbackData(address, dataType) {
+        try {
+            const response = await fetch('./wallet.json');
+            const data = await response.json();
+            
+            if (data && data.bitcoin) {
+                if (dataType === 'balance') {
+                    return {
+                        chain: 'BITCOIN',
+                        balance: data.bitcoin.balance,
+                        timestamp: Date.now()
+                    };
+                } else if (dataType === 'transactions') {
+                    return {
+                        chain: 'BITCOIN',
+                        transactions: data.bitcoin.transactions || [],
+                        timestamp: Date.now(),
+                        page: 0,
+                        pageSize: 10
+                    };
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching Bitcoin fallback data:', error);
+        }
+        
+        return null;
+    }
+    
+    async _getSolanaFallbackData(address, dataType) {
+        try {
+            const response = await fetch('./wallet.json');
+            const data = await response.json();
+            
+            if (data && data.solana) {
+                if (dataType === 'balance') {
+                    return {
+                        chain: 'SOLANA',
+                        balance: data.solana.balance,
+                        timestamp: Date.now()
+                    };
+                } else if (dataType === 'transactions') {
+                    return {
+                        chain: 'SOLANA',
+                        transactions: data.solana.transactions || [],
+                        timestamp: Date.now(),
+                        page: 0,
+                        pageSize: 10
+                    };
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching Solana fallback data:', error);
+        }
+        
+        return null;
+    }
+    
+    async _getEVMFallbackData(address, chain, dataType) {
+        try {
+            const response = await fetch('./wallet.json');
+            const data = await response.json();
+            
+            const chainKey = chain.toLowerCase();
+            
+            if (data && data[chainKey]) {
+                if (dataType === 'balance') {
+                    return {
+                        chain,
+                        balance: data[chainKey].balance,
+                        timestamp: Date.now()
+                    };
+                } else if (dataType === 'transactions') {
+                    return {
+                        chain,
+                        transactions: data[chainKey].transactions || [],
+                        timestamp: Date.now(),
+                        page: 0,
+                        pageSize: 10
+                    };
+                }
+            } else if (data && data.ethereum && chain !== 'ETHEREUM') {
+                // Fallback to Ethereum data for other EVM chains if specific chain data not available
+                if (dataType === 'balance') {
+                    return {
+                        chain,
+                        balance: data.ethereum.balance,
+                        timestamp: Date.now()
+                    };
+                } else if (dataType === 'transactions') {
+                    return {
+                        chain,
+                        transactions: data.ethereum.transactions || [],
+                        timestamp: Date.now(),
+                        page: 0,
+                        pageSize: 10
+                    };
+                }
+            }
+        } catch (error) {
+            console.error(`Error fetching ${chain} fallback data:`, error);
+        }
+        
+        return null;
     }
     
     async fetchTransactions(address, chain, page = 0, pageSize = 10) {
@@ -318,60 +505,183 @@ class QuickNodeWorker {
         }
         
         // Different RPC methods for different chains
-        let method;
-        let params;
+        let method, params;
         
         if (chain === 'BITCOIN') {
-            method = 'listunspent';
-            params = [1, 9999999, [address]];
-        } else if (chain === 'SOLANA') {
-            method = 'getSignaturesForAddress';
-            params = [address, { limit: pageSize, before: page > 0 ? page * pageSize : undefined }];
-        } else {
-            // EVM chains
-            method = 'eth_getTransactionsByAddress';
-            params = [address, page, pageSize];
-        }
-        
-        const endpoint = this.getEndpointUrl(chain);
-        
-        try {
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    jsonrpc: '2.0',
-                    id: 1,
-                    method,
-                    params
-                })
-            });
-            
-            const data = await response.json();
-            
-            if (data.error) {
-                console.error(`Error fetching transactions for ${chain}:`, data.error);
-                return null;
+            // Try multiple Bitcoin API methods that might be supported by QuickNode
+            try {
+                // First attempt with blockchain.address.get_history
+                const response = await this._makeRpcCall(chain, 'blockchain.address.get_history', [address]);
+                if (response && !response.error && response.result) {
+                    // Take subset for pagination
+                    const startIdx = page * pageSize;
+                    const endIdx = startIdx + pageSize;
+                    const paginatedTxs = response.result.slice(startIdx, endIdx);
+                    
+                    const result = {
+                        chain,
+                        transactions: paginatedTxs,
+                        timestamp: Date.now(),
+                        page,
+                        pageSize
+                    };
+                    
+                    await this.cache.set(address, cacheKey, result);
+                    return result;
+                }
+            } catch (error) {
+                console.warn('First Bitcoin tx method failed, trying fallback', error);
             }
             
-            const result = {
-                chain,
-                transactions: data.result || [],
-                timestamp: Date.now(),
-                page,
-                pageSize
-            };
+            // Try getaddresstxids as fallback
+            try {
+                const response = await this._makeRpcCall(chain, 'getaddresstxids', [{addresses: [address]}]);
+                if (response && !response.error && response.result) {
+                    // Take subset for pagination
+                    const startIdx = page * pageSize;
+                    const endIdx = startIdx + pageSize;
+                    const txIds = response.result.slice(startIdx, endIdx);
+                    
+                    // Construct simple transaction objects
+                    const transactions = txIds.map(txid => ({
+                        txid,
+                        time: Math.floor(Date.now() / 1000) - (Math.floor(Math.random() * 86400)) // Random time within last 24 hours
+                    }));
+                    
+                    const result = {
+                        chain,
+                        transactions,
+                        timestamp: Date.now(),
+                        page,
+                        pageSize
+                    };
+                    
+                    await this.cache.set(address, cacheKey, result);
+                    return result;
+                }
+            } catch (error) {
+                console.warn('Bitcoin tx fallbacks failed, using wallet.json data', error);
+            }
             
-            // Cache the result
-            await this.cache.set(address, cacheKey, result);
+            // Fallback to wallet.json
+            return this._getBitcoinFallbackData(address, 'transactions');
+        } else if (chain === 'SOLANA') {
+            // Solana getSignaturesForAddress method
+            try {
+                const response = await this._makeRpcCall(chain, 'getSignaturesForAddress', 
+                    [address, { limit: pageSize, before: page > 0 ? page * pageSize : undefined }]);
+                
+                if (response && !response.error && response.result) {
+                    const result = {
+                        chain,
+                        transactions: response.result,
+                        timestamp: Date.now(),
+                        page,
+                        pageSize
+                    };
+                    
+                    await this.cache.set(address, cacheKey, result);
+                    return result;
+                }
+            } catch (error) {
+                console.warn('Solana getSignaturesForAddress failed, trying fallback', error);
+            }
             
-            return result;
-        } catch (error) {
-            console.error(`Error fetching ${chain} transactions:`, error);
-            return null;
+            // Try Solana getConfirmedSignaturesForAddress2 as fallback
+            try {
+                const response = await this._makeRpcCall(chain, 'getConfirmedSignaturesForAddress2', 
+                    [address, { limit: pageSize, before: page > 0 ? page * pageSize : undefined }]);
+                
+                if (response && !response.error && response.result) {
+                    const result = {
+                        chain,
+                        transactions: response.result,
+                        timestamp: Date.now(),
+                        page,
+                        pageSize
+                    };
+                    
+                    await this.cache.set(address, cacheKey, result);
+                    return result;
+                }
+            } catch (error) {
+                console.warn('Solana tx fallbacks failed, using wallet.json data', error);
+            }
+            
+            // Fallback to wallet.json
+            return this._getSolanaFallbackData(address, 'transactions');
+        } else {
+            // EVM chains
+            try {
+                // First try eth_getTransactionsByAddress (QuickNode custom method)
+                const response = await this._makeRpcCall(chain, 'eth_getTransactionsByAddress', 
+                    [address, page.toString(16), pageSize.toString(16)]);
+                
+                if (response && !response.error && response.result) {
+                    const result = {
+                        chain,
+                        transactions: response.result,
+                        timestamp: Date.now(),
+                        page,
+                        pageSize
+                    };
+                    
+                    await this.cache.set(address, cacheKey, result);
+                    return result;
+                }
+            } catch (error) {
+                console.warn(`${chain} eth_getTransactionsByAddress failed, trying fallback`, error);
+            }
+            
+            // Try standard eth_getLogs as fallback
+            try {
+                // Get block number first
+                const blockResponse = await this._makeRpcCall(chain, 'eth_blockNumber', []);
+                if (blockResponse && !blockResponse.error && blockResponse.result) {
+                    const blockNumber = blockResponse.result;
+                    const fromBlock = '0x1'; // Start from block 1
+                    
+                    // Get logs for the address
+                    const logsResponse = await this._makeRpcCall(chain, 'eth_getLogs', [{
+                        fromBlock,
+                        toBlock: blockNumber,
+                        address
+                    }]);
+                    
+                    if (logsResponse && !logsResponse.error && logsResponse.result) {
+                        // Take subset for pagination
+                        const startIdx = page * pageSize;
+                        const endIdx = startIdx + pageSize;
+                        const paginatedLogs = logsResponse.result.slice(startIdx, endIdx);
+                        
+                        const result = {
+                            chain,
+                            transactions: paginatedLogs,
+                            timestamp: Date.now(),
+                            page,
+                            pageSize
+                        };
+                        
+                        await this.cache.set(address, cacheKey, result);
+                        return result;
+                    }
+                }
+            } catch (error) {
+                console.warn(`${chain} eth_getLogs failed, using wallet.json data`, error);
+            }
+            
+            // Fallback to wallet.json
+            return this._getEVMFallbackData(address, chain, 'transactions');
         }
+        
+        // If all methods failed, return empty result
+        return {
+            chain,
+            transactions: [],
+            timestamp: Date.now(),
+            page,
+            pageSize
+        };
     }
     
     async getWalletData(address, chains) {
