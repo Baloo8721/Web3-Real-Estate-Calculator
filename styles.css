@@ -1315,6 +1315,105 @@ input:checked + .toggle-slider:before {
     opacity: 1;
 }
 
+/* Tesla-inspired Wallet Toggle Styles */
+.wallet-toggle-wrapper {
+    margin-left: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+.wallet-toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 150px;
+    height: 36px;
+    margin: 0 auto;
+}
+
+.wallet-toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.wallet-toggle-label {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 0 5px rgba(77, 181, 255, 0.3), 0 0 10px rgba(0, 0, 0, 0.2) inset;
+}
+
+.wallet-toggle-label:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.wallet-toggle-inner {
+    position: absolute;
+    content: "";
+    height: 32px;
+    width: 75px;
+    left: 2px;
+    bottom: 2px;
+    background-color: #4db5ff;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+.wallet-toggle-switch-calc, .wallet-toggle-switch-wallet {
+    position: absolute;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 75px;
+    height: 100%;
+    color: white;
+    font-weight: 500;
+    font-size: 12px;
+    transition: all 0.3s ease;
+    z-index: 2;
+    line-height: 1.2;
+}
+
+.wallet-toggle-switch-calc {
+    left: 0;
+}
+
+.wallet-toggle-switch-wallet {
+    right: 0;
+}
+
+input:checked + .wallet-toggle-label .wallet-toggle-inner {
+    transform: translateX(71px);
+}
+
+input:checked + .wallet-toggle-label .wallet-toggle-switch-calc {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+input:not(:checked) + .wallet-toggle-label .wallet-toggle-switch-wallet {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+input:not(:checked) + .wallet-toggle-label .wallet-toggle-switch-calc {
+    color: #fff;
+}
+
+input:checked + .wallet-toggle-label .wallet-toggle-switch-wallet {
+    color: #fff;
+}
+
 /* Crypto toggle styles - Tesla-inspired design */
 .crypto-toggle-wrapper {
     margin-bottom: 20px;

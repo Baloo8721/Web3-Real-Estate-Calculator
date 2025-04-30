@@ -239,10 +239,12 @@
                         <div class="input-group">
                             <input type="number" id="seller-commission" placeholder="Commission (%)" data-lang="seller_commission" step="0.1" aria-label="Commission" min="0" max="100">
                             <label for="seller-commission" data-lang="seller_commission">Commission (%)</label>
+                            <span class="field-info" style="text-decoration: none;">Default: 6% of sale price (avg)</span>
                         </div>
                         <div class="input-group">
                             <input type="number" id="seller-closing" placeholder="Closing Costs ($)" data-lang="seller_closing" aria-label="Closing Costs" min="0" step="1000">
                             <label for="seller-closing" data-lang="seller_closing">Closing Costs ($)</label>
+                            <span class="field-info" style="text-decoration: none;">Default: 3% of home price</span>
                         </div>
                         <div class="input-group">
                             <input type="number" id="seller-repairs" placeholder="Repairs ($)" data-lang="seller_repairs" aria-label="Repairs" min="0" step="1000">
@@ -289,12 +291,15 @@
                     <div class="calc-card">
                         <div class="crypto-header">
                             <h3 data-lang="crypto_calc">Crypto Calculator</h3>
-                            <div class="toggle-container">
-                                <span class="toggle-label">Wallet Search</span>
-                                <label class="toggle-switch">
+                            <div class="wallet-toggle-wrapper">
+                                <div class="wallet-toggle-switch">
                                     <input type="checkbox" id="crypto-wallet-toggle">
-                                    <span class="toggle-slider"></span>
-                                </label>
+                                    <label for="crypto-wallet-toggle" class="wallet-toggle-label">
+                                        <span class="wallet-toggle-inner"></span>
+                                        <span class="wallet-toggle-switch-calc"><img src="CRYPTO (1).png" width="28" height="28" alt="Crypto conversion" style="filter: brightness(0) invert(1);"></span>
+                                        <span class="wallet-toggle-switch-wallet">Wallet<br><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         

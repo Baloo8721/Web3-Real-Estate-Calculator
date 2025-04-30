@@ -1958,15 +1958,44 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        // Add seller calculator button event listener
-        document.getElementById('seller-calc')?.addEventListener('click', () => {
-            calculateSeller();
-            // Scroll to show results
-            const sellerResults = document.getElementById('seller-result');
-            if (sellerResults) {
-                sellerResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Initialize seller calculator (if it exists)
+        const sellerCalcBtn = document.getElementById('seller-calc');
+        if (sellerCalcBtn) {
+            // Initialize auto-calculation fields with data-auto attribute
+            const commissionField = document.getElementById('seller-commission');
+            const closingField = document.getElementById('seller-closing');
+            const priceField = document.getElementById('seller-price');
+            
+            if (commissionField && closingField && priceField) {
+                // Set initial auto attribute - they're auto-calculated until manually changed
+                commissionField.setAttribute('data-auto', 'true');
+                closingField.setAttribute('data-auto', 'true');
+                
+                // Listen for price changes to auto-update fields
+                priceField.addEventListener('input', updateSellerAutoFields);
+                
+                // Mark fields as manually entered when user edits them
+                commissionField.addEventListener('input', function() {
+                    this.setAttribute('data-auto', 'false');
+                });
+                
+                closingField.addEventListener('input', function() {
+                    this.setAttribute('data-auto', 'false');
+                });
+                
+                // Initial calculation of fields if price is pre-filled
+                updateSellerAutoFields();
             }
-        });
+            
+            sellerCalcBtn.addEventListener('click', () => {
+                calculateSeller();
+                // Scroll to show results
+                const sellerResults = document.getElementById('seller-result');
+                if (sellerResults) {
+                    sellerResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        }
         
         // Add investor calculator button event listener
         document.getElementById('investor-calc')?.addEventListener('click', () => {
@@ -3825,6 +3854,27 @@ async function calculateQuickAffordability() {
     } catch (error) {
         console.error('Affordability calculation error:', error);
         return null;
+    }
+}
+
+// Auto-calculate seller commission and closing costs based on price
+function updateSellerAutoFields() {
+    const price = parseFloat(document.getElementById('seller-price').value) || 0;
+    
+    // Only update if price is valid
+    if (price > 0) {
+        const commissionField = document.getElementById('seller-commission');
+        const closingField = document.getElementById('seller-closing');
+        
+        // Only auto-update if field hasn't been manually changed (indicated by the data-auto attribute)
+        if (commissionField.getAttribute('data-auto') !== 'false') {
+            commissionField.value = '6.0'; // 6% is the average commission
+        }
+        
+        if (closingField.getAttribute('data-auto') !== 'false') {
+            const calculatedClosing = Math.round(price * 0.03); // 3% is the average for closing costs
+            closingField.value = calculatedClosing;
+        }
     }
 }
 
