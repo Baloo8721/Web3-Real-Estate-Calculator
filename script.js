@@ -4503,22 +4503,432 @@ function renderInvestorResults(inputs) {
 function saveResults() {
     try {
         if (!lastInputs.mode) return;
-        let content = `# Mortgage Calculator Results\n\n`;
-        content += `**Mode**: ${lastInputs.mode}\n\n`;
-        for (const [key, value] of Object.entries(lastInputs)) {
-            if (key !== 'mode') {
-                content += `**${key}**: ${value.toFixed ? value.toFixed(2) : value}\n`;
-            }
+        
+        // Show a toast message
+        const toast = document.createElement('div');
+        toast.className = 'toast-message';
+        toast.textContent = 'Generating PDF...';
+        toast.style.position = 'fixed';
+        toast.style.bottom = '20px';
+        toast.style.left = '50%';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.background = 'rgba(20, 35, 55, 0.9)';
+        toast.style.color = '#00ddeb';
+        toast.style.padding = '12px 24px';
+        toast.style.borderRadius = '50px';
+        toast.style.zIndex = '1001';
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        toast.style.border = '1px solid rgba(0, 221, 235, 0.3)';
+        toast.style.boxShadow = '0 4px 16px rgba(0, 221, 235, 0.2)';
+        toast.style.fontWeight = '500';
+        document.body.appendChild(toast);
+        
+        // Show toast
+        setTimeout(() => {
+            toast.style.opacity = '1';
+        }, 10);
+        
+        // Create formatter for currency
+        const formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2
+        });
+        
+        // Create PDF content with styling
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Set font styles
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(18);
+        doc.setTextColor(0, 120, 130); // Teal color for title
+        
+        // Add title
+        doc.text('Real Estate Calculator Results', 105, 20, { align: 'center' });
+        
+        // Add decorative line
+        doc.setDrawColor(0, 200, 210);
+        doc.setLineWidth(0.5);
+        doc.line(20, 25, 190, 25);
+        
+        // Reset styles for content
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        
+        // Add calculator type based on mode
+        let yPosition = 35;
+        switch(lastInputs.mode) {
+            case 'buyer':
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(16);
+                doc.text('🏠 BUYER CALCULATOR', 105, yPosition, { align: 'center' });
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(12);
+                yPosition += 15;
+                
+                // SECTION: Loan Summary
+                doc.setDrawColor(200, 200, 200);
+                doc.setFillColor(240, 240, 240);
+                doc.roundedRect(20, yPosition - 5, 170, 10, 2, 2, 'F');
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(14);
+                doc.setTextColor(0, 100, 120);
+                doc.text('Loan Summary', 105, yPosition, { align: 'center' });
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0);
+                yPosition += 15;
+                
+                // Create two-column layout for loan summary
+                const col1X = 30;
+                const col2X = 110;
+                
+                doc.setFont('helvetica', 'bold');
+                doc.text('Loan Type:', col1X, yPosition);
+                doc.setFont('helvetica', 'normal');
+                doc.text('Conventional', col1X + 50, yPosition);
+                
+                doc.setFont('helvetica', 'bold');
+                doc.text('Loan Length:', col2X, yPosition);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`${lastInputs.term} Years`, col2X + 50, yPosition);
+                yPosition += 10;
+                
+                doc.setFont('helvetica', 'bold');
+                doc.text('Interest:', col1X, yPosition);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`${lastInputs.rate}%`, col1X + 50, yPosition);
+                
+                if (lastInputs.pmiRate) {
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('PMI:', col2X, yPosition);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text(`${lastInputs.pmiRate}%`, col2X + 50, yPosition);
+                }
+                yPosition += 10;
+                
+                doc.setFont('helvetica', 'bold');
+                doc.text('Loan Amount:', col1X, yPosition);
+                doc.setFont('helvetica', 'normal');
+                doc.text(formatter.format(lastInputs.price - lastInputs.down), col1X + 50, yPosition);
+                
+                // Calculate and display LTV
+                const ltv = ((lastInputs.price - lastInputs.down) / lastInputs.price * 100).toFixed(1);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Loan-to-Value Ratio:', col2X, yPosition);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`${ltv}%`, col2X + 50, yPosition);
+                yPosition += 10;
+                
+                // Calculate total interest
+                const totalPayments = lastInputs.monthlyPayment * lastInputs.term * 12;
+                const totalInterest = totalPayments - (lastInputs.price - lastInputs.down);
+                
+                doc.setFont('helvetica', 'bold');
+                doc.text('Total Interest:', col1X, yPosition);
+                doc.setFont('helvetica', 'normal');
+                doc.text(formatter.format(totalInterest), col1X + 50, yPosition);
+                
+                doc.setFont('helvetica', 'bold');
+                doc.text('Total Paid:', col2X, yPosition);
+                doc.setFont('helvetica', 'normal');
+                doc.text(formatter.format(totalPayments), col2X + 50, yPosition);
+                yPosition += 20;
+                
+                // SECTION: Monthly Costs
+                doc.setDrawColor(200, 200, 200);
+                doc.setFillColor(240, 240, 240);
+                doc.roundedRect(20, yPosition - 5, 170, 10, 2, 2, 'F');
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(14);
+                doc.setTextColor(0, 100, 120);
+                doc.text('Monthly Costs', 105, yPosition, { align: 'center' });
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0);
+                yPosition += 15;
+                
+                // Monthly payment details
+                doc.setFont('helvetica', 'bold');
+                doc.text('Principal & Interest:', col1X, yPosition);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`${formatter.format(lastInputs.monthlyPayment)}/mo`, col1X + 70, yPosition);
+                yPosition += 8;
+                
+                if (lastInputs.taxes) { 
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('Property Taxes:', col1X, yPosition); 
+                    doc.setFont('helvetica', 'normal');
+                    doc.text(`${formatter.format(lastInputs.taxes)}/mo`, col1X + 70, yPosition);
+                    yPosition += 8; 
+                }
+                
+                if (lastInputs.insurance) { 
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('Homeowners Insurance:', col1X, yPosition);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text(`${formatter.format(lastInputs.insurance)}/mo`, col1X + 70, yPosition);
+                    yPosition += 8; 
+                }
+                
+                if (lastInputs.hoa) { 
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('HOA Fees:', col1X, yPosition);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text(`${formatter.format(lastInputs.hoa)}/mo`, col1X + 70, yPosition);
+                    yPosition += 8; 
+                }
+                
+                if (lastInputs.cdd) { 
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('CDD Fees:', col1X, yPosition);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text(`${formatter.format(lastInputs.cdd)}/mo`, col1X + 70, yPosition);
+                    yPosition += 8; 
+                }
+                
+                if (lastInputs.pmi) { 
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('Private Mortgage Insurance:', col1X, yPosition);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text(`${formatter.format(lastInputs.pmi)}/mo`, col1X + 70, yPosition);
+                    yPosition += 8; 
+                }
+                
+                if (lastInputs.totalMonthlyPayment) {
+                    doc.setDrawColor(0, 200, 210);
+                    doc.setLineWidth(0.2);
+                    doc.line(col1X, yPosition - 2, col1X + 120, yPosition - 2);
+                    
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('Total Monthly Payment:', col1X, yPosition);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(`${formatter.format(lastInputs.totalMonthlyPayment)}/mo`, col1X + 70, yPosition);
+                    yPosition += 10;
+                }
+                
+                // If there's extra payment info
+                if (lastInputs.extraPayment) {
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('With Extra Payment:', col1X, yPosition);
+                    doc.setFont('helvetica', 'normal');
+                    const totalWithExtra = lastInputs.totalMonthlyPayment + lastInputs.extraPayment;
+                    doc.text(`${formatter.format(totalWithExtra)}/mo`, col1X + 70, yPosition);
+                    yPosition += 20;
+                    
+                    // SECTION: Extra Payment Details
+                    doc.setDrawColor(200, 200, 200);
+                    doc.setFillColor(240, 240, 240);
+                    doc.roundedRect(20, yPosition - 5, 170, 10, 2, 2, 'F');
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(14);
+                    doc.setTextColor(0, 100, 120);
+                    doc.text('Extra Payment Details', 105, yPosition, { align: 'center' });
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(12);
+                    doc.setTextColor(0, 0, 0);
+                    yPosition += 15;
+                    
+                    // Calculate time saved with extra payments
+                    const monthlyRate = lastInputs.rate / 100 / 12;
+                    const totalPayments = lastInputs.term * 12;
+                    const loanAmount = lastInputs.price - lastInputs.down;
+                    const regularPayment = lastInputs.monthlyPayment;
+                    const totalPaymentWithExtra = regularPayment + lastInputs.extraPayment;
+                    
+                    // Simplified calculation for time saved
+                    const newTerm = Math.log(1 / (1 - loanAmount * monthlyRate / totalPaymentWithExtra)) / Math.log(1 + monthlyRate);
+                    const yearsSaved = lastInputs.term - (newTerm / 12);
+                    const yearsPart = Math.floor(yearsSaved);
+                    const monthsPart = Math.round((yearsSaved - yearsPart) * 12);
+                    
+                    const newYears = Math.floor(newTerm / 12);
+                    const newMonths = Math.round((newTerm / 12 - newYears) * 12);
+                    
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('Loan Term with Extra Payments:', col1X, yPosition);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text(`${newYears} years ${newMonths} months`, col1X + 90, yPosition);
+                    yPosition += 10;
+                    
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('Years Saved with Extra Payments:', col1X, yPosition);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text(`${yearsPart}.${monthsPart} years`, col1X + 90, yPosition);
+                    yPosition += 10;
+                    
+                    // Calculate money saved
+                    const regularTotalCost = regularPayment * totalPayments;
+                    const newTotalCost = totalPaymentWithExtra * newTerm;
+                    const moneySaved = regularTotalCost - newTotalCost;
+                    
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('Money Saved with Extra Payments:', col1X, yPosition);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text(formatter.format(moneySaved), col1X + 90, yPosition);
+                    yPosition += 15;
+                }
+                
+                // If we need to create a new page for remaining content
+                if (yPosition > 250) {
+                    doc.addPage();
+                    yPosition = 20;
+                }
+                
+                // SECTION: Upfront Costs
+                doc.setDrawColor(200, 200, 200);
+                doc.setFillColor(240, 240, 240);
+                doc.roundedRect(20, yPosition - 5, 170, 10, 2, 2, 'F');
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(14);
+                doc.setTextColor(0, 100, 120);
+                doc.text('Upfront Costs', 105, yPosition, { align: 'center' });
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0);
+                yPosition += 15;
+                
+                // Down payment details
+                const downPaymentPercentage = (lastInputs.down / lastInputs.price * 100).toFixed(1);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Down Payment:', col1X, yPosition);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`${formatter.format(lastInputs.down)} (${downPaymentPercentage}%)`, col1X + 60, yPosition);
+                yPosition += 10;
+                
+                // Estimate closing costs
+                const closingCosts = lastInputs.price * 0.03; // Estimate as 3% of purchase price
+                
+                doc.setFont('helvetica', 'bold');
+                doc.text('Closing Costs (est.):', col1X, yPosition);
+                doc.setFont('helvetica', 'normal');
+                doc.text(formatter.format(closingCosts), col1X + 60, yPosition);
+                yPosition += 10;
+                
+                doc.setDrawColor(0, 200, 210);
+                doc.setLineWidth(0.2);
+                doc.line(col1X, yPosition - 2, col1X + 120, yPosition - 2);
+                
+                doc.setFont('helvetica', 'bold');
+                doc.text('Total Upfront Costs:', col1X, yPosition);
+                doc.setFont('helvetica', 'bold');
+                doc.text(formatter.format(lastInputs.down + closingCosts), col1X + 60, yPosition);
+                yPosition += 10;
+                break;
+                
+            case 'seller':
+                doc.setFont('helvetica', 'bold');
+                doc.text('💰 SELLER CALCULATOR', 20, yPosition);
+                doc.setFont('helvetica', 'normal');
+                yPosition += 10;
+                
+                doc.text(`Sale Price: ${formatter.format(lastInputs.price)}`, 20, yPosition); yPosition += 8;
+                doc.text(`Mortgage Balance: ${formatter.format(lastInputs.balance)}`, 20, yPosition); yPosition += 8;
+                doc.text(`Commission: ${lastInputs.commission}%`, 20, yPosition); yPosition += 8;
+                
+                doc.setFont('helvetica', 'bold');
+                doc.text(`Net Proceeds: ${formatter.format(lastInputs.netProceeds)}`, 20, yPosition);
+                doc.setFont('helvetica', 'normal');
+                yPosition += 8;
+                break;
+                
+            case 'investor':
+                doc.setFont('helvetica', 'bold');
+                doc.text('📈 INVESTOR CALCULATOR', 20, yPosition);
+                doc.setFont('helvetica', 'normal');
+                yPosition += 10;
+                
+                doc.text(`Property Price: ${formatter.format(lastInputs.price)}`, 20, yPosition); yPosition += 8;
+                doc.text(`Monthly Rental Income: ${formatter.format(lastInputs.rental)}/month`, 20, yPosition); yPosition += 8;
+                doc.text(`Monthly Expenses: ${formatter.format(lastInputs.expenses)}/month`, 20, yPosition); yPosition += 8;
+                
+                doc.setFont('helvetica', 'bold');
+                doc.text(`Cash Flow: ${formatter.format(lastInputs.cashFlow)}/month`, 20, yPosition); yPosition += 8;
+                doc.text(`Cap Rate: ${lastInputs.capRate}%`, 20, yPosition); yPosition += 8;
+                doc.text(`Cash on Cash Return: ${lastInputs.cashOnCash}%`, 20, yPosition);
+                doc.setFont('helvetica', 'normal');
+                yPosition += 8;
+                break;
+                
+            case 'crypto':
+                doc.setFont('helvetica', 'bold');
+                doc.text('🪙 CRYPTO CALCULATOR', 20, yPosition);
+                doc.setFont('helvetica', 'normal');
+                yPosition += 10;
+                
+                // Add crypto-specific details if available
+                if (lastInputs.cryptoAmount) {
+                    doc.text(`Crypto Amount: ${lastInputs.cryptoAmount}`, 20, yPosition); yPosition += 8;
+                }
+                if (lastInputs.cryptoValue) {
+                    doc.text(`Value in USD: ${formatter.format(lastInputs.cryptoValue)}`, 20, yPosition); yPosition += 8;
+                }
+                break;
         }
-        const blob = new Blob([content], { type: 'text/markdown' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `mortgage_calc_${new Date().toISOString().split('T')[0]}.md`;
-        a.click();
-        URL.revokeObjectURL(url);
+        
+        // Add footer
+        yPosition = Math.max(yPosition + 20, 230);
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text('Generated by Web3 Real Estate Calculator', 105, yPosition, { align: 'center' });
+        doc.text('https://tylerbelisle.kw.com/', 105, yPosition + 6, { align: 'center' });
+        
+        // Add timestamp
+        const now = new Date();
+        doc.text(`Generated on: ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}`, 105, yPosition + 12, { align: 'center' });
+        
+        // Save PDF with a descriptive filename
+        const filename = `real-estate-${lastInputs.mode}-calculation-${now.getTime()}.pdf`;
+        doc.save(filename);
+        
+        // Hide and remove toast
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 2000);
+        
+        // Show success toast
+        const successToast = document.createElement('div');
+        successToast.className = 'toast-message';
+        successToast.textContent = 'PDF downloaded successfully!';
+        successToast.style.position = 'fixed';
+        successToast.style.bottom = '20px';
+        successToast.style.left = '50%';
+        successToast.style.transform = 'translateX(-50%)';
+        successToast.style.background = 'rgba(20, 35, 55, 0.9)';
+        successToast.style.color = '#00ddeb';
+        successToast.style.padding = '12px 24px';
+        successToast.style.borderRadius = '50px';
+        successToast.style.zIndex = '1001';
+        successToast.style.opacity = '0';
+        successToast.style.transition = 'opacity 0.3s';
+        successToast.style.border = '1px solid rgba(0, 221, 235, 0.3)';
+        successToast.style.boxShadow = '0 4px 16px rgba(0, 221, 235, 0.2)';
+        successToast.style.fontWeight = '500';
+        document.body.appendChild(successToast);
+        
+        // Show success toast after a delay
+        setTimeout(() => {
+            successToast.style.opacity = '1';
+            
+            // Hide and remove success toast
+            setTimeout(() => {
+                successToast.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(successToast);
+                }, 300);
+            }, 2000);
+        }, 500);
+        
     } catch (error) {
         console.error('Save results error:', error);
+        alert('Error generating PDF. Please try again later.');
     }
 }
 
@@ -4594,8 +5004,13 @@ function shareResults() {
         shareOptions.className = 'share-options';
         shareOptions.innerHTML = `
             <div class="share-title">Share Results</div>
-            <button id="copy-text" class="share-option">📋 Copy as Text</button>
-            <button id="copy-link" class="share-option">🔗 Copy Link</button>
+            <div class="save-copy-container">
+                <div class="save-copy-label">Save Copy</div>
+                <div class="save-copy-options">
+                    <button id="copy-link" class="save-copy-option">Link</button>
+                    <button id="save-pdf" class="save-copy-option">PDF</button>
+                </div>
+            </div>
             <div class="share-divider">Or share directly</div>
             <div class="share-apps">
                 <button id="share-email" class="share-app">📧 Email</button>
@@ -4642,7 +5057,40 @@ function shareResults() {
                 border-bottom: 1px solid rgba(255, 255, 255, 0.15);
                 padding-bottom: 10px;
             }
-            .share-option, .share-app {
+            .save-copy-container {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+            .save-copy-label {
+                font-size: 0.95em;
+                color: #d5e1ef;
+                font-weight: 500;
+                margin-bottom: 4px;
+            }
+            .save-copy-options {
+                display: flex;
+                gap: 10px;
+            }
+            .save-copy-option {
+                flex: 1;
+                padding: 12px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                background: rgba(255, 255, 255, 0.08);
+                cursor: pointer;
+                font-size: 0.95em;
+                transition: all 0.3s ease;
+                text-align: center;
+                color: #d5e1ef;
+                font-weight: 500;
+            }
+            .save-copy-option:hover {
+                background: rgba(255, 255, 255, 0.12);
+                border-color: rgba(255, 255, 255, 0.2);
+                box-shadow: 0 4px 12px rgba(0, 221, 235, 0.15);
+            }
+            .share-app {
                 padding: 14px;
                 border: 1px solid rgba(255, 255, 255, 0.1);
                 border-radius: 8px;
@@ -4650,11 +5098,11 @@ function shareResults() {
                 cursor: pointer;
                 font-size: 0.95em;
                 transition: all 0.3s ease;
-                text-align: left;
+                text-align: center;
                 color: #d5e1ef;
                 font-weight: 500;
             }
-            .share-option:hover, .share-app:hover {
+            .share-app:hover {
                 background: rgba(255, 255, 255, 0.12);
                 border-color: rgba(255, 255, 255, 0.2);
                 box-shadow: 0 4px 12px rgba(0, 221, 235, 0.15);
@@ -4746,42 +5194,138 @@ function shareResults() {
             }, 2000);
         }
         
-        // Copy text to clipboard using a fallback approach
-        document.getElementById('copy-text').addEventListener('click', () => {
+        // Generate and download PDF
+        document.getElementById('save-pdf').addEventListener('click', () => {
             try {
-                // Create a temporary textarea element
-                const textArea = document.createElement('textarea');
-                textArea.value = resultText;
+                showToast('Generating PDF...');
                 
-                // Make the textarea out of viewport
-                textArea.style.position = 'fixed';
-                textArea.style.left = '-999999px';
-                textArea.style.top = '-999999px';
-                document.body.appendChild(textArea);
+                // Create PDF content with styling
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
                 
-                // Select and copy
-                textArea.focus();
-                textArea.select();
-                const successful = document.execCommand('copy');
+                // Set font styles
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(16);
+                doc.setTextColor(0, 120, 130); // Teal color for title
                 
-                // Clean up
-                document.body.removeChild(textArea);
+                // Add title
+                doc.text('Real Estate Calculator Results', 105, 20, { align: 'center' });
                 
-                if (successful) {
-                    showToast('Results copied to clipboard as text!');
-                    console.log('Text copied successfully using fallback');
-                } else {
-                    throw new Error('Copy command failed');
+                // Add decorative line
+                doc.setDrawColor(0, 200, 210);
+                doc.setLineWidth(0.5);
+                doc.line(20, 25, 190, 25);
+                
+                // Reset styles for content
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0);
+                
+                // Add calculator type based on mode
+                let yPosition = 35;
+                switch(lastInputs.mode) {
+                    case 'buyer':
+                        doc.setFont('helvetica', 'bold');
+                        doc.text('🏠 BUYER CALCULATOR', 20, yPosition);
+                        doc.setFont('helvetica', 'normal');
+                        yPosition += 10;
+                        
+                        doc.text(`Home Price: ${formatter.format(lastInputs.price)}`, 20, yPosition); yPosition += 8;
+                        doc.text(`Down Payment: ${formatter.format(lastInputs.down)}`, 20, yPosition); yPosition += 8;
+                        doc.text(`Loan Amount: ${formatter.format(lastInputs.price - lastInputs.down)}`, 20, yPosition); yPosition += 8;
+                        doc.text(`Interest Rate: ${lastInputs.rate}%`, 20, yPosition); yPosition += 8;
+                        doc.text(`Loan Term: ${lastInputs.term} years`, 20, yPosition); yPosition += 12;
+                        
+                        doc.setFont('helvetica', 'bold');
+                        doc.text(`Monthly Payment: ${formatter.format(lastInputs.monthlyPayment)}/month`, 20, yPosition); yPosition += 8;
+                        doc.setFont('helvetica', 'normal');
+                        
+                        if (lastInputs.taxes) { doc.text(`Property Taxes: ${formatter.format(lastInputs.taxes)}/month`, 20, yPosition); yPosition += 8; }
+                        if (lastInputs.insurance) { doc.text(`Insurance: ${formatter.format(lastInputs.insurance)}/month`, 20, yPosition); yPosition += 8; }
+                        if (lastInputs.hoa) { doc.text(`HOA: ${formatter.format(lastInputs.hoa)}/month`, 20, yPosition); yPosition += 8; }
+                        if (lastInputs.pmi) { doc.text(`PMI: ${formatter.format(lastInputs.pmi)}/month`, 20, yPosition); yPosition += 8; }
+                        
+                        if (lastInputs.totalMonthlyPayment) {
+                            doc.setFont('helvetica', 'bold');
+                            doc.text(`Total Monthly Cost: ${formatter.format(lastInputs.totalMonthlyPayment)}/month`, 20, yPosition);
+                            doc.setFont('helvetica', 'normal');
+                            yPosition += 8;
+                        }
+                        break;
+                        
+                    case 'seller':
+                        doc.setFont('helvetica', 'bold');
+                        doc.text('💰 SELLER CALCULATOR', 20, yPosition);
+                        doc.setFont('helvetica', 'normal');
+                        yPosition += 10;
+                        
+                        doc.text(`Sale Price: ${formatter.format(lastInputs.price)}`, 20, yPosition); yPosition += 8;
+                        doc.text(`Mortgage Balance: ${formatter.format(lastInputs.balance)}`, 20, yPosition); yPosition += 8;
+                        doc.text(`Commission: ${lastInputs.commission}%`, 20, yPosition); yPosition += 8;
+                        
+                        doc.setFont('helvetica', 'bold');
+                        doc.text(`Net Proceeds: ${formatter.format(lastInputs.netProceeds)}`, 20, yPosition);
+                        doc.setFont('helvetica', 'normal');
+                        yPosition += 8;
+                        break;
+                        
+                    case 'investor':
+                        doc.setFont('helvetica', 'bold');
+                        doc.text('📈 INVESTOR CALCULATOR', 20, yPosition);
+                        doc.setFont('helvetica', 'normal');
+                        yPosition += 10;
+                        
+                        doc.text(`Property Price: ${formatter.format(lastInputs.price)}`, 20, yPosition); yPosition += 8;
+                        doc.text(`Monthly Rental Income: ${formatter.format(lastInputs.rental)}/month`, 20, yPosition); yPosition += 8;
+                        doc.text(`Monthly Expenses: ${formatter.format(lastInputs.expenses)}/month`, 20, yPosition); yPosition += 8;
+                        
+                        doc.setFont('helvetica', 'bold');
+                        doc.text(`Cash Flow: ${formatter.format(lastInputs.cashFlow)}/month`, 20, yPosition); yPosition += 8;
+                        doc.text(`Cap Rate: ${lastInputs.capRate}%`, 20, yPosition); yPosition += 8;
+                        doc.text(`Cash on Cash Return: ${lastInputs.cashOnCash}%`, 20, yPosition);
+                        doc.setFont('helvetica', 'normal');
+                        yPosition += 8;
+                        break;
+                        
+                    case 'crypto':
+                        doc.setFont('helvetica', 'bold');
+                        doc.text('🪙 CRYPTO CALCULATOR', 20, yPosition);
+                        doc.setFont('helvetica', 'normal');
+                        yPosition += 10;
+                        
+                        // Add crypto-specific details if available
+                        if (lastInputs.cryptoAmount) {
+                            doc.text(`Crypto Amount: ${lastInputs.cryptoAmount}`, 20, yPosition); yPosition += 8;
+                        }
+                        if (lastInputs.cryptoValue) {
+                            doc.text(`Value in USD: ${formatter.format(lastInputs.cryptoValue)}`, 20, yPosition); yPosition += 8;
+                        }
+                        break;
                 }
                 
+                // Add footer
+                yPosition = Math.max(yPosition + 20, 230);
+                doc.setFont('helvetica', 'italic');
+                doc.setFontSize(10);
+                doc.setTextColor(100, 100, 100);
+                doc.text('Generated by Web3 Real Estate Calculator', 105, yPosition, { align: 'center' });
+                doc.text('https://tylerbelisle.kw.com/', 105, yPosition + 6, { align: 'center' });
+                
+                // Add timestamp
+                const now = new Date();
+                doc.text(`Generated on: ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}`, 105, yPosition + 12, { align: 'center' });
+                
+                // Save PDF with a descriptive filename
+                const filename = `real-estate-${lastInputs.mode}-calculation-${now.getTime()}.pdf`;
+                doc.save(filename);
+                
+                showToast('PDF downloaded successfully!');
                 document.body.removeChild(overlay);
                 document.head.removeChild(tempStyle);
-            } catch (error) {
-                console.error('Error in copy text handler:', error);
-                alert('Error copying text. We\'ll use a simpler approach.');
                 
-                // Show the text in a prompt for manual copy as last resort
-                prompt('Copy the text below (Ctrl+C / Cmd+C):', resultText);
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                alert('Error generating PDF. Please try again later.');
                 document.body.removeChild(overlay);
                 document.head.removeChild(tempStyle);
             }
