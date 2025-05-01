@@ -4599,9 +4599,8 @@ function renderInvestorResults(inputs) {
                     <span>${translations[lang].monthly_expenses || 'Monthly Expenses'}:</span>
                     <span>${formatter.format(expenses)}/mo</span>
                 </div>
-            </div>
-            <button class="reset-btn" onclick="resetCalculator();" data-lang="reset_calculator">${translations[lang].reset_calculator || 'Reset Calculator'}</button>
-        `;
+                <button class="save-pdf-btn" onclick="saveResults()">Save as PDF</button>
+            `;
     } catch (error) {
         console.error('Error rendering investor results:', error);
     }

@@ -766,6 +766,24 @@ p.subtitle {
     }
 }
 
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .results-container, .results-container * {
+        visibility: visible;
+    }
+    .results-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+    .no-print, button, .reset-btn {
+        display: none !important;
+    }
+}
+
 /* Styling for field information text */
 .field-info {
     display: block;
