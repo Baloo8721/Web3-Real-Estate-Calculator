@@ -1436,18 +1436,18 @@ async function fetchMortgageRate(loanTerm = 30) {
     
     // Default fallback rates if we can't fetch from web scraping (as decimals for calculations)
     const fallbackRates = {
-        '15': 0.0610, // 6.10% for 15-year fixed (April 2025)
-        '30': 0.0681, // 6.81% for 30-year fixed (April 2025)
-        '10': 0.0681, // Use 30-year rate for 10-year
-        '20': 0.0681  // Use 30-year rate for 20-year
+        '15': 0.0616, // 6.16% for 15-year fixed (May 2025)
+        '30': 0.0683, // 6.83% for 30-year fixed (May 2025)
+        '10': 0.0683, // Use 30-year rate for 10-year
+        '20': 0.0683  // Use 30-year rate for 20-year
     };
     
     // Fallback rates in percentage format for display
     const fallbackRatesPercent = {
-        '15': 6.10,
-        '30': 6.81,
-        '10': 6.81,
-        '20': 6.81
+        '15': 6.16,
+        '30': 6.83,
+        '10': 6.83,
+        '20': 6.83
     };
     
     try {
@@ -1462,7 +1462,13 @@ async function fetchMortgageRate(loanTerm = 30) {
             
         // Try to fetch from rates.json with cache busting
         console.log(`Fetching mortgage rates from ${basePath} with cache busting...`);
-        const response = await fetch(basePath + cacheBuster);
+        const response = await fetch(basePath + cacheBuster, {
+            cache: 'no-store', // Force bypass the browser cache
+            headers: {
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            }
+        });
         
         if (!response.ok) {
             console.warn(`Failed to fetch rates: ${response.status}, using fallback rates`);
@@ -1541,6 +1547,9 @@ async function fetchMortgageRate(loanTerm = 30) {
             if (loanTerm === 15) {
                 const fifteenYearRate = rates.find(r => r.term === '15-year')?.rate;
                 if (typeof fifteenYearRate === 'number' && !isNaN(fifteenYearRate) && fifteenYearRate > 0) {
+                    // Store the successful rate fetch
+                    storeSuccessfulRate(15, fifteenYearRate / 100, source);
+                    
                     return { 
                         rate: fifteenYearRate / 100, 
                         source, 
@@ -1549,12 +1558,30 @@ async function fetchMortgageRate(loanTerm = 30) {
                 }
             }
             // For other terms (10, 20, 30), return the 30-year rate
+            
+            // Store the successful rate fetch
+            if (loanTerm === 30) {
+                storeSuccessfulRate(30, rate / 100, source);
+            }
+            
             return { 
                 rate: rate / 100, 
                 source, 
                 displayRate: rate 
             };
         } else {
+            // Try to get a previously stored rate
+            const storedRate = getLastValidRate(loanTerm);
+            if (storedRate) {
+                console.log(`Using stored rate for ${loanTerm}-year term: ${storedRate.rate * 100}%`);
+                return {
+                    rate: storedRate.rate,
+                    source: 'stored',
+                    displayRate: storedRate.rate * 100
+                };
+            }
+            
+            // If no stored rate, use fallback
             return { 
                 rate: fallbackRates[loanTerm.toString()], 
                 source: 'fallback', 
@@ -1622,13 +1649,54 @@ function adjustRateForCreditScore(rate, creditScore, loanTerm) {
     return adjustedRate;
 }
 
+// Function to store a successful rate fetch with timestamp
+function storeSuccessfulRate(loanTerm, rate, source) {
+    if (typeof rate === 'number' && !isNaN(rate) && rate > 0) {
+        // Store the rate with timestamp
+        const timestamp = Date.now();
+        localStorage.setItem(`lastValidRate_${loanTerm}`, rate);
+        localStorage.setItem(`lastValidRateTime_${loanTerm}`, timestamp);
+        localStorage.setItem(`lastValidRateSource_${loanTerm}`, source);
+        console.log(`Stored valid ${loanTerm}-year rate: ${rate} (${source}) at ${new Date(timestamp).toLocaleString()}`);
+        return true;
+    }
+    return false;
+}
+
+// Function to get the last valid rate from localStorage
+function getLastValidRate(loanTerm) {
+    const rate = localStorage.getItem(`lastValidRate_${loanTerm}`);
+    const timestamp = localStorage.getItem(`lastValidRateTime_${loanTerm}`);
+    const source = localStorage.getItem(`lastValidRateSource_${loanTerm}`) || 'stored';
+    
+    if (rate && timestamp) {
+        // Check if the stored rate is not too old (within 7 days)
+        const now = Date.now();
+        const age = now - parseInt(timestamp);
+        const maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
+        
+        if (age <= maxAge) {
+            console.log(`Using stored ${loanTerm}-year rate: ${rate} from ${new Date(parseInt(timestamp)).toLocaleString()}`);
+            return {
+                rate: parseFloat(rate),
+                source: source,
+                timestamp: parseInt(timestamp)
+            };
+        }
+    }
+    return null;
+}
+
 // Function to update the "Current Market Rate" option text with the actual rate
 function updateMarketRateOption(rateData, loanTerm = 30) {
     const marketRateOption = document.querySelector('#buyer-rate-preset option[value="market"]');
     if (!marketRateOption) return;
     
-    // Get the fallback rate for this term
-    const fallbackRate = loanTerm === 15 ? 6.10 : 6.81;
+    // Get the fallback rate for this term - updated with current rates
+    const fallbackRate = loanTerm === 15 ? 6.16 : 6.83;
+    
+    // Try to get a stored valid rate as an additional fallback
+    const storedRate = getLastValidRate(loanTerm);
     
     console.log(`updateMarketRateOption called with loanTerm: ${loanTerm}, rateData:`, rateData);
     
@@ -1643,6 +1711,11 @@ function updateMarketRateOption(rateData, loanTerm = 30) {
         
         // Check if the rate is valid
         const isValidRate = typeof rate === 'number' && !isNaN(rate) && rate > 0;
+        
+        // If we have a valid rate, store it for future use
+        if (isValidRate && source === 'scraped') {
+            storeSuccessfulRate(loanTerm, rate, source);
+        }
         
         // If the rate is valid and from scraping, use it. Otherwise use fallback.
         if (isValidRate && source === 'scraped') {
@@ -1668,11 +1741,25 @@ function updateMarketRateOption(rateData, loanTerm = 30) {
                 }
             }
         } else {
-            // Use fallback rate
-            const optionText = `Average Mortgage Rates (${fallbackRate}%)`;
+            // Try to use stored rate first, then fallback
+            let rateToUse = fallbackRate;
+            let rateSource = 'fallback';
+            
+            // Check if we have a stored rate we can use
+            if (storedRate) {
+                rateToUse = storedRate.rate;
+                rateSource = storedRate.source;
+                console.log(`Using stored ${loanTerm}-year rate: ${rateToUse}`);
+            } else {
+                console.log(`No stored rate available, using hardcoded fallback for ${loanTerm}-year: ${fallbackRate}`);
+            }
+            
+            // Format the option text based on source
+            const sourceLabel = rateSource === 'scraped' ? 'Previous Mortgage Rates' : 'Average Mortgage Rates';
+            const optionText = `${sourceLabel} (${rateToUse.toFixed(2)}%)`;
             
             marketRateOption.textContent = optionText;
-            console.log(`Setting fallback rate option to: ${optionText}`);
+            console.log(`Setting ${rateSource} rate option to: ${optionText}`);
             
             // Also update the selected option text if it's currently selected
             const ratePresetSelect = document.getElementById('buyer-rate-preset');
@@ -1682,19 +1769,34 @@ function updateMarketRateOption(rateData, loanTerm = 30) {
                     ratePresetSelect.selectedOptions[0].textContent = optionText;
                 }
                 
-                // Update the rate input field with the fallback rate
+                // Update the rate input field with the rate
                 const rateInput = document.getElementById('buyer-rate');
                 if (rateInput) {
-                    rateInput.value = fallbackRate.toFixed(2);
+                    rateInput.value = rateToUse.toFixed(2);
                 }
             }
         }
     } else {
-        // No rate data provided, use fallback
-        const optionText = `Average Market (${fallbackRate}%)`;
+        // No rate data provided, try to use stored rate first, then fallback
+        let rateToUse = fallbackRate;
+        let rateSource = 'fallback';
+        
+        // Check if we have a stored rate we can use
+        if (storedRate) {
+            rateToUse = storedRate.rate;
+            rateSource = storedRate.source;
+            console.log(`No rate data provided. Using stored ${loanTerm}-year rate: ${rateToUse}`);
+        } else {
+            console.log(`No rate data or stored rate available, using hardcoded fallback for ${loanTerm}-year: ${fallbackRate}`);
+        }
+        
+        // Format the option text based on source
+        const sourceLabel = rateSource === 'scraped' ? 'Previous Mortgage Rates' : 'Average Mortgage Rates';
+        const optionText = `${sourceLabel} (${rateToUse.toFixed(2)}%)`;
         
         // Update the option in the dropdown list
         marketRateOption.textContent = optionText;
+        console.log(`No rate data provided. Setting ${rateSource} rate option to: ${optionText}`);
         
         // Update the visible selected text if market rate is currently selected
         const ratePresetSelect = document.getElementById('buyer-rate-preset');
@@ -1707,7 +1809,7 @@ function updateMarketRateOption(rateData, loanTerm = 30) {
             // Also update the rate input field
             const rateInput = document.getElementById('buyer-rate');
             if (rateInput) {
-                rateInput.value = fallbackRate.toFixed(2);
+                rateInput.value = rateToUse.toFixed(2);
             }
         }
     }
@@ -2178,21 +2280,23 @@ function initializeBuyerCalculator() {
             if (document.getElementById('buyer-rate-preset').value === 'market') {
                 const loanTerm = parseInt(this.value) || 30;
                 
-                // Update the rate input and dropdown text based on the selected loan term
-                updateInterestRateForTerm(loanTerm);
+                console.log(`Loan term changed to ${loanTerm} years, updating interest rate...`);
                 
-                // No need to update the rate input field directly here
-                // as updateInterestRateForTerm will handle it
-                
-                // Force a recalculation
-                setTimeout(() => {
+                // Always update the rate input and dropdown text based on the selected loan term
+                updateInterestRateForTerm(loanTerm).then(() => {
+                    console.log(`Interest rate updated for ${loanTerm}-year term`);
+                    
+                    // Force a recalculation after the rate has been updated
                     const calculateButton = document.getElementById('buyer-calculate');
                     if (calculateButton) {
+                        console.log('Triggering recalculation...');
                         calculateButton.click();
                     } else {
                         console.warn('Calculate button (buyer-calculate) not found');
                     }
-                }, 50);
+                }).catch(error => {
+                    console.error('Error updating interest rate:', error);
+                });
             }
         }
     });
@@ -2210,6 +2314,9 @@ function initializeBuyerCalculator() {
     
     // Define a function to update the interest rate based on loan term
     async function updateInterestRateForTerm(loanTerm) {
+        // Clear any cached rates to ensure we get fresh data
+        localStorage.removeItem('mortgageRates');
+        localStorage.removeItem('mortgageRatesTime');
         // Get the interest rate dropdown and input field
         const ratePresetSelect = document.getElementById('buyer-rate-preset');
         const rateInput = document.getElementById('buyer-rate');
