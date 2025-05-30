@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="budgetCalculator.js"></script>
 </head>
 <body id="page-top">
     <div class="language-selector">
@@ -48,38 +49,110 @@
                     <div class="calc-card">
                         <h3 data-lang="buyer_calc">Buyer Calculator</h3>
                         
-                        <!-- Combined Home Price with dropdown -->
-                        <div class="input-group combo-input-group">
-                            <select id="buyer-price-range" aria-label="Home Price Range">
-                                <option value="custom" selected data-lang="custom_price">Custom Price</option>
-                                <option value="50000-100000">$50,000 - $100,000</option>
-                                <option value="100001-200000">$100,001 - $200,000</option>
-                                <option value="200001-350000">$200,001 - $350,000</option>
-                                <option value="350001-500000">$350,001 - $500,000</option>
-                                <option value="500001-750000">$500,001 - $750,000</option>
-                                <option value="750001-1000000">$750,001 - $1,000,000</option>
-                                <option value="1000001-2000000">$1,000,001 - $2,000,000</option>
-                                <option value="2000001-plus">$2,000,001+</option>
-                            </select>
-                            <input type="number" id="buyer-price" placeholder="Enter price" min="0" step="1000" class="combo-input">
-                            <label for="buyer-price-range" data-lang="buyer_price">Home Price ($)</label>
+                        <!-- Budget/Price Section with Slider -->
+                        <div id="budget-form-step" class="form-step" style="margin-top: 20px; padding: 15px; border-radius: 8px; background-color: rgba(26, 32, 44, 0.5); position: relative;">
+                            <div class="text-sm text-white mb-3">Budget/Price ($)</div>
+                            <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                                <!-- Left side: Slider and output -->
+                                <div style="flex: 1 1 300px; min-width: 250px;">
+                                    <input type="range" id="budget" name="budget" min="100000" max="3000000" step="25000" value="300000" class="slider" style="width: 100%; background: linear-gradient(90deg, #26c6da 0%, #64b5f6 50%, #ab47bc 100%); height: 6px; border-radius: 3px; appearance: none; outline: none;" oninput="updateBudgetVisualization(this.value)">
+                                    
+                                    <div style="display: flex; justify-content: space-between; margin-top: 8px;">
+                                        <span style="font-size: 12px; color: #26c6da;">$100k</span>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <output id="budget-output" for="budget" style="font-size: 18px; font-weight: 600; color: #ffffff; text-shadow: 0 0 10px rgba(38, 198, 218, 0.5); cursor: pointer;" onclick="enableDirectBudgetInput()">$300,000</output>
+                                            <input type="text" id="budget-direct-input" style="display: none; font-size: 18px; font-weight: 600; color: #ffffff; background: transparent; border: none; border-bottom: 1px solid #26c6da; width: 120px; text-align: center; outline: none;" onblur="applyDirectBudgetInput()" onkeydown="handleBudgetInputKeydown(event)">
+                                            <span style="font-size: 18px; color: #f7931a; font-weight: 600; position: relative;">
+                                                <span id="btc-amount" style="cursor: pointer;" title="Click to edit BTC amount" onclick="makeBtcEditable()">₿2.84</span>
+                                                <input type="text" id="btc-direct-input" style="display: none; font-size: 18px; font-weight: 600; color: #f7931a; background: transparent; border: none; border-bottom: 1px solid #f7931a; width: 80px; text-align: center; outline: none; position: absolute; top: 0; left: 0;" onblur="applyBtcDirectInput()" onkeydown="if(event.key === 'Enter') { applyBtcDirectInput(); }">
+                                            </span>
+                                        </div>
+                                        <span style="font-size: 12px; color: #ab47bc;">$3M+</span>
+                                    </div>
+                                    
+                                    <!-- Payment Estimate -->
+                                    <div id="payment-estimate" style="margin-top: 15px; background-color: rgba(38, 198, 218, 0.1); border-radius: 6px; padding: 10px; border-left: 3px solid #26c6da;">
+                                        <div style="position: relative; text-align: center; margin-bottom: 0px;">
+                                            <div style="font-size: 14px; color: #ffffff;">Estimated Monthly Payment</div>
+                                            <div style="font-size: 12px; color: #a0aec0; text-align: center;">30yr fixed @ 7.0%</div>
+                                        </div>
+                                        <div style="position: relative; margin-bottom: 10px; margin-top: 5px;">
+                                            <div style="display: flex; align-items: center; justify-content: center; width: 100%;">
+                                                <span id="type-hint" style="font-size: 12px; color: #a0aec0; margin-right: 5px; opacity: 0.7; cursor: pointer; transition: opacity 0.2s;" title="Click to edit">✏️</span>
+                                                <div id="monthly-payment" style="font-size: 20px; font-weight: 600; color: #26c6da; text-align: center; cursor: pointer;" title="Click to edit monthly payment">$2,532</div>
+                                                <span style="font-size: 11px; color: #f7931a; font-weight: 600; position: relative; margin-left: 8px;">
+                                                    <span id="sats-amount" style="cursor: pointer;" title="Click to edit Satoshi amount" onclick="makeSatsEditable()">₿2.39M sats</span>
+                                                    <input type="text" id="sats-direct-input" style="display: none; font-size: 11px; font-weight: 600; color: #f7931a; background: transparent; border: none; border-bottom: 1px solid #f7931a; width: 80px; text-align: center; outline: none; position: absolute; top: 0; left: 0;" onblur="applySatsDirectInput()" onkeydown="if(event.key === 'Enter') { applySatsDirectInput(); }">
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div id="payment-breakdown" style="margin-top: 0px; font-size: 11px; color: #a0aec0; line-height: 1.3;">
+                                            Includes principal & interest, property tax (0.82%), PMI (1%), and insurance. Based on 5% down payment.
+                                            <button id="show-details" style="background: none; border: none; color: #26c6da; padding: 0; font-size: 11px; cursor: pointer; text-decoration: underline; display: inline-flex; align-items: center;" onclick="togglePaymentDetails()">
+                                                Show details <span id="details-arrow" style="margin-left: 2px;">▼</span>
+                                            </button>
+                                        </div>
+                                        <div id="payment-details" style="display: none; margin-top: 10px; font-size: 11px; color: #a0aec0; background-color: rgba(38, 198, 218, 0.05); padding: 8px; border-radius: 4px;">
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                                <span>Principal & Interest:</span>
+                                                <span id="principal-interest">$1,995</span>
+                                            </div>
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                                <span>Property Tax (0.82%):</span>
+                                                <span id="property-tax">$205</span>
+                                            </div>
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                                <span>PMI (1%):</span>
+                                                <span id="pmi">$237</span>
+                                            </div>
+                                            <div style="display: flex; justify-content: space-between;">
+                                                <span>Insurance:</span>
+                                                <span id="insurance">$95</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         
-                        <!-- Combined Down Payment with percentage option -->
-                        <div class="input-group combo-input-group">
-                            <select id="buyer-down-percent" aria-label="Down Payment Percentage">
-                                <option value="custom" selected data-lang="custom_amount">Custom Amount</option>
-                                <option value="3.5">3.5% (FHA Minimum)</option>
-                                <option value="5">5%</option>
-                                <option value="10">10%</option>
-                                <option value="15">15%</option>
-                                <option value="20">20% (No PMI)</option>
-                                <option value="25">25%</option>
-                                <option value="30">30%</option>
-                            </select>
-                            <input type="number" id="buyer-down" placeholder="Enter amount" min="0" step="1000" class="combo-input">
-                            <label for="buyer-down-percent" data-lang="buyer_down">Down Payment ($)</label>
+                        <!-- Hidden input to store the budget value for form submission -->
+                        <input type="hidden" id="buyer-price" value="300000">
+                        
+                        <!-- Down Payment Section with Slider -->
+                        <div id="down-payment-form-step" class="form-step" style="margin-top: 20px; padding: 15px; border-radius: 8px; background-color: rgba(26, 32, 44, 0.5); position: relative;">
+                            <div class="text-sm text-white mb-3">Down Payment</div>
+                            <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                                <!-- Left side: Slider and output -->
+                                <div style="flex: 1 1 300px; min-width: 250px;">
+                                    <input type="range" id="down-payment-slider" name="down-payment" min="0" max="90" step="0.1" value="20" class="slider" style="width: 100%; background: linear-gradient(90deg, #26c6da 0%, #64b5f6 50%, #ab47bc 100%); height: 6px; border-radius: 3px; appearance: none; outline: none;" oninput="updateDownPaymentVisualization(this.value)">
+                                    
+                                    <div style="display: flex; justify-content: space-between; margin-top: 8px;">
+                                        <span style="font-size: 12px; color: #26c6da;">0%</span>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <output id="down-payment-output" for="down-payment-slider" style="font-size: 18px; font-weight: 600; color: #ffffff; text-shadow: 0 0 10px rgba(38, 198, 218, 0.5); cursor: pointer;" onclick="enableDirectDownPaymentInput()">20%</output>
+                                            <input type="text" id="down-payment-direct-input" style="display: none; font-size: 18px; font-weight: 600; color: #ffffff; background: transparent; border: none; border-bottom: 1px solid #26c6da; width: 80px; text-align: center; outline: none;" onblur="applyDirectDownPaymentInput()" onkeydown="handleDownPaymentInputKeydown(event)">
+                                            <span style="font-size: 18px; color: #64b5f6; font-weight: 600;">$<span id="down-payment-amount">60,000</span></span>
+                                        </div>
+                                        <span style="font-size: 12px; color: #ab47bc;">90%</span>
+                                    </div>
+                                    
+                                    <!-- Down Payment Presets -->
+                                    <div style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">
+                                        <button type="button" class="down-payment-preset" data-value="3.5" style="background-color: rgba(38, 198, 218, 0.1); border: 1px solid rgba(38, 198, 218, 0.3); border-radius: 4px; padding: 6px 10px; font-size: 12px; color: #ffffff; cursor: pointer; transition: all 0.2s ease;">3.5% (FHA)</button>
+                                        <button type="button" class="down-payment-preset" data-value="5" style="background-color: rgba(38, 198, 218, 0.1); border: 1px solid rgba(38, 198, 218, 0.3); border-radius: 4px; padding: 6px 10px; font-size: 12px; color: #ffffff; cursor: pointer; transition: all 0.2s ease;">5%</button>
+                                        <button type="button" class="down-payment-preset" data-value="10" style="background-color: rgba(38, 198, 218, 0.1); border: 1px solid rgba(38, 198, 218, 0.3); border-radius: 4px; padding: 6px 10px; font-size: 12px; color: #ffffff; cursor: pointer; transition: all 0.2s ease;">10%</button>
+                                        <button type="button" class="down-payment-preset" data-value="15" style="background-color: rgba(38, 198, 218, 0.1); border: 1px solid rgba(38, 198, 218, 0.3); border-radius: 4px; padding: 6px 10px; font-size: 12px; color: #ffffff; cursor: pointer; transition: all 0.2s ease;">15%</button>
+                                        <button type="button" class="down-payment-preset" data-value="20" style="background-color: rgba(38, 198, 218, 0.3); border: 1px solid rgba(38, 198, 218, 0.5); border-radius: 4px; padding: 6px 10px; font-size: 12px; color: #ffffff; cursor: pointer; transition: all 0.2s ease;">20% (No PMI)</button>
+                                        <button type="button" class="down-payment-preset" data-value="25" style="background-color: rgba(38, 198, 218, 0.1); border: 1px solid rgba(38, 198, 218, 0.3); border-radius: 4px; padding: 6px 10px; font-size: 12px; color: #ffffff; cursor: pointer; transition: all 0.2s ease;">25%</button>
+                                        <button type="button" class="down-payment-preset" data-value="30" style="background-color: rgba(38, 198, 218, 0.1); border: 1px solid rgba(38, 198, 218, 0.3); border-radius: 4px; padding: 6px 10px; font-size: 12px; color: #ffffff; cursor: pointer; transition: all 0.2s ease;">30%</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                        
+                        <!-- Hidden inputs to store the down payment values for form submission -->
+                        <input type="hidden" id="buyer-down" value="60000">
+                        <input type="hidden" id="buyer-down-percent" value="20">
                         
                         <!-- Loan Type -->
                         <div class="input-group">
