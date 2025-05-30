@@ -6,11 +6,18 @@
     <!-- API key should be set during deployment -->
     <meta name="nasdaq-api-key" content="J4DWQftvW2EC8noiYB8Y">
     <title data-lang="title">Ultimate Real Estate Calculator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="custom-select.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="budgetCalculator.js"></script>
+    <script src="languageDropdown.js"></script>
+    <script src="cryptoModal.js"></script>
+    <script src="aboutPopup.js"></script>
+    <script src="custom-select.js"></script>
+    <script src="custom-select-integration.js"></script>
 </head>
 <body id="page-top">
     <div class="language-selector">
@@ -20,18 +27,40 @@
         <span onclick="changeLanguage('ar')">العربية</span> |
         <span class="more-languages">
             More ▼
-            <div class="language-dropdown">
-                <span onclick="changeLanguage('ru')">Русский</span>
-                <span onclick="changeLanguage('pt')">Português</span>
-                <span onclick="changeLanguage('fr')">Français</span>
-                <span onclick="changeLanguage('it')">Italiano</span>
-                <span onclick="changeLanguage('de')">Deutsch</span>
-                <span onclick="changeLanguage('ja')">日本語</span>
-                <span onclick="changeLanguage('sv')">Svenska</span>
-                <span onclick="changeLanguage('ko')">한국어</span>
+            <div class="language-dropdown" style="display: none; position: absolute; background: rgba(30, 40, 60, 0.95); padding: 10px; border-radius: 8px; margin-top: 5px; z-index: 100; min-width: 180px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                <div class="dropdown-section">
+                    <span onclick="changeLanguage('ru')">Русский</span>
+                    <span onclick="changeLanguage('pt')">Português</span>
+                    <span onclick="changeLanguage('fr')">Français</span>
+                    <span onclick="changeLanguage('it')">Italiano</span>
+                    <span onclick="changeLanguage('de')">Deutsch</span>
+                    <span onclick="changeLanguage('ja')">日本語</span>
+                    <span onclick="changeLanguage('sv')">Svenska</span>
+                    <span onclick="changeLanguage('ko')">한국어</span>
+                </div>
+                <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 8px 0;"></div>
+                <div class="dropdown-section">
+                    <span onclick="document.getElementById('about-overlay').style.display = 'flex'; setTimeout(function() { document.getElementById('about-overlay').style.opacity = '1'; }, 10); closeAllLanguageDropdowns();">
+                        <i class="fas fa-info-circle" style="margin-right: 8px;"></i>About
+                    </span>
+                    <span onclick="window.open('https://baloo8721.github.io/Web3-Real-Estate-Calculator/', '_blank')">
+                        <i class="fas fa-calculator" style="margin-right: 8px;"></i>Calculator
+                    </span>
+                    <span onclick="window.open('https://www.spatial.io/', '_blank'); closeAllLanguageDropdowns();">
+                        <i class="fas fa-video" style="margin-right: 8px;"></i>Virtual Office
+                    </span>
+                    <span onclick="document.getElementById('chatbotButton').click(); closeAllLanguageDropdowns();">
+                        <i class="fas fa-robot" style="margin-right: 8px;"></i>Chat A.I.
+                    </span>
+                    <span onclick="document.getElementById('crypto-overlay').style.display = 'flex'; setTimeout(function() { document.getElementById('crypto-overlay').style.opacity = '1'; }, 10); closeAllLanguageDropdowns();">
+                        <i class="fab fa-bitcoin" style="margin-right: 8px;"></i>Learn Crypto
+                    </span>
+                    <span onclick="document.getElementById('blockchain-overlay').style.display = 'flex'; setTimeout(function() { document.getElementById('blockchain-overlay').style.opacity = '1'; }, 10); closeAllLanguageDropdowns();">
+                        <i class="fas fa-link" style="margin-right: 8px;"></i>Blockchain 101
+                    </span>
+                </div>
             </div>
         </span>
-
     </div>
     <div class="container">
         <h1 data-lang="title">Ultimate Real Estate Calculator</h1>
@@ -50,7 +79,7 @@
                         <h3 data-lang="buyer_calc">Buyer Calculator</h3>
                         
                         <!-- Budget/Price Section with Slider -->
-                        <div id="budget-form-step" class="form-step" style="margin-top: 20px; padding: 15px; border-radius: 8px; background-color: rgba(26, 32, 44, 0.5); position: relative;">
+                        <div id="budget-form-step" class="form-step" style="margin-top: 20px; padding: 15px; border-radius: 8px; position: relative;">
                             <div class="text-sm text-white mb-3">Budget/Price ($)</div>
                             <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap;">
                                 <!-- Left side: Slider and output -->
@@ -119,12 +148,12 @@
                         <input type="hidden" id="buyer-price" value="300000">
                         
                         <!-- Down Payment Section with Slider -->
-                        <div id="down-payment-form-step" class="form-step" style="margin-top: 20px; padding: 15px; border-radius: 8px; background-color: rgba(26, 32, 44, 0.5); position: relative;">
+                        <div id="down-payment-form-step" class="form-step" style="margin-top: 20px; padding: 15px; border-radius: 8px; position: relative;">
                             <div class="text-sm text-white mb-3">Down Payment</div>
                             <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap;">
                                 <!-- Left side: Slider and output -->
                                 <div style="flex: 1 1 300px; min-width: 250px;">
-                                    <input type="range" id="down-payment-slider" name="down-payment" min="0" max="90" step="0.1" value="20" class="slider" style="width: 100%; background: linear-gradient(90deg, #26c6da 0%, #64b5f6 50%, #ab47bc 100%); height: 6px; border-radius: 3px; appearance: none; outline: none;" oninput="updateDownPaymentVisualization(this.value)">
+                                    <input type="range" id="down-payment-slider" name="down-payment" min="0" max="90" step="0.1" value="3.5" class="slider" style="width: 100%; background: linear-gradient(90deg, #26c6da 0%, #64b5f6 50%, #ab47bc 100%); height: 6px; border-radius: 3px; appearance: none; outline: none;" oninput="updateDownPaymentVisualization(this.value)">
                                     
                                     <div style="display: flex; justify-content: space-between; margin-top: 8px;">
                                         <span style="font-size: 12px; color: #26c6da;">0%</span>
@@ -138,11 +167,11 @@
                                     
                                     <!-- Down Payment Presets -->
                                     <div style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">
-                                        <button type="button" class="down-payment-preset" data-value="3.5" style="background-color: rgba(38, 198, 218, 0.1); border: 1px solid rgba(38, 198, 218, 0.3); border-radius: 4px; padding: 6px 10px; font-size: 12px; color: #ffffff; cursor: pointer; transition: all 0.2s ease;">3.5% (FHA)</button>
+                                        <button type="button" class="down-payment-preset active" data-value="3.5" style="background-color: rgba(38, 198, 218, 0.3); border: 1px solid rgba(38, 198, 218, 0.5); border-radius: 4px; padding: 6px 10px; font-size: 12px; color: #ffffff; cursor: pointer; transition: all 0.2s ease;">3.5%</button>
                                         <button type="button" class="down-payment-preset" data-value="5" style="background-color: rgba(38, 198, 218, 0.1); border: 1px solid rgba(38, 198, 218, 0.3); border-radius: 4px; padding: 6px 10px; font-size: 12px; color: #ffffff; cursor: pointer; transition: all 0.2s ease;">5%</button>
                                         <button type="button" class="down-payment-preset" data-value="10" style="background-color: rgba(38, 198, 218, 0.1); border: 1px solid rgba(38, 198, 218, 0.3); border-radius: 4px; padding: 6px 10px; font-size: 12px; color: #ffffff; cursor: pointer; transition: all 0.2s ease;">10%</button>
                                         <button type="button" class="down-payment-preset" data-value="15" style="background-color: rgba(38, 198, 218, 0.1); border: 1px solid rgba(38, 198, 218, 0.3); border-radius: 4px; padding: 6px 10px; font-size: 12px; color: #ffffff; cursor: pointer; transition: all 0.2s ease;">15%</button>
-                                        <button type="button" class="down-payment-preset" data-value="20" style="background-color: rgba(38, 198, 218, 0.3); border: 1px solid rgba(38, 198, 218, 0.5); border-radius: 4px; padding: 6px 10px; font-size: 12px; color: #ffffff; cursor: pointer; transition: all 0.2s ease;">20% (No PMI)</button>
+                                        <button type="button" class="down-payment-preset" data-value="20" style="background-color: rgba(38, 198, 218, 0.1); border: 1px solid rgba(38, 198, 218, 0.3); border-radius: 4px; padding: 6px 10px; font-size: 12px; color: #ffffff; cursor: pointer; transition: all 0.2s ease;">20% (No PMI)</button>
                                         <button type="button" class="down-payment-preset" data-value="25" style="background-color: rgba(38, 198, 218, 0.1); border: 1px solid rgba(38, 198, 218, 0.3); border-radius: 4px; padding: 6px 10px; font-size: 12px; color: #ffffff; cursor: pointer; transition: all 0.2s ease;">25%</button>
                                         <button type="button" class="down-payment-preset" data-value="30" style="background-color: rgba(38, 198, 218, 0.1); border: 1px solid rgba(38, 198, 218, 0.3); border-radius: 4px; padding: 6px 10px; font-size: 12px; color: #ffffff; cursor: pointer; transition: all 0.2s ease;">30%</button>
                                     </div>
@@ -151,8 +180,8 @@
                         </div>
                         
                         <!-- Hidden inputs to store the down payment values for form submission -->
-                        <input type="hidden" id="buyer-down" value="60000">
-                        <input type="hidden" id="buyer-down-percent" value="20">
+                        <input type="hidden" id="buyer-down" value="10500">
+                        <input type="hidden" id="buyer-down-percent" value="3.5">
                         
                         <!-- Loan Type -->
                         <div class="input-group">
@@ -173,14 +202,11 @@
                                 <option value="20" data-lang="years_20">20 Years</option>
                                 <option value="15" data-lang="years_15">15 Years</option>
                                 <option value="10" data-lang="years_10">10 Years</option>
-                                <option value="custom" data-lang="custom_term">Custom</option>
+                                <option value="7" data-lang="years_7">7/1 ARM</option>
                             </select>
                             <label for="buyer-term-preset" data-lang="buyer_term_preset">Loan Term</label>
                         </div>
-                        <div class="input-group" id="buyer-term-custom-group" style="display: none;">
-                            <input type="number" id="buyer-term" placeholder="Loan Term (Years)" data-lang="buyer_term" aria-label="Custom Loan Term" min="1" step="1" value="30">
-                            <label for="buyer-term" data-lang="custom_term_label">Custom Term (Years)</label>
-                        </div>
+
                         
                         <!-- Interest Rate with common options -->
                         <div class="input-group">
@@ -428,6 +454,17 @@
                 <button type="button" class="save-btn" id="saveBtn" data-lang="save_results">Save Results</button>
                 <button type="button" class="share-btn" id="shareBtn" data-lang="share_results">Share Results</button>
                 <a href="https://baloo8721.github.io/WebRealtorFL-v2/" class="referral-link" data-lang="referral_link">Find an Agent</a>
+                
+                <div class="tool-button-wrapper" style="margin-top: 20px; width: 100%; height: auto; padding: 20px;">
+                    <a href="javascript:void(0)" onclick="document.getElementById('crypto-overlay').style.display = 'flex'; setTimeout(function() { document.getElementById('crypto-overlay').style.opacity = '1'; }, 10);" class="tool-link">
+                        <div class="tool-button">
+                            <div class="button-glow"></div>
+                            <i class="fab fa-bitcoin tool-icon" style="font-size: 34px; color: #f7931a; margin-top: 0; margin-bottom: 0;"></i>
+                        </div>
+                        <div class="tool-title">Learn Crypto</div>
+                        <div class="tool-description">3-minute guide to Bitcoin, Blockchain & Web3</div>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -445,5 +482,186 @@
     <script src="cryptoCalculator.js" type="module"></script>
     <script src="walletSearch.js" type="module"></script>
     <script src="script.js?v=20250429"></script>
+    <!-- Crypto Popup Overlay -->
+    <div id="crypto-overlay" class="about-overlay">
+        <div class="about-popup crypto-popup">
+            <button id="close-crypto" class="close-button">&times;</button>
+            <div class="popup-header">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#f7931a" stroke-width="1.5" style="width: 40px; height: 40px; margin-bottom: 15px;">
+                    <circle cx="12" cy="12" r="9" stroke="#f7931a" fill="rgba(247, 147, 26, 0.1)"></circle>
+                    <path d="M9.5 10h4.5a2 2 0 0 0 0-4h-2v2h-2.5" stroke="#f7931a" stroke-linecap="round"></path>
+                    <path d="M9.5 14h5a2 2 0 0 0 0-4h-5" stroke="#f7931a" stroke-linecap="round"></path>
+                    <line x1="12" y1="6" x2="12" y2="18" stroke="#f7931a" stroke-linecap="round"></line>
+                </svg>
+                <h2>Understanding Cryptocurrency & Blockchain</h2>
+            </div>
+            <p class="read-time"><i class="far fa-clock"></i> 3 minute read</p>
+            <div class="about-content">
+                <div class="content-section intro-section">
+                    <h3><span class="section-icon">💰</span> What is Cryptocurrency?</h3>
+                    <p>Cryptocurrency is digital money that uses encryption to secure transactions and control the creation of new units. Unlike traditional currency, it operates independently of central banks and governments.</p>
+                    
+                    <p>The most well-known cryptocurrency is Bitcoin (₿), created in 2009 by an anonymous person or group using the pseudonym Satoshi Nakamoto. Today, thousands of cryptocurrencies exist, each with different features and purposes.</p>
+                </div>
+                
+                <div class="content-section">
+                    <h3><span class="section-icon">🔗</span> How Blockchain Works</h3>
+                    <p>Blockchain is the technology that powers cryptocurrencies. Think of it as a digital ledger that records all transactions across a network of computers. Once information is recorded, it cannot be altered without changing all subsequent blocks, making it highly secure.</p>
+                    
+                    <p>Key features of blockchain include:</p>
+                    <ul>
+                        <li><strong>Decentralization:</strong> No single entity controls the network</li>
+                        <li><strong>Transparency:</strong> All transactions are visible to network participants</li>
+                        <li><strong>Immutability:</strong> Once recorded, data cannot be altered</li>
+                        <li><strong>Security:</strong> Cryptographic techniques protect the data</li>
+                    </ul>
+                </div>
+                
+                <div class="content-section" style="background: linear-gradient(135deg, rgba(247, 147, 26, 0.05), rgba(130, 71, 229, 0.05));">
+                    <h3><span class="section-icon">🌐</span> Understanding Web3</h3>
+                    <p>Web3 represents the next evolution of the internet, built on decentralized technologies like blockchain. Unlike Web2 (the current internet dominated by centralized platforms), Web3 aims to give users control over their data, digital identity, and online assets.</p>
+                    
+                    <p>Key components of Web3 include:</p>
+                    <ul>
+                        <li><strong>Cryptocurrency:</strong> Digital money for the decentralized web</li>
+                        <li><strong>Smart Contracts:</strong> Self-executing agreements with rules written in code</li>
+                        <li><strong>DApps:</strong> Decentralized applications that run on blockchain networks</li>
+                        <li><strong>DAOs:</strong> Decentralized Autonomous Organizations governed by community members</li>
+                        <li><strong>NFTs:</strong> Non-Fungible Tokens representing unique digital assets</li>
+                    </ul>
+                </div>
+                
+                <div class="content-section">
+                    <h3><span class="section-icon">🏠</span> Crypto & Real Estate</h3>
+                    <p>The intersection of cryptocurrency and real estate is creating new opportunities for buyers, sellers, and investors:</p>
+                    
+                    <ul>
+                        <li><strong>Property Purchases:</strong> Buying real estate with Bitcoin and other cryptocurrencies</li>
+                        <li><strong>Tokenization:</strong> Fractional ownership of properties through blockchain tokens</li>
+                        <li><strong>Smart Contracts:</strong> Automating transactions and reducing the need for intermediaries</li>
+                        <li><strong>International Transactions:</strong> Facilitating cross-border real estate deals without currency conversion issues</li>
+                    </ul>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
+                    <div style="display: flex; gap: 5px;">
+                        
+                        <!-- Calculator Button -->
+                        <a href="https://baloo8721.github.io/Web3-Real-Estate-Calculator/" target="_blank" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; width: 100px;">
+                            <div style="width: 40px; height: 40px; background: rgba(38, 198, 218, 0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-bottom: 5px;">
+                                <i class="fas fa-calculator" style="color: #26c6da; font-size: 18px;"></i>
+                            </div>
+                            <span style="font-size: 12px; color: #a0aec0; text-align: center;">Crypto Calculator</span>
+                        </a>
+                        
+                        <!-- Learn More Button -->
+                        <a href="https://bitcoin.org/" target="_blank" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; width: 100px;">
+                            <div style="width: 40px; height: 40px; background: rgba(247, 147, 26, 0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-bottom: 5px;">
+                                <i class="fab fa-bitcoin" style="color: #f7931a; font-size: 18px;"></i>
+                            </div>
+                            <span style="font-size: 12px; color: #a0aec0; text-align: center;">Learn More</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- About Popup Overlay -->
+    <div id="about-overlay" class="about-overlay">
+        <div class="about-popup">
+            <button id="close-about" class="close-button">&times;</button>
+            <div class="popup-header" style="position: relative; z-index: 1;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#26c6da" stroke-width="1.5" style="width: 40px; height: 40px; margin-bottom: 15px;">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="#26c6da" fill="rgba(38, 198, 218, 0.1)"></path>
+                    <path d="M2 17l10 5 10-5" stroke="#26c6da" stroke-linecap="round"></path>
+                    <path d="M2 12l10 5 10-5" stroke="#26c6da" stroke-linecap="round"></path>
+                </svg>
+                <h2>About Web3RealtorFL</h2>
+            </div>
+            <div class="about-content">
+                <div class="content-section intro-section">
+                    <p>Web3RealtorFL connects you with expert real estate agents specializing in your unique needs across Florida. Our platform leverages both human expertise and cutting-edge technology to find your perfect agent match.</p>
+                </div>
+                
+                <div class="content-section">
+                    <h3><span class="section-icon">🚀</span> Our Mission</h3>
+                    <p>To revolutionize real estate agent matching by combining professional human expertise with advanced Web3 technology, ensuring every client finds their ideal agent partner.</p>
+                </div>
+                
+                <div class="content-section">
+                    <h3><span class="section-icon">🔄</span> How It Works</h3>
+                    <div class="steps-container">
+                        <div class="step-item">
+                            <div class="step-number">1</div>
+                            <p>Fill out our simple form with your real estate needs</p>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">2</div>
+                            <p>Our system matches you with specialized agents</p>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">3</div>
+                            <p>Connect with your matched agents within 24 hours</p>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">4</div>
+                            <p>Choose your preferred agent and begin your real estate journey</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="content-section">
+                    <h3><span class="section-icon">💎</span> What Makes Us Different</h3>
+                    <div class="features-grid">
+                        <div class="feature-item">
+                            <div class="feature-icon">🔍</div>
+                            <div class="feature-title">Specialized Matching</div>
+                            <p>We connect you with agents who specialize in your specific needs, not just any available agent</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">₿</div>
+                            <div class="feature-title">Crypto Integration</div>
+                            <p>First platform to fully integrate cryptocurrency options for real estate transactions</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">🤖</div>
+                            <div class="feature-title">AI-Powered</div>
+                            <p>Advanced algorithms ensure the most compatible agent matches</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">🔒</div>
+                            <div class="feature-title">Privacy First</div>
+                            <p>Your data is secure and never sold to third parties</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
+                    <div style="display: flex; gap: 5px;">
+                        
+                        <!-- Calculator Button -->
+                        <a href="https://baloo8721.github.io/Web3-Real-Estate-Calculator/" target="_blank" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; width: 100px;">
+                            <div style="width: 40px; height: 40px; background: rgba(38, 198, 218, 0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-bottom: 5px;">
+                                <i class="fas fa-calculator" style="color: #26c6da; font-size: 18px;"></i>
+                            </div>
+                            <span style="font-size: 12px; color: #a0aec0; text-align: center;">Mortgage Calculator</span>
+                        </a>
+                        
+                        <!-- Chat Button -->
+                        <a href="javascript:void(0)" onclick="document.getElementById('about-overlay').style.display = 'none'; document.getElementById('about-overlay').style.opacity = '0'; document.getElementById('chatbotButton').click();" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; width: 100px;">
+                            <div style="width: 40px; height: 40px; background: rgba(38, 198, 218, 0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-bottom: 5px;">
+                                <i class="fas fa-robot" style="color: #26c6da; font-size: 18px;"></i>
+                            </div>
+                            <span style="font-size: 12px; color: #a0aec0; text-align: center;">Chat with AI</span>
+                        </a>
+                    </div>
+                    
+                    <div>
+                        <button onclick="document.getElementById('about-overlay').style.display = 'none'; document.getElementById('about-overlay').style.opacity = '0';" style="background: rgba(38, 198, 218, 0.2); border: 1px solid rgba(38, 198, 218, 0.4); color: #26c6da; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9em; transition: all 0.2s ease;">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
