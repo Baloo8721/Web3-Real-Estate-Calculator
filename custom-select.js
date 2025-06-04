@@ -314,12 +314,14 @@ class CustomSelect {
 
 // Initialize custom selects when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize for loan type and loan term selects
+  // Initialize for all custom selects
   const loanTypeSelect = document.getElementById('buyer-loan-type');
   const loanTermSelect = document.getElementById('buyer-term-preset');
+  const creditScoreSelect = document.getElementById('credit-score');
   
   if (loanTypeSelect) new CustomSelect(loanTypeSelect);
   if (loanTermSelect) new CustomSelect(loanTermSelect);
+  if (creditScoreSelect) new CustomSelect(creditScoreSelect);
   
   // Add overlay element to the body if it doesn't exist
   if (!document.getElementById('selectOverlay')) {
