@@ -14,8 +14,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="budgetCalculator.js"></script>
     <script src="languageDropdown.js"></script>
-    <script src="cryptoModal.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Initialize escrow fields on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const escrowCheckbox = document.getElementById('buyer-escrow');
+            const escrowFields = document.getElementById('escrow-fields');
+            if (escrowCheckbox && escrowFields) {
+                escrowFields.classList.toggle('active', escrowCheckbox.checked);
+            }
+        });
+    </script>
     <script src="aboutPopup.js"></script>
+    <script src="cryptoModal.js"></script>
     <script src="custom-select.js"></script>
     <script src="custom-select-integration.js"></script>
 </head>
@@ -151,18 +162,15 @@
                         <div id="down-payment-form-step" class="form-step" style="margin-top: 20px; padding: 15px; border-radius: 8px; position: relative;">
                             <div class="text-sm text-white mb-3">Down Payment</div>
                             <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap;">
-                                <!-- Left side: Slider and output -->
+                                <!-- Down payment display and input -->
                                 <div style="flex: 1 1 300px; min-width: 250px;">
-                                    <input type="range" id="down-payment-slider" name="down-payment" min="0" max="90" step="0.1" value="3.5" class="slider" style="width: 100%; background: linear-gradient(90deg, #26c6da 0%, #64b5f6 50%, #ab47bc 100%); height: 6px; border-radius: 3px; appearance: none; outline: none;" oninput="updateDownPaymentVisualization(this.value)">
+                                    <!-- Hidden slider that still works with the JavaScript -->
+                                    <input type="range" id="down-payment-slider" name="down-payment" min="0" max="90" step="0.1" value="3.5" class="slider" style="display: none;" oninput="updateDownPaymentVisualization(this.value)">
                                     
-                                    <div style="display: flex; justify-content: space-between; margin-top: 8px;">
-                                        <span style="font-size: 12px; color: #26c6da;">0%</span>
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <output id="down-payment-output" for="down-payment-slider" style="font-size: 18px; font-weight: 600; color: #ffffff; text-shadow: 0 0 10px rgba(38, 198, 218, 0.5); cursor: pointer;" onclick="enableDirectDownPaymentInput()">20%</output>
-                                            <input type="text" id="down-payment-direct-input" style="display: none; font-size: 18px; font-weight: 600; color: #ffffff; background: transparent; border: none; border-bottom: 1px solid #26c6da; width: 80px; text-align: center; outline: none;" onblur="applyDirectDownPaymentInput()" onkeydown="handleDownPaymentInputKeydown(event)">
-                                            <span style="font-size: 18px; color: #64b5f6; font-weight: 600;">$<span id="down-payment-amount">60,000</span></span>
-                                        </div>
-                                        <span style="font-size: 12px; color: #ab47bc;">90%</span>
+                                    <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin: 8px 0 15px 0;">
+                                        <output id="down-payment-output" for="down-payment-slider" style="font-size: 18px; font-weight: 600; color: #ffffff; text-shadow: 0 0 10px rgba(38, 198, 218, 0.5); cursor: pointer;" onclick="enableDirectDownPaymentInput()">3.5%</output>
+                                        <input type="text" id="down-payment-direct-input" style="display: none; font-size: 18px; font-weight: 600; color: #ffffff; background: transparent; border: none; border-bottom: 1px solid #26c6da; width: 80px; text-align: center; outline: none;" onblur="applyDirectDownPaymentInput()" onkeydown="handleDownPaymentInputKeydown(event)">
+                                        <span style="font-size: 18px; color: #26c6da; font-weight: 600;">$<span id="down-payment-amount">10,500</span></span>
                                     </div>
                                     
                                     <!-- Down Payment Presets -->
@@ -252,38 +260,25 @@
                         </div>
                         
                         <!-- Escrow Account Option -->
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="buyer-escrow">
-                            <label for="buyer-escrow" data-lang="buyer_escrow">Include Taxes & Insurance in Payment (Escrow), HOA/CDD Fees</label>
-                        </div>
-                        
-                        <!-- Escrow Fields Container - Initially Hidden -->
-                        <div id="escrow-fields" class="escrow-fields">
-
-                            <!-- Property Taxes -->
-                            <div class="input-group">
-                                <input type="number" id="buyer-property-tax" placeholder="Annual Property Taxes ($)" data-lang="buyer_property_tax" aria-label="Property Taxes" min="0" step="100">
-                                <label for="buyer-property-tax" data-lang="buyer_property_tax">Property Taxes ($/year)</label>
-                                <a href="https://smartasset.com/taxes/florida-property-tax-calculator#florida" target="_blank" class="field-info" data-lang="default_property_tax">Default: 0.82% of home value (national average)</a>
+                        <div class="escrow-container">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="buyer-escrow">
+                                <label for="buyer-escrow" data-lang="buyer_escrow">Include Taxes & Insurance in Payment (Escrow), HOA/CDD Fees</label>
                             </div>
                             
-                            <!-- Homeowners Insurance -->
-                            <div class="input-group">
-                                <input type="number" id="buyer-insurance" placeholder="Annual Insurance ($)" data-lang="buyer_insurance" aria-label="Homeowners Insurance" min="0" step="100">
-                                <label for="buyer-insurance" data-lang="buyer_insurance">Homeowners Insurance ($/year)</label>
-                                <a href="https://www.nerdwallet.com/insurance/homeowners/florida-home-insurance" target="_blank" class="field-info" data-lang="default_insurance">Default: Based on $2,325 per year for $300k home value in FL</a>
-                            </div>
-                            
-                            <!-- HOA Fees -->
-                            <div class="input-group">
-                                <input type="number" id="buyer-hoa" placeholder="Monthly HOA Fees ($)" data-lang="buyer_hoa" aria-label="HOA Fees" min="0" step="10">
-                                <label for="buyer-hoa" data-lang="buyer_hoa">HOA Fees ($/month)</label>
-                            </div>
-                            
-                            <!-- CDD Fees -->
-                            <div class="input-group">
-                                <input type="number" id="buyer-cdd" placeholder="Monthly CDD Fees ($)" data-lang="buyer_cdd" aria-label="CDD Fees" min="0" step="10">
-                                <label for="buyer-cdd" data-lang="buyer_cdd">CDD Fees ($/month)</label>
+                            <!-- Escrow Fields Container - Initially Hidden -->
+                            <div id="escrow-fields" class="escrow-fields">
+                                <!-- HOA Fees -->
+                                <div class="input-group">
+                                    <input type="number" id="buyer-hoa" placeholder="Monthly HOA Fees ($)" data-lang="buyer_hoa" aria-label="HOA Fees" min="0" step="10">
+                                    <label for="buyer-hoa" data-lang="buyer_hoa">HOA Fees ($/month)</label>
+                                </div>
+                                
+                                <!-- CDD Fees -->
+                                <div class="input-group">
+                                    <input type="number" id="buyer-cdd" placeholder="Monthly CDD Fees ($)" data-lang="buyer_cdd" aria-label="CDD Fees" min="0" step="10">
+                                    <label for="buyer-cdd" data-lang="buyer_cdd">CDD Fees ($/month)</label>
+                                </div>
                             </div>
                         </div>
                         
@@ -310,10 +305,10 @@
                             <!-- Credit Score -->
                             <div class="input-group">
                                 <select id="credit-score" aria-label="Credit Score" data-lang="credit_score">
-                                    <option value="below620">Below 620</option>
-                                    <option value="620-679">620-679</option>
-                                    <option value="680-739">680-739</option>
-                                    <option value="740plus" selected>740+</option>
+                                    <option value="below620" data-icon="📉">Below 620</option>
+                                    <option value="620-679" data-icon="📊">620-679</option>
+                                    <option value="680-739" data-icon="📈">680-739</option>
+                                    <option value="740plus" selected data-icon="💯">740+</option>
                                 </select>
                                 <label for="credit-score" data-lang="credit_score">Credit Score</label>
                             </div>

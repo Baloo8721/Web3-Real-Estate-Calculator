@@ -940,6 +940,59 @@ p.subtitle {
     box-shadow: 0 0 8px rgba(0, 221, 235, 0.3);
 }
 
+/* Style for form inputs to match custom select buttons */
+#buyer-rate-preset,
+#buyer-pmi-rate,
+#buyer-closing-costs,
+#buyer-extra-payment {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 0.95em;
+    color: #e2e8f0;
+    background: rgba(45, 55, 72, 0.7);
+    border: 1px solid #4a5568;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    height: 48px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Hover state for all inputs */
+#buyer-rate-preset:hover,
+#buyer-pmi-rate:hover,
+#buyer-closing-costs:hover,
+#buyer-extra-payment:hover {
+    background: rgba(56, 65, 85, 0.8);
+    border-color: #26c6da;
+}
+
+/* Focus state for all inputs */
+#buyer-rate-preset:focus,
+#buyer-pmi-rate:focus,
+#buyer-closing-costs:focus,
+#buyer-extra-payment:focus {
+    background: rgba(56, 65, 85, 0.8);
+    border-color: #26c6da;
+    box-shadow: 0 0 0 1px #26c6da;
+    outline: none;
+}
+
+/* Style for the dropdown arrow */
+#buyer-rate-preset {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e2e8f0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+    padding-right: 36px;
+}
+
+/* Ensure consistent spacing */
+.input-group {
+    margin-bottom: 15px;
+}
+
 /* Center floating labels for specific fields */
 #buyer-closing-costs + label,
 #buyer-property-tax + label,
@@ -988,30 +1041,36 @@ p.subtitle {
     transition: all 0.3s ease;
 }
 
-/* Fix spacing between escrow and affordability checkboxes */
-#buyer-escrow:not(:checked) + label + .escrow-fields + .checkbox-group {
-    margin-top: -12px;
+/* Escrow Container */
+.escrow-container {
+    margin: 15px 0;
 }
 
-/* Escrow Fields Container */
+/* Escrow Fields Container - Hidden by default */
 .escrow-fields {
+    display: none;
     background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(0, 221, 235, 0.3);
     border-radius: 8px;
-    border: 1px dashed rgba(0, 221, 235, 0.3);
-    overflow: hidden;
-    max-height: 0;
-    opacity: 0;
-    padding: 0;
-    margin: 0;
-    transition: all 0.4s ease-in-out;
+    padding: 16px;
+    margin: 10px 0 20px 0;
+    transition: all 0.3s ease;
 }
 
-.escrow-fields.active {
-    max-height: 800px;
-    opacity: 1;
-    padding: 16px;
-    margin-bottom: 20px;
-    overflow-y: auto;
+/* Show escrow fields when checkbox is checked */
+#buyer-escrow:checked ~ .escrow-fields {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Style for the escrow checkbox */
+.escrow-container .checkbox-group {
+    margin-bottom: 0;
 }
 
 
@@ -1293,6 +1352,20 @@ p.subtitle {
     background: rgba(0, 221, 235, 0.05);
     border-radius: 8px;
     border: 1px dashed rgba(0, 221, 235, 0.3);
+}
+
+/* Affordability Fields */
+#affordability-fields {
+    display: none; /* Hidden by default */
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(0, 221, 235, 0.2);
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 10px;
+}
+
+#affordability-fields.active {
+    display: block;
 }
 
 /* Affordability Results Styling - Condensed */

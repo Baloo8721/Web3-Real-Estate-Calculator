@@ -2119,8 +2119,67 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// Function to initialize escrow toggle
+function initializeEscrowToggle() {
+    const escrowCheckbox = document.getElementById('buyer-escrow');
+    const escrowFields = document.getElementById('escrow-fields');
+    
+    if (!escrowCheckbox || !escrowFields) {
+        // If elements aren't found, try again after a short delay
+        setTimeout(initializeEscrowToggle, 100);
+        return;
+    }
+    
+    function toggleEscrowFields() {
+        if (escrowCheckbox.checked) {
+            escrowFields.classList.add('active');
+        } else {
+            escrowFields.classList.remove('active');
+        }
+    }
+    
+    // Remove any existing event listeners to prevent duplicates
+    const newCheckbox = escrowCheckbox.cloneNode(true);
+    escrowCheckbox.parentNode.replaceChild(newCheckbox, escrowCheckbox);
+    
+    // Add new event listener
+    newCheckbox.addEventListener('change', toggleEscrowFields);
+    
+    // Set initial state
+    toggleEscrowFields();
+}
+
+// Function to initialize escrow toggle functionality
+function initializeEscrowToggle() {
+    const escrowCheckbox = document.getElementById('buyer-escrow');
+    const escrowFields = document.getElementById('escrow-fields');
+    
+    if (!escrowCheckbox || !escrowFields) return;
+    
+    // Function to toggle escrow fields
+    function toggleEscrowFields() {
+        if (escrowCheckbox.checked) {
+            escrowFields.style.display = 'block';
+            escrowFields.style.opacity = '1';
+        } else {
+            escrowFields.style.display = 'none';
+            escrowFields.style.opacity = '0';
+        }
+    }
+    
+    // Add event listener
+    escrowCheckbox.addEventListener('change', toggleEscrowFields);
+    
+    // Set initial state
+    toggleEscrowFields();
+}
+
 // Initialize all the enhanced buyer calculator features
 function initializeBuyerCalculator() {
+    // Initialize escrow toggle
+    initializeEscrowToggle();
+    // Initialize escrow toggle
+    initializeEscrowToggle();
     // Price Range dropdown - now combined with input
     const priceRangeSelect = document.getElementById('buyer-price-range');
     const priceInput = document.getElementById('buyer-price');
@@ -2248,6 +2307,13 @@ function initializeBuyerCalculator() {
         if (downPercentSelect.value !== 'custom' && price > 0) {
             const percent = parseFloat(downPercentSelect.value);
             downInput.value = Math.round(price * (percent / 100));
+            
+            // Trigger a change event to update the monthly payment
+            const event = new Event('change');
+            downInput.dispatchEvent(event);
+            
+            // Also update PMI rate since down payment affects it
+            updatePMIRate();
         }
     }
     
@@ -2267,6 +2333,15 @@ function initializeBuyerCalculator() {
     const termPresetSelect = document.getElementById('buyer-term-preset');
     const termCustomGroup = document.getElementById('buyer-term-custom-group');
     const termInput = document.getElementById('buyer-term');
+    
+    // Add change event listener to term input to trigger recalculation
+    termInput.addEventListener('change', function() {
+        // Trigger a click on the calculate button to update the monthly payment
+        const calculateButton = document.getElementById('buyer-calculate');
+        if (calculateButton) {
+            calculateButton.click();
+        }
+    });
     
     termPresetSelect.addEventListener('change', function() {
         if (this.value === 'custom') {
@@ -2298,6 +2373,21 @@ function initializeBuyerCalculator() {
                     console.error('Error updating interest rate:', error);
                 });
             }
+        }
+    });
+    
+    // Get loan type select element
+    const loanTypeSelect = document.getElementById('buyer-loan-type');
+    
+    // Add change event listener to loan type select
+    loanTypeSelect.addEventListener('change', function() {
+        // Update PMI rate since loan type affects it
+        updatePMIRate();
+        
+        // Trigger a click on the calculate button to update the monthly payment
+        const calculateButton = document.getElementById('buyer-calculate');
+        if (calculateButton) {
+            calculateButton.click();
         }
     });
     
@@ -2491,9 +2581,7 @@ function initializeBuyerCalculator() {
         updateRateForTerm(30);
     }
     
-    // Loan type changes
-    const loanTypeSelect = document.getElementById('buyer-loan-type');
-    
+    // Loan type changes - using the loanTypeSelect declared earlier
     loanTypeSelect.addEventListener('change', function() {
         // Get the PMI input element
         const pmiRateInput = document.getElementById('buyer-pmi-rate');
@@ -2523,24 +2611,7 @@ function initializeBuyerCalculator() {
         }
     });
     
-    // Escrow checkbox toggle functionality
-    const escrowCheckbox = document.getElementById('buyer-escrow');
-    const escrowFields = document.getElementById('escrow-fields');
-    
-    // Function to toggle escrow fields visibility
-    function toggleEscrowFields() {
-        if (escrowCheckbox.checked) {
-            escrowFields.classList.add('active');
-        } else {
-            escrowFields.classList.remove('active');
-        }
-    }
-    
-    // Add event listener to checkbox
-    escrowCheckbox.addEventListener('change', toggleEscrowFields);
-    
-    // Set initial state based on checkbox
-    toggleEscrowFields();
+    // Escrow toggle is now handled by initializeEscrowToggle()
     
     // Affordability Calculator toggle functionality
     const affordabilityToggle = document.getElementById('affordability-toggle');
@@ -2556,10 +2627,11 @@ function initializeBuyerCalculator() {
     }
     
     // Add event listener to checkbox
-    affordabilityToggle.addEventListener('change', toggleAffordabilityFields);
-    
-    // Set initial state based on checkbox
-    toggleAffordabilityFields();
+    if (affordabilityToggle && affordabilityFields) {
+        affordabilityToggle.addEventListener('change', toggleAffordabilityFields);
+        // Set initial state based on checkbox
+        toggleAffordabilityFields();
+    }
     
     // We don't need a separate function for the loan summary, we'll include it directly in the calculation results
     
